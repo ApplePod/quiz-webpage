@@ -14,12 +14,12 @@ select game_ref.id, valueset.team_code, valueset.name, valueset.coins, valueset.
 from game_ref,
 (
   values
-    ('A', 'Group A', 0, 'teamA123'),
-    ('B', 'Group B', 0, 'teamB123'),
-    ('C', 'Group C', 0, 'teamC123'),
-    ('D', 'Group D', 0, 'teamD123'),
-    ('E', 'Group E', 0, 'teamE123'),
-    ('F', 'Group F', 0, 'teamF123')
+    ('A', 'Group A', 0, '1'),
+    ('B', 'Group B', 0, '1'),
+    ('C', 'Group C', 0, '1'),
+    ('D', 'Group D', 0, '1'),
+    ('E', 'Group E', 0, '1'),
+    ('F', 'Group F', 0, '1')
 ) as valueset(team_code, name, coins, password)
 on conflict (game_id, team_code) do update set
   name = excluded.name,
@@ -43,8 +43,8 @@ insert into public.questions (
 select
   game_ref.id,
   valueset.question_no,
-  valueset.question_text,
-  valueset.correct_answer,
+  '1',
+  '1',
   valueset.hint,
   valueset.hint_cost,
   valueset.coin_reward_first,
