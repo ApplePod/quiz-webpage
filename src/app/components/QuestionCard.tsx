@@ -99,7 +99,9 @@ export function QuestionCard({
   onClick,
 }: QuestionCardProps) {
   const isLocked = solveCount >= 3;
-  const isSolved = solveCount > 0;
+  // When fully solved (locked), hide the solved red border overlay.
+  // Visual progression stays green -> orange only.
+  const isSolved = solveCount > 0 && !isLocked;
   const solvedBorder = solvedBorderMap[questionNumber];
 
   // Determine card state
