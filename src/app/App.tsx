@@ -154,6 +154,9 @@ export default function App() {
     } else {
       try {
         await submitAnswer(teamId, selectedQuestionId, answer);
+        // Pull latest state immediately so the user sees the update
+        // even if Realtime delivery is delayed.
+        await syncFromSnapshot();
       } catch (submitError) {
         const message =
           submitError instanceof Error ? submitError.message : 'Failed to submit answer.';
@@ -183,6 +186,7 @@ export default function App() {
 
     try {
       await requestHint(teamId, questionId);
+      await syncFromSnapshot();
     } catch (hintError) {
       const message =
         hintError instanceof Error ? hintError.message : 'Failed to request hint.';
