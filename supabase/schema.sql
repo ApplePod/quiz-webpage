@@ -331,12 +331,49 @@ $$;
 
 grant execute on function public.request_hint(text, text, integer) to anon, authenticated;
 
-drop publication if exists supabase_realtime_quiz;
+-- Supabase Realtime listens on the built-in `supabase_realtime` publication.
+-- Ensure our tables are included (idempotent).
+do $$
+begin
+  begin
+    alter publication supabase_realtime add table public.games;
+  exception
+    when duplicate_object then null;
+    when undefined_object then null;
+  end;
 
-create publication supabase_realtime_quiz for table
-  public.games,
-  public.teams,
-  public.questions,
-  public.question_status,
-  public.question_solves,
-  public.submissions;
+  begin
+    alter publication supabase_realtime add table public.teams;
+  exception
+    when duplicate_object then null;
+    when undefined_object then null;
+  end;
+
+  begin
+    alter publication supabase_realtime add table public.questions;
+  exception
+    when duplicate_object then null;
+    when undefined_object then null;
+  end;
+
+  begin
+    alter publication supabase_realtime add table public.question_status;
+  exception
+    when duplicate_object then null;
+    when undefined_object then null;
+  end;
+
+  begin
+    alter publication supabase_realtime add table public.question_solves;
+  exception
+    when duplicate_object then null;
+    when undefined_object then null;
+  end;
+
+  begin
+    alter publication supabase_realtime add table public.submissions;
+  exception
+    when duplicate_object then null;
+    when undefined_object then null;
+  end;
+end $$;
