@@ -9,6 +9,9 @@ import { Team, Question, QuestionStatus, ViewType } from './types';
 import { initialTeams, initialQuestions } from './data/initialData';
 import { isSupabaseConfigured } from '../lib/supabase';
 import {
+  adminMarkAllSolved,
+  adminResetGame,
+  adminSetTestMode,
   fetchGameSnapshot,
   requestHint,
   resetAllQuestions,
@@ -381,6 +384,61 @@ export default function App() {
     }
   };
 
+  const handleAdminResetGame = async () => {
+    try {
+      if (!isSupabaseConfigured) {
+        setQuestionStatuses([]);
+        setTeams(initialTeams);
+        setQuestions(initialQuestions);
+        setTimeRemaining(7200);
+        setTimerRunning(false);
+        return;
+      }
+      await adminResetGame();
+      await syncFromSnapshot();
+    } catch (actionError) {
+      handleActionError(actionError, 'Failed to reset the game.');
+    }
+  };
+
+  const handleAdminSetTestMode = async () => {
+    try {
+      if (!isSupabaseConfigured) {
+        setTeams((previous) => previous.map((t) => ({ ...t, password: '1' })));
+        setQuestions((previous) =>
+          previous.map((q) => ({ ...q, questionText: '1', correctAnswer: '1' })),
+        );
+        return;
+      }
+      await adminSetTestMode();
+      await syncFromSnapshot();
+    } catch (actionError) {
+      handleActionError(actionError, 'Failed to enable test mode.');
+    }
+  };
+
+  const handleAdminMarkAllSolved = async () => {
+    try {
+      if (!isSupabaseConfigured) {
+        const topTeams = teams.slice().sort((a, b) => a.id.localeCompare(b.id)).slice(0, 3);
+        const solvedByTeams = topTeams.map((t) => t.id);
+        setQuestionStatuses(
+          questions.map((q) => ({
+            questionId: q.id,
+            solvedByTeams,
+            solveCount: 3,
+            locked: true,
+          })),
+        );
+        return;
+      }
+      await adminMarkAllSolved();
+      await syncFromSnapshot();
+    } catch (actionError) {
+      handleActionError(actionError, 'Failed to mark all questions as solved.');
+    }
+  };
+
   const currentQuestion = selectedQuestionId
     ? questions.find((q) => q.id === selectedQuestionId)
     : null;
@@ -471,20 +529,25 @@ export default function App() {
 
       {showAdminPanel && (
         <AdminPanel
-          teams={teams}
-          questions={questions}
-          questionStatuses={questionStatuses}
-          timeRemaining={timeRemaining}
-          timerRunning={timerRunning}
-          onClose={handleAdminPanelClose}
-          onUpdateTeam={handleUpdateTeam}
-          onUpdateQuestion={handleUpdateQuestion}
-          onResetQuestion={handleResetQuestion}
-          onResetAllQuestions={handleResetAllQuestions}
-          onResetAllTeams={handleResetAllTeams}
-          onResetTimer={handleResetTimer}
-          onToggleTimer={handleToggleTimer}
-          onManualLockQuestion={handleManualLockQuestion}
+          {...({
+            teams,
+            questions,
+            questionStatuses,
+            timeRemaining,
+            timerRunning,
+            onClose: handleAdminPanelClose,
+            onUpdateTeam: handleUpdateTeam,
+            onUpdateQuestion: handleUpdateQuestion,
+            onResetQuestion: handleResetQuestion,
+            onResetAllQuestions: handleResetAllQuestions,
+            onResetAllTeams: handleResetAllTeams,
+            onResetTimer: handleResetTimer,
+            onToggleTimer: handleToggleTimer,
+            onManualLockQuestion: handleManualLockQuestion,
+            onAdminResetGame: handleAdminResetGame,
+            onAdminSetTestMode: handleAdminSetTestMode,
+            onAdminMarkAllSolved: handleAdminMarkAllSolved,
+          } as any)}
         />
       )}
     </div>

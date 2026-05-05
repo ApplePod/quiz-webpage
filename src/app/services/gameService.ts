@@ -260,6 +260,33 @@ export async function updateTimer(timerSeconds: number, timerRunning: boolean) {
   }
 }
 
+export async function adminResetGame() {
+  ensureConfigured()
+  const supabase = requireSupabase()
+  const { error } = await supabase.rpc('admin_reset_game', {
+    p_game_code: GAME_CODE,
+  })
+  if (error) throw error
+}
+
+export async function adminSetTestMode() {
+  ensureConfigured()
+  const supabase = requireSupabase()
+  const { error } = await supabase.rpc('admin_set_test_mode', {
+    p_game_code: GAME_CODE,
+  })
+  if (error) throw error
+}
+
+export async function adminMarkAllSolved() {
+  ensureConfigured()
+  const supabase = requireSupabase()
+  const { error } = await supabase.rpc('admin_mark_all_solved', {
+    p_game_code: GAME_CODE,
+  })
+  if (error) throw error
+}
+
 export async function setQuestionLock(questionId: number, locked: boolean) {
   ensureConfigured()
   const supabase = requireSupabase()

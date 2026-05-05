@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { X, FileText, Users, Settings, RotateCcw, Play, Pause, StopCircle, Unlock, Lock, Save, Coins } from 'lucide-react';
+import { X, FileText, Users, Settings, RotateCcw, Play, Pause, StopCircle, Unlock, Lock, Save, Coins, FlaskConical } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Team, Question, QuestionStatus } from '../types';
 import { motion } from 'motion/react';
 
-interface AdminPanelProps {
+export type AdminPanelProps = {
   teams: Team[];
   questions: Question[];
   questionStatuses: QuestionStatus[];
@@ -21,7 +21,10 @@ interface AdminPanelProps {
   onResetTimer: () => void;
   onToggleTimer: () => void;
   onManualLockQuestion: (questionId: number, locked: boolean) => void;
-}
+  onAdminResetGame: () => void;
+  onAdminSetTestMode: () => void;
+  onAdminMarkAllSolved: () => void;
+};
 
 export function AdminPanel({
   teams,
@@ -38,6 +41,9 @@ export function AdminPanel({
   onResetTimer,
   onToggleTimer,
   onManualLockQuestion,
+  onAdminResetGame,
+  onAdminSetTestMode,
+  onAdminMarkAllSolved,
 }: AdminPanelProps) {
   const [editingTeam, setEditingTeam] = useState<string | null>(null);
   const [editingQuestion, setEditingQuestion] = useState<number | null>(null);
@@ -115,6 +121,10 @@ export function AdminPanel({
               <TabsTrigger value="controls" className="data-[state=active]:bg-gray-700">
                 <Settings className="w-4 h-4 mr-2" />
                 Game Controls
+              </TabsTrigger>
+              <TabsTrigger value="test" className="data-[state=active]:bg-gray-700">
+                <FlaskConical className="w-4 h-4 mr-2" />
+                테스트/리셋
               </TabsTrigger>
             </TabsList>
 
@@ -555,6 +565,78 @@ export function AdminPanel({
                 <p className="text-xs text-gray-400 mt-3">
                   Team scores reset to 0. Solve history is cleared for every question.
                 </p>
+              </div>
+            </TabsContent>
+
+            {/* Test/Reset Tab */}
+            <TabsContent value="test" className="mt-6">
+              <div className="bg-gray-800/50 rounded-xl border border-gray-700 p-6">
+                <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
+                  <FlaskConical className="w-5 h-5" />
+                  테스트/리셋 도구
+                </h3>
+                <p className="text-sm text-gray-400">
+                  아래 버튼들은 “테스트를 빨리 돌리기” 위한 기능입니다. 버튼을 누르면 DB(서버) 상태가 즉시 변경되어 모든 참가자 화면에 실시간 반영됩니다.
+                </p>
+
+                <div className="mt-5 grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="rounded-xl border border-gray-700 bg-gray-900 p-4">
+                    <div className="text-white font-semibold">전체 게임 초기화</div>
+                    <div className="text-xs text-gray-400 mt-1 leading-relaxed">
+                      제출 기록/정답 기록/문제 상태를 모두 삭제하고, 팀 코인을 0으로 초기화합니다.
+                      타이머는 2시간(정지)로 리셋됩니다.
+                    </div>
+                    <Button
+                      onClick={() => {
+                        const ok = window.confirm('정말 전체 게임을 초기화할까요? (되돌릴 수 없습니다)');
+                        if (!ok) return;
+                        onAdminResetGame();
+                      }}
+                      className="mt-3 w-full bg-red-600 hover:bg-red-700 text-white"
+                    >
+                      <RotateCcw className="w-4 h-4 mr-2" />
+                      전체 초기화 실행
+                    </Button>
+                  </div>
+
+                  <div className="rounded-xl border border-gray-700 bg-gray-900 p-4">
+                    <div className="text-white font-semibold">테스트 모드 (전부 ‘1’)</div>
+                    <div className="text-xs text-gray-400 mt-1 leading-relaxed">
+                      모든 팀 비밀번호를 <span className="text-gray-200 font-mono">1</span>로 설정하고,
+                      모든 문제의 질문/정답을 <span className="text-gray-200 font-mono">1</span>로 통일합니다.
+                      (이미 데이터가 1이라면 변화 없습니다)
+                    </div>
+                    <Button
+                      onClick={onAdminSetTestMode}
+                      className="mt-3 w-full bg-indigo-600 hover:bg-indigo-700 text-white"
+                    >
+                      테스트 모드 적용
+                    </Button>
+                  </div>
+
+                  <div className="rounded-xl border border-gray-700 bg-gray-900 p-4">
+                    <div className="text-white font-semibold">전체 문제 “3팀 정답” 처리</div>
+                    <div className="text-xs text-gray-400 mt-1 leading-relaxed">
+                      모든 문제를 “3팀이 이미 맞춘 상태(잠금)”로 만들어 메인 화면에서 잠김 UI(X 표시)를 한 번에 확인할 수 있습니다.
+                      정답팀은 팀코드 기준 상위 3팀으로 기록됩니다.
+                    </div>
+                    <Button
+                      onClick={() => {
+                        const ok = window.confirm('모든 문제를 잠금(3/3) 상태로 만들까요?');
+                        if (!ok) return;
+                        onAdminMarkAllSolved();
+                      }}
+                      className="mt-3 w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+                    >
+                      전체 정답 처리
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="mt-5 text-xs text-gray-500 leading-relaxed">
+                  팁: “전체 게임 초기화”는 테스트를 처음부터 다시 시작할 때 사용하세요. “테스트 모드”는 빠른 입력 확인용,
+                  “전체 정답 처리”는 잠김 UI/정답 표시 UI 확인용입니다.
+                </div>
               </div>
             </TabsContent>
           </Tabs>

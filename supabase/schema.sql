@@ -408,6 +408,111 @@ $$;
 
 grant execute on function public.request_hint(text, text, integer) to anon, authenticated;
 
+-- Admin/test utilities (MVP)
+-- Note: these are intentionally permissive for quick testing.
+-- For production, restrict execute permissions / add auth checks.
+
+create or replace function public.admin_reset_game(p_game_code text)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_game_id uuid;
+begin
+  select id into v_game_id from games where code = p_game_code limit 1;
+  if v_game_id is null then
+    raise exception 'Game not found';
+  end if;
+
+  delete from submissions where game_id = v_game_id;
+  delete from question_solves where game_id = v_game_id;
+  delete from question_status where game_id = v_game_id;
+
+  update teams set coins = 0 where game_id = v_game_id;
+  update games set timer_seconds = 7200, timer_running = false where id = v_game_id;
+
+  return jsonb_build_object('ok', true);
+end;
+$$;
+
+grant execute on function public.admin_reset_game(text) to anon, authenticated;
+
+create or replace function public.admin_set_test_mode(p_game_code text)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_game_id uuid;
+begin
+  select id into v_game_id from games where code = p_game_code limit 1;
+  if v_game_id is null then
+    raise exception 'Game not found';
+  end if;
+
+  -- Testing convenience: unify passwords and question content/answers.
+  update teams set password = '1' where game_id = v_game_id;
+  update questions set question_text = '1', correct_answer = '1' where game_id = v_game_id;
+
+  return jsonb_build_object('ok', true);
+end;
+$$;
+
+grant execute on function public.admin_set_test_mode(text) to anon, authenticated;
+
+create or replace function public.admin_mark_all_solved(p_game_code text)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_game_id uuid;
+begin
+  select id into v_game_id from games where code = p_game_code limit 1;
+  if v_game_id is null then
+    raise exception 'Game not found';
+  end if;
+
+  -- Insert up to 3 solve rows per question using first three teams (by team_code).
+  with ordered_teams as (
+    select id as team_id
+    from teams
+    where game_id = v_game_id
+    order by team_code
+    limit 3
+  ),
+  target_questions as (
+    select id as question_id
+    from questions
+    where game_id = v_game_id
+  )
+  insert into question_solves (game_id, question_id, team_id)
+  select v_game_id, q.question_id, t.team_id
+  from target_questions q
+  cross join ordered_teams t
+  on conflict (game_id, question_id, team_id) do nothing;
+
+  -- Reflect locked state on status table (3/3).
+  insert into question_status (game_id, question_id, solve_count, locked)
+  select v_game_id, q.id, 3, true
+  from questions q
+  where q.game_id = v_game_id
+  on conflict (game_id, question_id)
+  do update set
+    solve_count = 3,
+    locked = true,
+    updated_at = now();
+
+  return jsonb_build_object('ok', true);
+end;
+$$;
+
+grant execute on function public.admin_mark_all_solved(text) to anon, authenticated;
+
 -- Supabase Realtime listens on the built-in `supabase_realtime` publication.
 -- Ensure our tables are included (idempotent).
 do $$
