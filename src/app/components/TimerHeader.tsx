@@ -1,24 +1,13 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Clock, AlertCircle } from 'lucide-react';
 import { motion } from 'motion/react';
 
 interface TimerHeaderProps {
   timeRemaining: number; // in seconds
   timerRunning: boolean;
-  onTimeUpdate: (newTime: number) => void;
 }
 
-export function TimerHeader({ timeRemaining, timerRunning, onTimeUpdate }: TimerHeaderProps) {
-  useEffect(() => {
-    if (timeRemaining <= 0 || !timerRunning) return;
-
-    const interval = setInterval(() => {
-      onTimeUpdate(timeRemaining - 1);
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [timeRemaining, timerRunning, onTimeUpdate]);
-
+export function TimerHeader({ timeRemaining, timerRunning }: TimerHeaderProps) {
   const hours = Math.floor(timeRemaining / 3600);
   const minutes = Math.floor((timeRemaining % 3600) / 60);
   const seconds = timeRemaining % 60;

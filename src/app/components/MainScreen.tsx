@@ -13,7 +13,6 @@ interface MainScreenProps {
   timeRemaining: number;
   timerRunning: boolean;
   onQuestionSelect: (questionId: number) => void;
-  onTimeUpdate: (newTime: number) => void;
   onAdminClick: () => void;
 }
 
@@ -24,7 +23,6 @@ export function MainScreen({
   timeRemaining,
   timerRunning,
   onQuestionSelect,
-  onTimeUpdate,
   onAdminClick,
 }: MainScreenProps) {
 
@@ -50,7 +48,6 @@ export function MainScreen({
           <TimerHeader
             timeRemaining={timeRemaining}
             timerRunning={timerRunning}
-            onTimeUpdate={onTimeUpdate}
           />
         </div>
       </div>

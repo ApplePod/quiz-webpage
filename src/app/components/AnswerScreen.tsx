@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Team, Question } from '../types';
-import { ArrowLeft, Lightbulb, Send, CheckCircle2, XCircle, Coins } from 'lucide-react';
+import { ArrowLeft, Lightbulb, Send, CheckCircle2, XCircle, Coins, Sparkles } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog';
@@ -25,6 +25,8 @@ export function AnswerScreen({
   const [showHintDialog, setShowHintDialog] = useState(false);
   const [hintRevealed, setHintRevealed] = useState(false);
   const [result, setResult] = useState<'correct' | 'incorrect' | null>(null);
+  const [hintInsufficientCoins, setHintInsufficientCoins] = useState(false);
+  const [showRechargeDialog, setShowRechargeDialog] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,6 +43,12 @@ export function AnswerScreen({
 
   const handleHintConfirm = () => {
     setShowHintDialog(false);
+
+    if (hintInsufficientCoins) {
+      setShowRechargeDialog(true);
+      return;
+    }
+
     setHintRevealed(true);
     onHintRequest(team.id, question.id);
   };
@@ -226,7 +234,10 @@ export function AnswerScreen({
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => setShowHintDialog(true)}
+                    onClick={() => {
+                      setHintInsufficientCoins(team.coins < question.hintCost);
+                      setShowHintDialog(true);
+                    }}
                     className="w-full border-yellow-400/50 text-yellow-300 hover:bg-yellow-500/10 hover:text-yellow-200"
                   >
                     <Lightbulb className="w-5 h-5 mr-2" />
@@ -245,11 +256,12 @@ export function AnswerScreen({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-yellow-300">
               <Lightbulb className="w-6 h-6" />
-              View Hint
+              {hintInsufficientCoins ? 'Coins Needed' : 'View Hint'}
             </DialogTitle>
             <DialogDescription className="text-gray-300">
-              Viewing the hint will deduct {question.hintCost} coins from your team balance.
-              Do you want to continue?
+              {hintInsufficientCoins
+                ? '코인이 부족합니다. 무료충전하시겠습니까?'
+                : `Viewing the hint will deduct ${question.hintCost} coins from your team balance. Do you want to continue?`}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -264,7 +276,34 @@ export function AnswerScreen({
               onClick={handleHintConfirm}
               className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold"
             >
-              Yes, Show Hint
+              {hintInsufficientCoins ? 'Yes' : 'Yes, Show Hint'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Recharge 안내 Dialog */}
+      <Dialog open={showRechargeDialog} onOpenChange={setShowRechargeDialog}>
+        <DialogContent className="bg-gradient-to-br from-indigo-950 via-purple-950 to-pink-950 border-purple-400/50 text-white">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-purple-200">
+              <div className="w-8 h-8 rounded-full bg-purple-500/30 border border-purple-300/40 flex items-center justify-center">
+                <Sparkles className="w-4 h-4 text-purple-200" />
+              </div>
+              Free Recharge
+            </DialogTitle>
+            <DialogDescription className="text-purple-100/90">
+              무료 충전을 위해 <span className="font-semibold text-white">카운터로 와주세요</span>.
+              <br />
+              스태프가 바로 코인을 충전해드릴게요.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              onClick={() => setShowRechargeDialog(false)}
+              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold"
+            >
+              확인
             </Button>
           </DialogFooter>
         </DialogContent>

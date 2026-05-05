@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { MainScreen } from './components/MainScreen';
 import { TeamSelection } from './components/TeamSelection';
 import { PasswordAuth } from './components/PasswordAuth';
@@ -7,9 +7,23 @@ import { AdminAuth } from './components/AdminAuth';
 import { AdminPanel } from './components/AdminPanel';
 import { Team, Question, QuestionStatus, ViewType } from './types';
 import { initialTeams, initialQuestions } from './data/initialData';
+import { isSupabaseConfigured } from '../lib/supabase';
+import {
+  fetchGameSnapshot,
+  requestHint,
+  resetAllQuestions,
+  resetAllTeams,
+  resetQuestion,
+  setQuestionLock,
+  submitAnswer,
+  subscribeToGameChanges,
+  updateQuestion,
+  updateTeam,
+  updateTimer,
+  verifyTeamPassword,
+} from './services/gameService';
 
 export default function App() {
-  // State management
   const [currentView, setCurrentView] = useState<ViewType>('main');
   const [teams, setTeams] = useState<Team[]>(initialTeams);
   const [questions, setQuestions] = useState<Question[]>(initialQuestions);
@@ -20,15 +34,55 @@ export default function App() {
   const [questionStatuses, setQuestionStatuses] = useState<QuestionStatus[]>([]);
   const [showAdminAuth, setShowAdminAuth] = useState<boolean>(false);
   const [showAdminPanel, setShowAdminPanel] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>('');
 
-  // Handlers
-  const handleQuestionSelect = (questionId: number) => {
-    // Check if question is locked (3 teams have solved it)
-    const status = questionStatuses.find((s) => s.questionId === questionId);
-    if (status && status.solveCount >= 3) {
-      return; // Question is locked
+  const handleActionError = (actionError: unknown, fallbackMessage: string) => {
+    const message =
+      actionError instanceof Error ? actionError.message : fallbackMessage;
+    setError(message);
+  };
+
+  const syncFromSnapshot = useCallback(async () => {
+    try {
+      const snapshot = await fetchGameSnapshot();
+      setTeams(snapshot.teams);
+      setQuestions(snapshot.questions);
+      setQuestionStatuses(snapshot.questionStatuses);
+      setTimeRemaining(snapshot.game.timerSeconds);
+      setTimerRunning(snapshot.game.timerRunning);
+      setError('');
+    } catch (syncError) {
+      const message =
+        syncError instanceof Error ? syncError.message : 'Failed to sync game state.';
+      setError(message);
     }
+  }, []);
 
+  useEffect(() => {
+    void (async () => {
+      setLoading(true);
+      await syncFromSnapshot();
+      setLoading(false);
+    })();
+  }, [syncFromSnapshot]);
+
+  useEffect(() => {
+    let unsubscribe: undefined | (() => void);
+    void (async () => {
+      unsubscribe = await subscribeToGameChanges(async () => {
+        await syncFromSnapshot();
+      });
+    })();
+
+    return () => {
+      unsubscribe?.();
+    };
+  }, [syncFromSnapshot]);
+
+  const handleQuestionSelect = (questionId: number) => {
+    const status = questionStatuses.find((entry) => entry.questionId === questionId);
+    if (status && (status.locked || status.solveCount >= 3)) return;
     setSelectedQuestionId(questionId);
     setCurrentView('team-selection');
   };
@@ -38,58 +92,75 @@ export default function App() {
     setCurrentView('password');
   };
 
-  const handlePasswordSuccess = () => {
-    setCurrentView('answer');
+  const handlePasswordSuccess = async (password: string) => {
+    if (!selectedTeam) return false;
+    try {
+      const isValid = await verifyTeamPassword(selectedTeam.id, password);
+      if (isValid) {
+        setCurrentView('answer');
+        return true;
+      }
+      return false;
+    } catch (authError) {
+      const message =
+        authError instanceof Error ? authError.message : 'Failed to validate team password.';
+      setError(message);
+      return false;
+    }
   };
 
-  const handleAnswerSubmit = (answer: string, teamId: string) => {
+  const handleLocalAnswerSubmit = (answer: string, teamId: string) => {
     if (!selectedQuestionId) return;
-
-    const question = questions.find((q) => q.id === selectedQuestionId);
+    const question = questions.find((entry) => entry.id === selectedQuestionId);
     if (!question) return;
 
     const isCorrect = answer.trim().toLowerCase() === question.correctAnswer.toLowerCase();
+    if (!isCorrect) return;
 
-    // Only update status if answer is correct
-    if (isCorrect) {
-      setQuestionStatuses((prev) => {
-        const existing = prev.find((s) => s.questionId === selectedQuestionId);
+    setQuestionStatuses((previous) => {
+      const existing = previous.find((status) => status.questionId === selectedQuestionId);
+      if (existing?.solvedByTeams.includes(teamId)) return previous;
+      if (existing) {
+        const solvedByTeams = [...existing.solvedByTeams, teamId];
+        return previous.map((status) =>
+          status.questionId === selectedQuestionId
+            ? {
+                ...status,
+                solvedByTeams,
+                solveCount: solvedByTeams.length,
+                locked: solvedByTeams.length >= 3,
+              }
+            : status,
+        );
+      }
 
-        if (existing) {
-          // Check if team has already solved this question
-          if (existing.solvedByTeams.includes(teamId)) {
-            return prev; // Team already solved, no update
-          }
+      return [
+        ...previous,
+        { questionId: selectedQuestionId, solvedByTeams: [teamId], solveCount: 1, locked: false },
+      ];
+    });
 
-          // Add team to solved list
-          const newSolvedByTeams = [...existing.solvedByTeams, teamId];
-          const newSolveCount = newSolvedByTeams.length;
+    setTeams((previous) =>
+      previous.map((team) =>
+        team.id === teamId ? { ...team, coins: team.coins + question.coinReward } : team,
+      ),
+    );
+  };
 
-          return prev.map((s) =>
-            s.questionId === selectedQuestionId
-              ? { ...s, solvedByTeams: newSolvedByTeams, solveCount: newSolveCount }
-              : s
-          );
-        }
-
-        // Create new status
-        return [
-          ...prev,
-          {
-            questionId: selectedQuestionId,
-            solvedByTeams: [teamId],
-            solveCount: 1,
-          },
-        ];
-      });
-
-      // Update team coins with question's coin reward
-      setTeams((prev) =>
-        prev.map((t) => (t.id === teamId ? { ...t, coins: t.coins + question.coinReward } : t))
-      );
+  const handleAnswerSubmit = async (answer: string, teamId: string) => {
+    if (!selectedQuestionId) return;
+    if (!isSupabaseConfigured) {
+      handleLocalAnswerSubmit(answer, teamId);
+    } else {
+      try {
+        await submitAnswer(teamId, selectedQuestionId, answer);
+      } catch (submitError) {
+        const message =
+          submitError instanceof Error ? submitError.message : 'Failed to submit answer.';
+        setError(message);
+      }
     }
 
-    // Return to main screen
     setTimeout(() => {
       setCurrentView('main');
       setSelectedQuestionId(null);
@@ -97,22 +168,26 @@ export default function App() {
     }, 2000);
   };
 
-  const handleHintRequest = (teamId: string, questionId: number) => {
-    const question = questions.find((q) => q.id === questionId);
+  const handleHintRequest = async (teamId: string, questionId: number) => {
+    const question = questions.find((entry) => entry.id === questionId);
     if (!question) return;
 
-    // Deduct coins
-    setTeams((prev) =>
-      prev.map((t) =>
-        t.id === teamId ? { ...t, coins: Math.max(0, t.coins - question.hintCost) } : t
-      )
-    );
+    if (!isSupabaseConfigured) {
+      setTeams((previous) =>
+        previous.map((team) =>
+          team.id === teamId ? { ...team, coins: Math.max(0, team.coins - question.hintCost) } : team,
+        ),
+      );
+      return;
+    }
 
-    // Update selected team to reflect new coin balance
-    setSelectedTeam((prev) => {
-      if (!prev || prev.id !== teamId) return prev;
-      return { ...prev, coins: Math.max(0, prev.coins - question.hintCost) };
-    });
+    try {
+      await requestHint(teamId, questionId);
+    } catch (hintError) {
+      const message =
+        hintError instanceof Error ? hintError.message : 'Failed to request hint.';
+      setError(message);
+    }
   };
 
   const handleBackToMain = () => {
@@ -126,11 +201,6 @@ export default function App() {
     setSelectedTeam(null);
   };
 
-  const handleTimeUpdate = (newTime: number) => {
-    setTimeRemaining(newTime);
-  };
-
-  // Admin handlers
   const handleAdminClick = () => {
     setShowAdminAuth(true);
   };
@@ -148,63 +218,140 @@ export default function App() {
     setShowAdminPanel(false);
   };
 
-  const handleUpdateTeam = (teamId: string, updates: Partial<Team>) => {
-    setTeams((prev) =>
-      prev.map((t) => (t.id === teamId ? { ...t, ...updates } : t))
-    );
-  };
-
-  const handleUpdateQuestion = (questionId: number, updates: Partial<Question>) => {
-    setQuestions((prev) =>
-      prev.map((q) => (q.id === questionId ? { ...q, ...updates } : q))
-    );
-  };
-
-  const handleResetQuestion = (questionId: number) => {
-    setQuestionStatuses((prev) => prev.filter((s) => s.questionId !== questionId));
-  };
-
-  const handleResetAllQuestions = () => {
-    setQuestionStatuses([]);
-  };
-
-  const handleResetAllTeams = () => {
-    setTeams(initialTeams);
-  };
-
-  const handleResetTimer = () => {
-    setTimeRemaining(7200);
-    setTimerRunning(false);
-  };
-
-  const handleToggleTimer = () => {
-    setTimerRunning((prev) => !prev);
-  };
-
-  const handleManualLockQuestion = (questionId: number, locked: boolean) => {
-    if (locked) {
-      setQuestionStatuses((prev) => {
-        const existing = prev.find((s) => s.questionId === questionId);
-        if (existing) {
-          return prev.map((s) =>
-            s.questionId === questionId ? { ...s, solveCount: 3 } : s
-          );
-        }
-        return [...prev, { questionId, solvedByTeams: [], solveCount: 3 }];
-      });
-    } else {
-      setQuestionStatuses((prev) =>
-        prev.map((s) =>
-          s.questionId === questionId ? { ...s, solveCount: Math.min(s.solveCount, 2) } : s
-        )
-      );
+  const handleUpdateTeam = async (teamId: string, updates: Partial<Team>) => {
+    try {
+      if (!isSupabaseConfigured) {
+        setTeams((previous) =>
+          previous.map((team) => (team.id === teamId ? { ...team, ...updates } : team)),
+        );
+        return;
+      }
+      await updateTeam(teamId, updates);
+      await syncFromSnapshot();
+    } catch (actionError) {
+      handleActionError(actionError, 'Failed to update team.');
     }
   };
 
-  // Get current question
+  const handleUpdateQuestion = async (questionId: number, updates: Partial<Question>) => {
+    try {
+      if (!isSupabaseConfigured) {
+        setQuestions((previous) =>
+          previous.map((question) =>
+            question.id === questionId ? { ...question, ...updates } : question,
+          ),
+        );
+        return;
+      }
+      await updateQuestion(questionId, updates);
+      await syncFromSnapshot();
+    } catch (actionError) {
+      handleActionError(actionError, 'Failed to update question.');
+    }
+  };
+
+  const handleResetQuestion = async (questionId: number) => {
+    try {
+      if (!isSupabaseConfigured) {
+        setQuestionStatuses((previous) =>
+          previous.filter((status) => status.questionId !== questionId),
+        );
+        return;
+      }
+      await resetQuestion(questionId);
+      await syncFromSnapshot();
+    } catch (actionError) {
+      handleActionError(actionError, 'Failed to reset this question.');
+    }
+  };
+
+  const handleResetAllQuestions = async () => {
+    try {
+      if (!isSupabaseConfigured) {
+        setQuestionStatuses([]);
+        return;
+      }
+      await resetAllQuestions();
+      await syncFromSnapshot();
+    } catch (actionError) {
+      handleActionError(actionError, 'Failed to reset all questions.');
+    }
+  };
+
+  const handleResetAllTeams = async () => {
+    try {
+      if (!isSupabaseConfigured) {
+        setTeams(initialTeams);
+        return;
+      }
+      await resetAllTeams();
+      await syncFromSnapshot();
+    } catch (actionError) {
+      handleActionError(actionError, 'Failed to reset all teams.');
+    }
+  };
+
+  const handleResetTimer = async () => {
+    try {
+      if (isSupabaseConfigured) {
+        await updateTimer(7200, false);
+        await syncFromSnapshot();
+        return;
+      }
+      setTimeRemaining(7200);
+      setTimerRunning(false);
+    } catch (actionError) {
+      handleActionError(actionError, 'Failed to reset timer.');
+    }
+  };
+
+  const handleToggleTimer = async () => {
+    try {
+      if (isSupabaseConfigured) {
+        await updateTimer(timeRemaining, !timerRunning);
+        await syncFromSnapshot();
+        return;
+      }
+      setTimerRunning((previous) => !previous);
+    } catch (actionError) {
+      handleActionError(actionError, 'Failed to toggle timer.');
+    }
+  };
+
+  const handleManualLockQuestion = async (questionId: number, locked: boolean) => {
+    try {
+      if (!isSupabaseConfigured) {
+        setQuestionStatuses((previous) => {
+          const existing = previous.find((status) => status.questionId === questionId);
+          if (!existing) {
+            return [...previous, { questionId, solvedByTeams: [], solveCount: locked ? 3 : 0, locked }];
+          }
+          return previous.map((status) =>
+            status.questionId === questionId
+              ? { ...status, solveCount: locked ? 3 : 0, locked }
+              : status,
+          );
+        });
+        return;
+      }
+      await setQuestionLock(questionId, locked);
+      await syncFromSnapshot();
+    } catch (actionError) {
+      handleActionError(actionError, 'Failed to change lock status.');
+    }
+  };
+
   const currentQuestion = selectedQuestionId
     ? questions.find((q) => q.id === selectedQuestionId)
     : null;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 flex items-center justify-center text-white">
+        Loading realtime quiz...
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 relative overflow-hidden">
@@ -216,6 +363,18 @@ export default function App() {
       </div>
 
       <div className="relative z-10 container mx-auto px-4 py-8">
+        {error && (
+          <div className="mb-4 rounded-lg border border-red-500/40 bg-red-500/15 p-3 text-sm text-red-100">
+            {error}
+          </div>
+        )}
+
+        {!isSupabaseConfigured && (
+          <div className="mb-4 rounded-lg border border-yellow-500/40 bg-yellow-500/15 p-3 text-sm text-yellow-100">
+            Supabase 환경변수가 없어 로컬 모드로 실행 중입니다. 멀티유저 실시간 동기화는 비활성화됩니다.
+          </div>
+        )}
+
         {/* View Rendering */}
         {currentView === 'main' && (
           <MainScreen
@@ -225,7 +384,6 @@ export default function App() {
             timeRemaining={timeRemaining}
             timerRunning={timerRunning}
             onQuestionSelect={handleQuestionSelect}
-            onTimeUpdate={handleTimeUpdate}
             onAdminClick={handleAdminClick}
           />
         )}

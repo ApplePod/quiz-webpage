@@ -20,6 +20,7 @@ export interface QuestionStatus {
   questionId: number;
   solvedByTeams: string[]; // Array of team IDs that solved this question
   solveCount: number; // Number of teams that have solved (0-3)
+  locked?: boolean;
 }
 
 export type ViewType = 'main' | 'team-selection' | 'password' | 'answer';
@@ -30,4 +31,11 @@ export interface QuizState {
   selectedTeam: Team | null;
   timeRemaining: number; // in seconds
   questionStatuses: QuestionStatus[];
+}
+
+export interface GameMeta {
+  code: string;
+  name: string;
+  timerSeconds: number;
+  timerRunning: boolean;
 }

@@ -8,7 +8,7 @@ import { motion } from 'motion/react';
 interface PasswordAuthProps {
   team: Team;
   selectedQuestionId: number;
-  onSuccess: () => void;
+  onSuccess: (password: string) => Promise<boolean> | boolean;
   onBack: () => void;
 }
 
@@ -20,15 +20,17 @@ export function PasswordAuth({
 }: PasswordAuthProps) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === team.password) {
-      onSuccess();
-    } else {
+    setIsSubmitting(true);
+    const isValid = await onSuccess(password);
+    if (!isValid) {
       setError('Incorrect password. Please try again.');
       setPassword('');
     }
+    setIsSubmitting(false);
   };
 
   return (
@@ -93,14 +95,15 @@ export function PasswordAuth({
             <Button
               type="submit"
               className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-6 text-lg"
+              disabled={isSubmitting}
             >
-              Continue
+              {isSubmitting ? 'Checking...' : 'Continue'}
             </Button>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-xs text-gray-400">
-              Note: For demo purposes, the password is {team.password}
+              Passwords are validated securely against the shared game room.
             </p>
           </div>
         </motion.div>

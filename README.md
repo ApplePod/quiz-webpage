@@ -59,12 +59,39 @@ A modern, interactive team-based quiz competition platform built with React, Typ
 
 ### Installation
 ```bash
-pnpm install
+npm install
 ```
 
 ### Development
 ```bash
-pnpm build
+npm run dev
+```
+
+## Supabase Realtime Setup (MVP)
+
+1. Create a Supabase project.
+2. In Supabase SQL Editor, run:
+   - `supabase/schema.sql`
+   - `supabase/seed.sql`
+3. Copy `.env.example` to `.env` and set:
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_ANON_KEY`
+   - `VITE_GAME_CODE` (default: `demo-room`)
+4. Restart local dev server:
+```bash
+npm run dev
+```
+
+If env vars are missing, the app automatically runs in local fallback mode (single-browser demo mode).
+
+## Multi-user Validation Checklist
+
+1. Open the app in two different browsers/devices.
+2. In device A, submit a correct answer.
+3. Confirm device B scoreboard and question status update automatically.
+4. In admin panel, edit a team or question.
+5. Confirm all devices reflect changes in real time.
+6. Trigger reset actions and verify shared state remains consistent.
 ```
 
 ## Data Structure
