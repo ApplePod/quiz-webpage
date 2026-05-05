@@ -14,12 +14,12 @@ select game_ref.id, valueset.team_code, valueset.name, valueset.coins, valueset.
 from game_ref,
 (
   values
-    ('A', 'Group A', 100, 'teamA123'),
-    ('B', 'Group B', 100, 'teamB123'),
-    ('C', 'Group C', 100, 'teamC123'),
-    ('D', 'Group D', 100, 'teamD123'),
-    ('E', 'Group E', 100, 'teamE123'),
-    ('F', 'Group F', 100, 'teamF123')
+    ('A', 'Group A', 0, 'teamA123'),
+    ('B', 'Group B', 0, 'teamB123'),
+    ('C', 'Group C', 0, 'teamC123'),
+    ('D', 'Group D', 0, 'teamD123'),
+    ('E', 'Group E', 0, 'teamE123'),
+    ('F', 'Group F', 0, 'teamF123')
 ) as valueset(team_code, name, coins, password)
 on conflict (game_id, team_code) do update set
   name = excluded.name,

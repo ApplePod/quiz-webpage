@@ -529,6 +529,33 @@ export function AdminPanel({
                   </div>
                 </div>
               </div>
+
+              {/* Reset buttons (high visibility) */}
+              <div className="mt-6 bg-gray-800/50 rounded-xl border border-gray-700 p-6">
+                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                  <RotateCcw className="w-5 h-5" />
+                  Reset
+                </h3>
+                <div className="flex flex-col md:flex-row gap-3">
+                  <Button
+                    onClick={onResetAllQuestions}
+                    className="flex-1 bg-orange-600 hover:bg-orange-700 text-white"
+                  >
+                    <RotateCcw className="w-4 h-4 mr-2" />
+                    Reset All Solves
+                  </Button>
+                  <Button
+                    onClick={onResetAllTeams}
+                    className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                  >
+                    <RotateCcw className="w-4 h-4 mr-2" />
+                    Reset All Team Scores
+                  </Button>
+                </div>
+                <p className="text-xs text-gray-400 mt-3">
+                  Team scores reset to 0. Solve history is cleared for every question.
+                </p>
+              </div>
             </TabsContent>
           </Tabs>
         </div>

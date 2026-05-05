@@ -37,6 +37,60 @@ create table if not exists public.questions (
   unique (game_id, question_no)
 );
 
+-- Migration helper: if `questions` already existed (older schema), add missing tiered columns.
+alter table public.questions
+  add column if not exists coin_reward_first integer;
+alter table public.questions
+  add column if not exists coin_reward_second integer;
+alter table public.questions
+  add column if not exists coin_reward_third integer;
+
+do $$
+begin
+  -- Backfill defaults from legacy `coin_reward` if it exists; otherwise use safe defaults.
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'questions'
+      and column_name = 'coin_reward'
+  ) then
+    execute $sql$
+      update public.questions
+      set
+        coin_reward_first = coalesce(coin_reward_first, coin_reward, 20),
+        coin_reward_second = coalesce(coin_reward_second, greatest(0, floor(coin_reward * 0.6)::int), 15),
+        coin_reward_third = coalesce(coin_reward_third, greatest(0, floor(coin_reward * 0.3)::int), 10)
+    $sql$;
+  else
+    update public.questions
+    set
+      coin_reward_first = coalesce(coin_reward_first, 20),
+      coin_reward_second = coalesce(coin_reward_second, 15),
+      coin_reward_third = coalesce(coin_reward_third, 10);
+  end if;
+
+  -- Ensure constraints/defaults exist even when columns were added via ALTER.
+  begin
+    alter table public.questions alter column coin_reward_first set not null;
+  exception when others then null; end;
+  begin
+    alter table public.questions alter column coin_reward_second set not null;
+  exception when others then null; end;
+  begin
+    alter table public.questions alter column coin_reward_third set not null;
+  exception when others then null; end;
+
+  begin
+    alter table public.questions alter column coin_reward_first set default 20;
+  exception when others then null; end;
+  begin
+    alter table public.questions alter column coin_reward_second set default 15;
+  exception when others then null; end;
+  begin
+    alter table public.questions alter column coin_reward_third set default 10;
+  exception when others then null; end;
+end $$;
+
 create table if not exists public.question_status (
   id uuid primary key default gen_random_uuid(),
   game_id uuid not null references public.games(id) on delete cascade,

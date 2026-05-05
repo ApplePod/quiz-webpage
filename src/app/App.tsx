@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { MainScreen } from './components/MainScreen';
 import { TeamSelection } from './components/TeamSelection';
 import { PasswordAuth } from './components/PasswordAuth';
@@ -36,6 +36,7 @@ export default function App() {
   const [showAdminPanel, setShowAdminPanel] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
+  const tickWriteAccumulator = useRef(0);
 
   const handleActionError = (actionError: unknown, fallbackMessage: string) => {
     const message =
@@ -66,6 +67,30 @@ export default function App() {
       setLoading(false);
     })();
   }, [syncFromSnapshot]);
+
+  // Local ticking so the timer visually counts down immediately.
+  // When using Supabase, we also persist the remaining time periodically so other clients stay close.
+  useEffect(() => {
+    if (!timerRunning) return;
+    if (timeRemaining <= 0) return;
+
+    const interval = setInterval(() => {
+      setTimeRemaining((previous) => Math.max(0, previous - 1));
+
+      if (!isSupabaseConfigured) return;
+
+      tickWriteAccumulator.current += 1;
+      // Persist every 5 seconds to reduce DB writes but keep clients synced.
+      if (tickWriteAccumulator.current >= 5) {
+        tickWriteAccumulator.current = 0;
+        void updateTimer(Math.max(0, timeRemaining - 1), true).catch(() => {
+          // Ignore periodic write failures; next snapshot sync will correct.
+        });
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [timerRunning, timeRemaining]);
 
   useEffect(() => {
     let unsubscribe: undefined | (() => void);
@@ -307,6 +332,7 @@ export default function App() {
   const handleResetTimer = async () => {
     try {
       if (isSupabaseConfigured) {
+        tickWriteAccumulator.current = 0;
         await updateTimer(7200, false);
         await syncFromSnapshot();
         return;
@@ -321,6 +347,7 @@ export default function App() {
   const handleToggleTimer = async () => {
     try {
       if (isSupabaseConfigured) {
+        tickWriteAccumulator.current = 0;
         await updateTimer(timeRemaining, !timerRunning);
         await syncFromSnapshot();
         return;

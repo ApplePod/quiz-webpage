@@ -2,12 +2,12 @@ import { Team, Question } from '../types';
 
 // Initial team data with passwords
 export const initialTeams: Team[] = [
-  { id: 'A', name: 'Group A', coins: 100, password: 'teamA123' },
-  { id: 'B', name: 'Group B', coins: 100, password: 'teamB123' },
-  { id: 'C', name: 'Group C', coins: 100, password: 'teamC123' },
-  { id: 'D', name: 'Group D', coins: 100, password: 'teamD123' },
-  { id: 'E', name: 'Group E', coins: 100, password: 'teamE123' },
-  { id: 'F', name: 'Group F', coins: 100, password: 'teamF123' },
+  { id: 'A', name: 'Group A', coins: 0, password: 'teamA123' },
+  { id: 'B', name: 'Group B', coins: 0, password: 'teamB123' },
+  { id: 'C', name: 'Group C', coins: 0, password: 'teamC123' },
+  { id: 'D', name: 'Group D', coins: 0, password: 'teamD123' },
+  { id: 'E', name: 'Group E', coins: 0, password: 'teamE123' },
+  { id: 'F', name: 'Group F', coins: 0, password: 'teamF123' },
 ];
 
 // Initial question data (25 questions)
