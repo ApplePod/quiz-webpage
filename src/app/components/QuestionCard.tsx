@@ -39,7 +39,7 @@ const solvedBorderMap: Record<number, BorderSide[] | 'diagonal'> = {
   25: [3],
 }
 
-const solvedBorderThicknessPx = 3
+const solvedBorderThicknessPx = 5
 const solvedBorderGlow = 'shadow-[0_0_10px_rgba(239,68,68,0.8)]'
 
 function SolvedBorderMask({ sides }: { sides: BorderSide[] }) {
@@ -193,7 +193,7 @@ export function QuestionCard({
                 repeatDelay: 2,
               }}
             >
-              <X className="w-28 h-28 text-gray-300/70 stroke-[2]" />
+              <X className="w-32 h-32 text-gray-300/60 stroke-[1.5]" />
             </motion.div>
           </motion.div>
         )}
