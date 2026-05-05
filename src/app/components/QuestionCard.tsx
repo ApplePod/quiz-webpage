@@ -43,54 +43,52 @@ const solvedBorderThicknessPx = 3
 const solvedBorderGlow = 'shadow-[0_0_10px_rgba(239,68,68,0.8)]'
 
 function SolvedBorderMask({ sides }: { sides: BorderSide[] }) {
-  // Use SVG stroke + clipPath to match rounded corners perfectly (no straight protrusions).
-  const stroke = solvedBorderThicknessPx
-  const pad = stroke / 2
-  const clipPad = stroke + 2
-  // Tailwind rounded-2xl ~= 1rem. In a 100x100 viewBox, rx=16 is a good match.
-  const rx = 16
-
-  const clipForSide: Record<BorderSide, { x: number; y: number; w: number; h: number }> = {
-    1: { x: 0, y: 0, w: 100, h: clipPad }, // top
-    2: { x: 0, y: 0, w: clipPad, h: 100 }, // left
-    3: { x: 0, y: 100 - clipPad, w: 100, h: clipPad }, // bottom
-    4: { x: 100 - clipPad, y: 0, w: clipPad, h: 100 }, // right
-  }
+  // Return to the simpler overlay style, but match corner rounding
+  // by rounding the segment ends with the same radius as the card.
+  const thickness = `${solvedBorderThicknessPx}px`
+  const style: React.CSSProperties = { width: thickness, height: thickness }
 
   return (
-    <svg
-      className={`absolute inset-0 h-full w-full ${solvedBorderGlow}`}
-      viewBox="0 0 100 100"
-      preserveAspectRatio="none"
-      aria-hidden="true"
-    >
-      <defs>
-        {sides.map((side) => {
-          const clip = clipForSide[side]
-          return (
-            <clipPath key={side} id={`solvedSideClip-${side}`}>
-              <rect x={clip.x} y={clip.y} width={clip.w} height={clip.h} />
-            </clipPath>
-          )
-        })}
-      </defs>
-
-      {sides.map((side) => (
-        <rect
-          key={side}
-          x={pad}
-          y={pad}
-          width={100 - stroke}
-          height={100 - stroke}
-          rx={rx}
-          fill="transparent"
-          stroke="rgb(239 68 68)"
-          strokeWidth={stroke}
-          vectorEffect="non-scaling-stroke"
-          clipPath={`url(#solvedSideClip-${side})`}
+    <div className={`absolute inset-0 rounded-2xl ${solvedBorderGlow}`} aria-hidden="true">
+      {sides.includes(1) && (
+        <div
+          className="absolute left-0 right-0 top-0 bg-red-500 rounded-t-2xl"
+          style={{ height: thickness }}
         />
-      ))}
-    </svg>
+      )}
+      {sides.includes(2) && (
+        <div
+          className="absolute bottom-0 left-0 top-0 bg-red-500 rounded-l-2xl"
+          style={{ width: thickness }}
+        />
+      )}
+      {sides.includes(3) && (
+        <div
+          className="absolute bottom-0 left-0 right-0 bg-red-500 rounded-b-2xl"
+          style={{ height: thickness }}
+        />
+      )}
+      {sides.includes(4) && (
+        <div
+          className="absolute bottom-0 right-0 top-0 bg-red-500 rounded-r-2xl"
+          style={{ width: thickness }}
+        />
+      )}
+
+      {/* Corner dots to soften joins when adjacent sides exist */}
+      {sides.includes(1) && sides.includes(2) && (
+        <div className="absolute left-0 top-0 bg-red-500 rounded-full" style={{ ...style }} />
+      )}
+      {sides.includes(1) && sides.includes(4) && (
+        <div className="absolute right-0 top-0 bg-red-500 rounded-full" style={{ ...style }} />
+      )}
+      {sides.includes(3) && sides.includes(2) && (
+        <div className="absolute bottom-0 left-0 bg-red-500 rounded-full" style={{ ...style }} />
+      )}
+      {sides.includes(3) && sides.includes(4) && (
+        <div className="absolute bottom-0 right-0 bg-red-500 rounded-full" style={{ ...style }} />
+      )}
+    </div>
   )
 }
 
