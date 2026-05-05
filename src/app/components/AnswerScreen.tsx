@@ -84,7 +84,7 @@ export function AnswerScreen({
                 <div className="text-sm text-gray-300">Reward</div>
                 <div className="text-3xl font-bold text-green-400 flex items-center gap-2">
                   <Coins className="w-7 h-7" />
-                  {question.coinReward}
+                  {question.coinRewardFirst}
                 </div>
               </div>
               <div className="text-right">
@@ -147,7 +147,7 @@ export function AnswerScreen({
                       transition={{ delay: 0.3 }}
                       className="text-green-300"
                     >
-                      Well done! +{question.coinReward} coins awarded.
+                      Well done! Coins awarded based on solve order.
                     </motion.p>
                   </div>
                 </>

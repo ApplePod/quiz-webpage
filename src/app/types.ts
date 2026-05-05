@@ -13,7 +13,9 @@ export interface Question {
   correctAnswer: string;
   hint: string;
   hintCost: number;
-  coinReward: number;
+  coinRewardFirst: number;
+  coinRewardSecond: number;
+  coinRewardThird: number;
 }
 
 export interface QuestionStatus {

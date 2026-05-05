@@ -117,6 +117,15 @@ export default function App() {
     const isCorrect = answer.trim().toLowerCase() === question.correctAnswer.toLowerCase();
     if (!isCorrect) return;
 
+    const existingStatus = questionStatuses.find((status) => status.questionId === selectedQuestionId);
+    const solveCount = existingStatus?.solveCount ?? 0;
+    const reward =
+      solveCount === 0
+        ? question.coinRewardFirst
+        : solveCount === 1
+          ? question.coinRewardSecond
+          : question.coinRewardThird;
+
     setQuestionStatuses((previous) => {
       const existing = previous.find((status) => status.questionId === selectedQuestionId);
       if (existing?.solvedByTeams.includes(teamId)) return previous;
@@ -142,7 +151,7 @@ export default function App() {
 
     setTeams((previous) =>
       previous.map((team) =>
-        team.id === teamId ? { ...team, coins: team.coins + question.coinReward } : team,
+        team.id === teamId ? { ...team, coins: team.coins + reward } : team,
       ),
     );
   };

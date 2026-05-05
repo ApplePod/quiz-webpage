@@ -65,7 +65,7 @@ export function MainScreen({
                   <QuestionCard
                     key={question.id}
                     questionNumber={question.id}
-                    coinReward={question.coinReward}
+                    coinReward={question.coinRewardFirst}
                     solveCount={status?.solveCount || 0}
                     onClick={() => onQuestionSelect(question.id)}
                   />

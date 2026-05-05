@@ -30,7 +30,9 @@ create table if not exists public.questions (
   correct_answer text not null,
   hint text not null,
   hint_cost integer not null default 10 check (hint_cost >= 0),
-  coin_reward integer not null default 20 check (coin_reward >= 0),
+  coin_reward_first integer not null default 20 check (coin_reward_first >= 0),
+  coin_reward_second integer not null default 15 check (coin_reward_second >= 0),
+  coin_reward_third integer not null default 10 check (coin_reward_third >= 0),
   created_at timestamptz not null default now(),
   unique (game_id, question_no)
 );
@@ -185,7 +187,7 @@ as $$
     'questions', (
       select coalesce(jsonb_agg(q order by q.question_no), '[]'::jsonb)
       from (
-        select id, question_no, question_text, correct_answer, hint, hint_cost, coin_reward
+        select id, question_no, question_text, correct_answer, hint, hint_cost, coin_reward_first, coin_reward_second, coin_reward_third
         from questions
         where game_id = (select id from games where code = p_game_code limit 1)
       ) q
@@ -235,6 +237,8 @@ declare
   v_status_id uuid;
   v_is_correct boolean;
   v_existing_solve boolean;
+  v_current_solve_count integer;
+  v_reward integer;
 begin
   select id into v_game_id from games where code = p_game_code limit 1;
   if v_game_id is null then
@@ -269,11 +273,23 @@ begin
     return jsonb_build_object('isCorrect', true, 'alreadySolved', true);
   end if;
 
+  select coalesce(solve_count, 0)
+  into v_current_solve_count
+  from question_status
+  where game_id = v_game_id and question_id = v_question.id
+  limit 1;
+
+  v_reward := case
+    when v_current_solve_count = 0 then v_question.coin_reward_first
+    when v_current_solve_count = 1 then v_question.coin_reward_second
+    else v_question.coin_reward_third
+  end;
+
   insert into question_solves (game_id, question_id, team_id)
   values (v_game_id, v_question.id, v_team.id);
 
   update teams
-  set coins = coins + v_question.coin_reward
+  set coins = coins + v_reward
   where id = v_team.id;
 
   insert into question_status (game_id, question_id, solve_count, locked)
@@ -285,7 +301,7 @@ begin
     updated_at = now()
   returning id into v_status_id;
 
-  return jsonb_build_object('isCorrect', true, 'alreadySolved', false);
+  return jsonb_build_object('isCorrect', true, 'alreadySolved', false, 'reward', v_reward);
 end;
 $$;
 

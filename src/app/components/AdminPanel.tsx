@@ -130,7 +130,7 @@ export function AdminPanel({
                         <th className="px-4 py-3 text-left text-gray-300 font-semibold">Answer</th>
                         <th className="px-4 py-3 text-left text-gray-300 font-semibold">Hint</th>
                         <th className="px-4 py-3 text-left text-gray-300 font-semibold">Hint Cost</th>
-                        <th className="px-4 py-3 text-left text-gray-300 font-semibold">Reward</th>
+                        <th className="px-4 py-3 text-left text-gray-300 font-semibold">Reward (1st/2nd/3rd)</th>
                         <th className="px-4 py-3 text-left text-gray-300 font-semibold">Solves</th>
                         <th className="px-4 py-3 text-left text-gray-300 font-semibold">Actions</th>
                       </tr>
@@ -208,21 +208,51 @@ export function AdminPanel({
                             </td>
                             <td className="px-4 py-3">
                               {isEditing ? (
-                                <Input
-                                  type="number"
-                                  value={questionEdits.coinReward || 0}
-                                  onChange={(e) =>
-                                    setQuestionEdits({
-                                      ...questionEdits,
-                                      coinReward: parseInt(e.target.value) || 0,
-                                    })
-                                  }
-                                  className="bg-gray-700 border-gray-600 text-white text-xs w-20"
-                                />
+                                <div className="flex items-center gap-2">
+                                  <Input
+                                    type="number"
+                                    value={questionEdits.coinRewardFirst || 0}
+                                    onChange={(e) =>
+                                      setQuestionEdits({
+                                        ...questionEdits,
+                                        coinRewardFirst: parseInt(e.target.value) || 0,
+                                      })
+                                    }
+                                    className="bg-gray-700 border-gray-600 text-white text-xs w-20"
+                                  />
+                                  <Input
+                                    type="number"
+                                    value={questionEdits.coinRewardSecond || 0}
+                                    onChange={(e) =>
+                                      setQuestionEdits({
+                                        ...questionEdits,
+                                        coinRewardSecond: parseInt(e.target.value) || 0,
+                                      })
+                                    }
+                                    className="bg-gray-700 border-gray-600 text-white text-xs w-20"
+                                  />
+                                  <Input
+                                    type="number"
+                                    value={questionEdits.coinRewardThird || 0}
+                                    onChange={(e) =>
+                                      setQuestionEdits({
+                                        ...questionEdits,
+                                        coinRewardThird: parseInt(e.target.value) || 0,
+                                      })
+                                    }
+                                    className="bg-gray-700 border-gray-600 text-white text-xs w-20"
+                                  />
+                                </div>
                               ) : (
-                                <div className="flex items-center gap-1">
-                                  <span className="text-yellow-400 font-bold">{question.coinReward}</span>
-                                  <Coins className="w-4 h-4 text-yellow-400" />
+                                <div className="flex items-center gap-2">
+                                  <div className="flex items-center gap-1">
+                                    <span className="text-yellow-400 font-bold">{question.coinRewardFirst}</span>
+                                    <Coins className="w-4 h-4 text-yellow-400" />
+                                  </div>
+                                  <span className="text-gray-500">/</span>
+                                  <span className="text-yellow-300 font-semibold">{question.coinRewardSecond}</span>
+                                  <span className="text-gray-500">/</span>
+                                  <span className="text-yellow-200 font-semibold">{question.coinRewardThird}</span>
                                 </div>
                               )}
                             </td>

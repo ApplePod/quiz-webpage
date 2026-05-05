@@ -53,7 +53,9 @@ function mapSnapshot(payload: any): GameSnapshot {
     correctAnswer: question.correct_answer,
     hint: question.hint,
     hintCost: question.hint_cost,
-    coinReward: question.coin_reward,
+    coinRewardFirst: question.coin_reward_first ?? question.coin_reward,
+    coinRewardSecond: question.coin_reward_second ?? Math.max(0, Math.floor((question.coin_reward ?? 0) * 0.6)),
+    coinRewardThird: question.coin_reward_third ?? Math.max(0, Math.floor((question.coin_reward ?? 0) * 0.3)),
   }))
 
   const questionStatuses: QuestionStatus[] = (payload.question_status ?? []).map(
@@ -173,7 +175,9 @@ export async function updateQuestion(questionId: number, updates: Partial<Questi
       correct_answer: updates.correctAnswer,
       hint: updates.hint,
       hint_cost: updates.hintCost,
-      coin_reward: updates.coinReward,
+      coin_reward_first: updates.coinRewardFirst,
+      coin_reward_second: updates.coinRewardSecond,
+      coin_reward_third: updates.coinRewardThird,
     })
     .eq('question_no', questionId)
 
