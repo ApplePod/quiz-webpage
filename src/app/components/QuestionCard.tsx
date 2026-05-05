@@ -9,6 +9,36 @@ interface QuestionCardProps {
   onClick: () => void;
 }
 
+type BorderSide = 1 | 2 | 3 | 4
+
+// Counter-clockwise: (1,2,3,4) = (top, left, bottom, right)
+const solvedBorderMap: Record<number, BorderSide[] | 'diagonal'> = {
+  1: [1, 2, 3],
+  2: [1, 3, 4],
+  3: [4],
+  4: [1],
+  5: [1, 4],
+  6: [2],
+  7: 'diagonal',
+  8: [4],
+  9: [3],
+  10: [3, 4],
+  11: [3],
+  12: [3],
+  14: [3],
+  15: [3],
+  16: [2, 3],
+  17: [3],
+  18: [4],
+  19: [3],
+  20: [3],
+  21: [3],
+  22: [3],
+  23: [2, 4],
+  24: [3],
+  25: [3],
+}
+
 export function QuestionCard({
   questionNumber,
   coinReward,
@@ -16,6 +46,8 @@ export function QuestionCard({
   onClick,
 }: QuestionCardProps) {
   const isLocked = solveCount >= 3;
+  const isSolved = solveCount > 0;
+  const solvedBorder = solvedBorderMap[questionNumber];
 
   // Determine card state
   const getCardStyle = () => {
@@ -113,6 +145,35 @@ export function QuestionCard({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Solved border overlay (custom per question) */}
+      {isSolved && solvedBorder && (
+        <div className="pointer-events-none absolute inset-0 z-20">
+          {solvedBorder === 'diagonal' ? (
+            <div className="absolute inset-0 overflow-hidden rounded-2xl">
+              <div
+                className="absolute left-1/2 top-1/2 h-[3px] w-[140%] -translate-x-1/2 -translate-y-1/2 rotate-45 bg-red-500 shadow-[0_0_12px_rgba(239,68,68,0.8)]"
+                aria-hidden="true"
+              />
+            </div>
+          ) : (
+            <>
+              {solvedBorder.includes(1) && (
+                <div className="absolute left-2 right-2 top-2 h-[3px] rounded-full bg-red-500 shadow-[0_0_12px_rgba(239,68,68,0.8)]" />
+              )}
+              {solvedBorder.includes(2) && (
+                <div className="absolute bottom-2 left-2 top-2 w-[3px] rounded-full bg-red-500 shadow-[0_0_12px_rgba(239,68,68,0.8)]" />
+              )}
+              {solvedBorder.includes(3) && (
+                <div className="absolute bottom-2 left-2 right-2 h-[3px] rounded-full bg-red-500 shadow-[0_0_12px_rgba(239,68,68,0.8)]" />
+              )}
+              {solvedBorder.includes(4) && (
+                <div className="absolute bottom-2 right-2 top-2 w-[3px] rounded-full bg-red-500 shadow-[0_0_12px_rgba(239,68,68,0.8)]" />
+              )}
+            </>
+          )}
+        </div>
+      )}
 
       <div className="flex flex-col items-center gap-3">
         {/* Icon based on state */}
