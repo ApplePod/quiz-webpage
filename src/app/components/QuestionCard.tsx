@@ -43,39 +43,54 @@ const solvedBorderThicknessPx = 3
 const solvedBorderGlow = 'shadow-[0_0_10px_rgba(239,68,68,0.8)]'
 
 function SolvedBorderMask({ sides }: { sides: BorderSide[] }) {
-  const thickness = solvedBorderThicknessPx
-  const t = `${thickness}px`
-  // Match Tailwind `rounded-2xl` radius (1rem)
-  const r = '1rem'
-  const baseStyle: React.CSSProperties = {
-    borderColor: 'rgb(239 68 68)',
-    borderStyle: 'solid',
-    borderWidth: t,
-    borderRadius: r,
-    boxShadow: '0 0 10px rgba(239, 68, 68, 0.8)',
-  }
+  // Use SVG stroke + clipPath to match rounded corners perfectly (no straight protrusions).
+  const stroke = solvedBorderThicknessPx
+  const pad = stroke / 2
+  const clipPad = stroke + 2
+  // Tailwind rounded-2xl ~= 1rem. In a 100x100 viewBox, rx=16 is a good match.
+  const rx = 16
 
-  const clipForSide: Record<BorderSide, string> = {
-    1: `inset(0 0 calc(100% - ${t}) 0 round ${r})`, // top
-    2: `inset(0 calc(100% - ${t}) 0 0 round ${r})`, // left
-    3: `inset(calc(100% - ${t}) 0 0 0 round ${r})`, // bottom
-    4: `inset(0 0 0 calc(100% - ${t}) round ${r})`, // right
+  const clipForSide: Record<BorderSide, { x: number; y: number; w: number; h: number }> = {
+    1: { x: 0, y: 0, w: 100, h: clipPad }, // top
+    2: { x: 0, y: 0, w: clipPad, h: 100 }, // left
+    3: { x: 0, y: 100 - clipPad, w: 100, h: clipPad }, // bottom
+    4: { x: 100 - clipPad, y: 0, w: clipPad, h: 100 }, // right
   }
 
   return (
-    <>
+    <svg
+      className={`absolute inset-0 h-full w-full ${solvedBorderGlow}`}
+      viewBox="0 0 100 100"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+      <defs>
+        {sides.map((side) => {
+          const clip = clipForSide[side]
+          return (
+            <clipPath key={side} id={`solvedSideClip-${side}`}>
+              <rect x={clip.x} y={clip.y} width={clip.w} height={clip.h} />
+            </clipPath>
+          )
+        })}
+      </defs>
+
       {sides.map((side) => (
-        <div
+        <rect
           key={side}
-          className="absolute inset-0"
-          style={{
-            ...baseStyle,
-            clipPath: clipForSide[side],
-          }}
-          aria-hidden="true"
+          x={pad}
+          y={pad}
+          width={100 - stroke}
+          height={100 - stroke}
+          rx={rx}
+          fill="transparent"
+          stroke="rgb(239 68 68)"
+          strokeWidth={stroke}
+          vectorEffect="non-scaling-stroke"
+          clipPath={`url(#solvedSideClip-${side})`}
         />
       ))}
-    </>
+    </svg>
   )
 }
 
