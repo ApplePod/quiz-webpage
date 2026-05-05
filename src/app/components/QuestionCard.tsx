@@ -39,6 +39,9 @@ const solvedBorderMap: Record<number, BorderSide[] | 'diagonal'> = {
   25: [3],
 }
 
+const solvedBorderThicknessPx = 3
+const solvedBorderGlow = 'shadow-[0_0_10px_rgba(239,68,68,0.8)]'
+
 export function QuestionCard({
   questionNumber,
   coinReward,
@@ -152,24 +155,75 @@ export function QuestionCard({
           {solvedBorder === 'diagonal' ? (
             <div className="absolute inset-0 overflow-hidden rounded-2xl">
               <div
-                className="absolute left-1/2 top-1/2 h-[2px] w-[160%] -translate-x-1/2 -translate-y-1/2 rotate-45 bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.8)]"
+                className={`absolute left-1/2 top-1/2 w-[170%] -translate-x-1/2 -translate-y-1/2 rotate-45 bg-red-500 ${solvedBorderGlow}`}
+                style={{ height: `${solvedBorderThicknessPx}px` }}
                 aria-hidden="true"
               />
             </div>
           ) : (
             <>
-              {solvedBorder.includes(1) && (
-                <div className="absolute left-0 right-0 top-0 h-px bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.8)]" />
-              )}
-              {solvedBorder.includes(2) && (
-                <div className="absolute bottom-0 left-0 top-0 w-px bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.8)]" />
-              )}
-              {solvedBorder.includes(3) && (
-                <div className="absolute bottom-0 left-0 right-0 h-px bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.8)]" />
-              )}
-              {solvedBorder.includes(4) && (
-                <div className="absolute bottom-0 right-0 top-0 w-px bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.8)]" />
-              )}
+              {(() => {
+                const sides = solvedBorder
+                const hasTop = sides.includes(1)
+                const hasLeft = sides.includes(2)
+                const hasBottom = sides.includes(3)
+                const hasRight = sides.includes(4)
+                const capSize = solvedBorderThicknessPx * 2
+                return (
+                  <>
+                    {hasTop && (
+                      <div
+                        className={`absolute left-0 right-0 top-0 bg-red-500 ${solvedBorderGlow}`}
+                        style={{ height: `${solvedBorderThicknessPx}px` }}
+                      />
+                    )}
+                    {hasLeft && (
+                      <div
+                        className={`absolute bottom-0 left-0 top-0 bg-red-500 ${solvedBorderGlow}`}
+                        style={{ width: `${solvedBorderThicknessPx}px` }}
+                      />
+                    )}
+                    {hasBottom && (
+                      <div
+                        className={`absolute bottom-0 left-0 right-0 bg-red-500 ${solvedBorderGlow}`}
+                        style={{ height: `${solvedBorderThicknessPx}px` }}
+                      />
+                    )}
+                    {hasRight && (
+                      <div
+                        className={`absolute bottom-0 right-0 top-0 bg-red-500 ${solvedBorderGlow}`}
+                        style={{ width: `${solvedBorderThicknessPx}px` }}
+                      />
+                    )}
+
+                    {/* Rounded corner caps when sides connect */}
+                    {hasTop && hasLeft && (
+                      <div
+                        className={`absolute left-0 top-0 rounded-full bg-red-500 ${solvedBorderGlow}`}
+                        style={{ width: `${capSize}px`, height: `${capSize}px` }}
+                      />
+                    )}
+                    {hasTop && hasRight && (
+                      <div
+                        className={`absolute right-0 top-0 rounded-full bg-red-500 ${solvedBorderGlow}`}
+                        style={{ width: `${capSize}px`, height: `${capSize}px` }}
+                      />
+                    )}
+                    {hasBottom && hasLeft && (
+                      <div
+                        className={`absolute bottom-0 left-0 rounded-full bg-red-500 ${solvedBorderGlow}`}
+                        style={{ width: `${capSize}px`, height: `${capSize}px` }}
+                      />
+                    )}
+                    {hasBottom && hasRight && (
+                      <div
+                        className={`absolute bottom-0 right-0 rounded-full bg-red-500 ${solvedBorderGlow}`}
+                        style={{ width: `${capSize}px`, height: `${capSize}px` }}
+                      />
+                    )}
+                  </>
+                )
+              })()}
             </>
           )}
         </div>
