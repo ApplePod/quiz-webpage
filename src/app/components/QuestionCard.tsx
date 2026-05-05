@@ -152,23 +152,23 @@ export function QuestionCard({
           {solvedBorder === 'diagonal' ? (
             <div className="absolute inset-0 overflow-hidden rounded-2xl">
               <div
-                className="absolute left-1/2 top-1/2 h-[3px] w-[140%] -translate-x-1/2 -translate-y-1/2 rotate-45 bg-red-500 shadow-[0_0_12px_rgba(239,68,68,0.8)]"
+                className="absolute left-1/2 top-1/2 h-[2px] w-[160%] -translate-x-1/2 -translate-y-1/2 rotate-45 bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.8)]"
                 aria-hidden="true"
               />
             </div>
           ) : (
             <>
               {solvedBorder.includes(1) && (
-                <div className="absolute left-2 right-2 top-2 h-[3px] rounded-full bg-red-500 shadow-[0_0_12px_rgba(239,68,68,0.8)]" />
+                <div className="absolute left-0 right-0 top-0 h-px bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.8)]" />
               )}
               {solvedBorder.includes(2) && (
-                <div className="absolute bottom-2 left-2 top-2 w-[3px] rounded-full bg-red-500 shadow-[0_0_12px_rgba(239,68,68,0.8)]" />
+                <div className="absolute bottom-0 left-0 top-0 w-px bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.8)]" />
               )}
               {solvedBorder.includes(3) && (
-                <div className="absolute bottom-2 left-2 right-2 h-[3px] rounded-full bg-red-500 shadow-[0_0_12px_rgba(239,68,68,0.8)]" />
+                <div className="absolute bottom-0 left-0 right-0 h-px bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.8)]" />
               )}
               {solvedBorder.includes(4) && (
-                <div className="absolute bottom-2 right-2 top-2 w-[3px] rounded-full bg-red-500 shadow-[0_0_12px_rgba(239,68,68,0.8)]" />
+                <div className="absolute bottom-0 right-0 top-0 w-px bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.8)]" />
               )}
             </>
           )}
