@@ -451,6 +451,9 @@ export default function App() {
           <AnswerScreen
             team={selectedTeam}
             question={currentQuestion}
+            solveCount={
+              questionStatuses.find((status) => status.questionId === currentQuestion.id)?.solveCount || 0
+            }
             onSubmit={handleAnswerSubmit}
             onHintRequest={handleHintRequest}
             onBack={handleBackToMain}

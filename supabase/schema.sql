@@ -292,6 +292,7 @@ declare
   v_is_correct boolean;
   v_existing_solve boolean;
   v_current_solve_count integer;
+  v_new_solve_count integer;
   v_reward integer;
 begin
   select id into v_game_id from games where code = p_game_code limit 1;
@@ -327,11 +328,12 @@ begin
     return jsonb_build_object('isCorrect', true, 'alreadySolved', true);
   end if;
 
-  select coalesce(solve_count, 0)
+  -- Determine solve order from the source of truth (unique solves table),
+  -- not from the denormalized question_status which can get out of sync.
+  select count(*)
   into v_current_solve_count
-  from question_status
-  where game_id = v_game_id and question_id = v_question.id
-  limit 1;
+  from question_solves
+  where game_id = v_game_id and question_id = v_question.id;
 
   v_reward := case
     when v_current_solve_count = 0 then v_question.coin_reward_first
@@ -342,16 +344,21 @@ begin
   insert into question_solves (game_id, question_id, team_id)
   values (v_game_id, v_question.id, v_team.id);
 
+  select count(*)
+  into v_new_solve_count
+  from question_solves
+  where game_id = v_game_id and question_id = v_question.id;
+
   update teams
   set coins = coins + v_reward
   where id = v_team.id;
 
   insert into question_status (game_id, question_id, solve_count, locked)
-  values (v_game_id, v_question.id, 1, false)
+  values (v_game_id, v_question.id, least(3, v_new_solve_count), (least(3, v_new_solve_count) >= 3))
   on conflict (game_id, question_id)
   do update set
-    solve_count = least(3, question_status.solve_count + 1),
-    locked = (least(3, question_status.solve_count + 1) >= 3),
+    solve_count = least(3, v_new_solve_count),
+    locked = (least(3, v_new_solve_count) >= 3),
     updated_at = now()
   returning id into v_status_id;
 

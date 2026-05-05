@@ -61,12 +61,19 @@ export function MainScreen({
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
               {questions.map((question) => {
                 const status = questionStatuses.find((s) => s.questionId === question.id);
+                const solveCount = status?.solveCount || 0;
+                const nextReward =
+                  solveCount === 0
+                    ? question.coinRewardFirst
+                    : solveCount === 1
+                      ? question.coinRewardSecond
+                      : question.coinRewardThird;
                 return (
                   <QuestionCard
                     key={question.id}
                     questionNumber={question.id}
-                    coinReward={question.coinRewardFirst}
-                    solveCount={status?.solveCount || 0}
+                    coinReward={nextReward}
+                    solveCount={solveCount}
                     onClick={() => onQuestionSelect(question.id)}
                   />
                 );

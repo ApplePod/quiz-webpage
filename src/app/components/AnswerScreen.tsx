@@ -9,6 +9,7 @@ import { motion } from 'motion/react';
 interface AnswerScreenProps {
   team: Team;
   question: Question;
+  solveCount: number;
   onSubmit: (answer: string, teamId: string) => void;
   onHintRequest: (teamId: string, questionId: number) => void;
   onBack: () => void;
@@ -17,6 +18,7 @@ interface AnswerScreenProps {
 export function AnswerScreen({
   team,
   question,
+  solveCount,
   onSubmit,
   onHintRequest,
   onBack,
@@ -27,6 +29,12 @@ export function AnswerScreen({
   const [result, setResult] = useState<'correct' | 'incorrect' | null>(null);
   const [hintInsufficientCoins, setHintInsufficientCoins] = useState(false);
   const [showRechargeDialog, setShowRechargeDialog] = useState(false);
+  const rewardForCurrentOrder =
+    solveCount === 0
+      ? question.coinRewardFirst
+      : solveCount === 1
+        ? question.coinRewardSecond
+        : question.coinRewardThird;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,7 +92,7 @@ export function AnswerScreen({
                 <div className="text-sm text-gray-300">Reward</div>
                 <div className="text-3xl font-bold text-green-400 flex items-center gap-2">
                   <Coins className="w-7 h-7" />
-                  {question.coinRewardFirst}
+                  {rewardForCurrentOrder}
                 </div>
               </div>
               <div className="text-right">
@@ -147,7 +155,7 @@ export function AnswerScreen({
                       transition={{ delay: 0.3 }}
                       className="text-green-300"
                     >
-                      Well done! Coins awarded based on solve order.
+                      Well done! +{rewardForCurrentOrder} coins awarded.
                     </motion.p>
                   </div>
                 </>
