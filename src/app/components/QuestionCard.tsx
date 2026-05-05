@@ -193,7 +193,7 @@ export function QuestionCard({
                 repeatDelay: 2,
               }}
             >
-              <X className="w-16 h-16 text-red-400 stroke-[3]" />
+              <X className="w-28 h-28 text-gray-300/70 stroke-[2]" />
             </motion.div>
           </motion.div>
         )}
