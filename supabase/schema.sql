@@ -319,6 +319,12 @@ begin
     return jsonb_build_object('isCorrect', false, 'alreadySolved', false);
   end if;
 
+  -- Serialize solve awarding per (game, question) to prevent race conditions.
+  -- This ensures 1st/2nd/3rd rewards are assigned deterministically even under simultaneous submissions.
+  perform pg_advisory_xact_lock(
+    hashtext(v_game_id::text || ':' || v_question.id::text)
+  );
+
   select exists (
     select 1 from question_solves
     where game_id = v_game_id and question_id = v_question.id and team_id = v_team.id
@@ -334,6 +340,10 @@ begin
   into v_current_solve_count
   from question_solves
   where game_id = v_game_id and question_id = v_question.id;
+
+  if v_current_solve_count >= 3 then
+    return jsonb_build_object('isCorrect', true, 'alreadySolved', false, 'locked', true, 'reward', 0);
+  end if;
 
   v_reward := case
     when v_current_solve_count = 0 then v_question.coin_reward_first

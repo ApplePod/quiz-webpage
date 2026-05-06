@@ -123,7 +123,7 @@ export async function submitAnswer(teamId: string, questionId: number, answer: s
   ensureConfigured()
   const supabase = requireSupabase()
 
-  const { error } = await supabase.rpc('submit_answer', {
+  const { data, error } = await supabase.rpc('submit_answer', {
     p_game_code: GAME_CODE,
     p_team_code: teamId,
     p_question_no: questionId,
@@ -133,6 +133,8 @@ export async function submitAnswer(teamId: string, questionId: number, answer: s
   if (error) {
     throw error
   }
+
+  return data as any
 }
 
 export async function requestHint(teamId: string, questionId: number) {

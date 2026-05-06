@@ -239,7 +239,10 @@ export default function App() {
       handleLocalAnswerSubmit(answer, teamId);
     } else {
       try {
-        await submitAnswer(teamId, selectedQuestionId, answer);
+        const response = await submitAnswer(teamId, selectedQuestionId, answer);
+        if (response?.locked) {
+          setError('이미 3팀이 정답 처리하여 잠긴 문제입니다.');
+        }
         // Pull latest state immediately so the user sees the update
         // even if Realtime delivery is delayed.
         await syncFromSnapshot();
