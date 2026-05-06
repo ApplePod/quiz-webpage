@@ -1,12 +1,25 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Team, Question } from '../types';
-import { ArrowLeft, Lightbulb, Send, CheckCircle2, XCircle, Coins, Sparkles } from 'lucide-react';
+import {
+  ArrowLeft,
+  Lightbulb,
+  Send,
+  CheckCircle2,
+  XCircle,
+  Coins,
+  Sparkles,
+  ChevronUp,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  RotateCcw,
+  Delete,
+} from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog';
 import { motion } from 'motion/react';
 import {
-  arrowKeyToDirectionDigit,
   directionDigitsToArrows,
   encodeCorrectAnswer,
   isCorrectForQuestion,
@@ -77,53 +90,47 @@ export function AnswerScreen({
   }, [question.id]);
 
   useEffect(() => {
+    // directionLock input now uses on-screen buttons (mouse/touch-friendly)
+    // (We intentionally do not bind keydown here to match the desired UX.)
+    return undefined;
+  }, [expectedDirectionDigits, onSubmit, question, result, team.id]);
+
+  const pushDirectionDigit = (digit: number) => {
     if (result) return;
     if (question.answerType !== 'directionLock') return;
 
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        event.preventDefault();
-        setDirectionDigits([]);
-        setLastDirectionDigit(null);
-        return;
+    setLastDirectionDigit(digit);
+    setDirectionDigits((previous) => {
+      const next = [...previous, digit];
+      const targetLength = expectedDirectionDigits.length || next.length;
+      const trimmed = next.slice(0, targetLength);
+
+      if (expectedDirectionDigits.length > 0 && trimmed.length === expectedDirectionDigits.length) {
+        const submitted = encodeCorrectAnswer('directionLock', trimmed);
+        const isCorrect = isCorrectForQuestion(
+          { ...question, answerType: 'directionLock', correctAnswer: expectedDirectionDigits },
+          submitted,
+        );
+        setResult(isCorrect ? 'correct' : 'incorrect');
+        setTimeout(() => {
+          onSubmit(submitted, team.id);
+        }, 2000);
       }
 
-      if (event.key === 'Backspace') {
-        event.preventDefault();
-        setDirectionDigits((previous) => previous.slice(0, -1));
-        return;
-      }
+      return trimmed;
+    });
+  };
 
-      const digit = arrowKeyToDirectionDigit(event.key);
-      if (!digit) return;
+  const popDirectionDigit = () => {
+    if (result) return;
+    setDirectionDigits((previous) => previous.slice(0, -1));
+  };
 
-      event.preventDefault();
-      setLastDirectionDigit(digit);
-
-      setDirectionDigits((previous) => {
-        const next = [...previous, digit];
-        const targetLength = expectedDirectionDigits.length || next.length;
-        const trimmed = next.slice(0, targetLength);
-
-        if (expectedDirectionDigits.length > 0 && trimmed.length === expectedDirectionDigits.length) {
-          const submitted = encodeCorrectAnswer('directionLock', trimmed);
-          const isCorrect = isCorrectForQuestion(
-            { ...question, answerType: 'directionLock', correctAnswer: expectedDirectionDigits },
-            submitted,
-          );
-          setResult(isCorrect ? 'correct' : 'incorrect');
-          setTimeout(() => {
-            onSubmit(submitted, team.id);
-          }, 2000);
-        }
-
-        return trimmed;
-      });
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [expectedDirectionDigits, onSubmit, question, result, team.id]);
+  const resetDirectionDigits = () => {
+    if (result) return;
+    setDirectionDigits([]);
+    setLastDirectionDigit(null);
+  };
 
   const handleHintConfirm = () => {
     setShowHintDialog(false);
@@ -302,7 +309,7 @@ export function AnswerScreen({
                     <div>
                       <div className="text-sm font-medium text-gray-300">Direction Lock</div>
                       <div className="text-xs text-gray-400 mt-1">
-                        방향키로 입력하세요. <span className="text-gray-300">ESC</span> 초기화, <span className="text-gray-300">Backspace</span> 한 칸 삭제
+                        버튼(상/하/좌/우)을 눌러 입력하세요.
                       </div>
                     </div>
                     <div className="text-right">
@@ -315,29 +322,66 @@ export function AnswerScreen({
 
                   <div className="bg-white/5 rounded-xl border border-white/20 p-6">
                     <div className="flex items-center justify-center">
-                      <motion.div
-                        animate={{
-                          rotate:
-                            lastDirectionDigit === 1
-                              ? 0
-                              : lastDirectionDigit === 3
-                                ? 90
+                      <div className="relative w-56 h-56">
+                        <div className="absolute inset-0 rounded-full border border-white/20 bg-gradient-to-br from-white/10 to-white/0 shadow-inner" />
+                        <div className="absolute inset-6 rounded-full border border-white/15 bg-black/20" />
+
+                        {/* Buttons */}
+                        <button
+                          type="button"
+                          onClick={() => pushDirectionDigit(1)}
+                          className="absolute left-1/2 top-2 -translate-x-1/2 rounded-full border border-white/20 bg-white/10 backdrop-blur px-4 py-3 text-white hover:bg-white/15 active:scale-95 transition"
+                        >
+                          <ChevronUp className="w-6 h-6" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => pushDirectionDigit(2)}
+                          className="absolute left-1/2 bottom-2 -translate-x-1/2 rounded-full border border-white/20 bg-white/10 backdrop-blur px-4 py-3 text-white hover:bg-white/15 active:scale-95 transition"
+                        >
+                          <ChevronDown className="w-6 h-6" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => pushDirectionDigit(4)}
+                          className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full border border-white/20 bg-white/10 backdrop-blur px-4 py-3 text-white hover:bg-white/15 active:scale-95 transition"
+                        >
+                          <ChevronLeft className="w-6 h-6" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => pushDirectionDigit(3)}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full border border-white/20 bg-white/10 backdrop-blur px-4 py-3 text-white hover:bg-white/15 active:scale-95 transition"
+                        >
+                          <ChevronRight className="w-6 h-6" />
+                        </button>
+
+                        {/* Knob */}
+                        <motion.div
+                          animate={{
+                            x:
+                              lastDirectionDigit === 4
+                                ? -26
+                                : lastDirectionDigit === 3
+                                  ? 26
+                                  : 0,
+                            y:
+                              lastDirectionDigit === 1
+                                ? -26
                                 : lastDirectionDigit === 2
-                                  ? 180
-                                  : lastDirectionDigit === 4
-                                    ? -90
-                                    : 0,
-                          scale: lastDirectionDigit ? [1, 1.08, 1] : 1,
-                        }}
-                        transition={{ type: 'spring', stiffness: 260, damping: 18 }}
-                        className="relative w-32 h-32 rounded-full border border-white/25 bg-gradient-to-br from-white/10 to-white/0 shadow-inner flex items-center justify-center"
-                      >
-                        <div className="absolute inset-3 rounded-full border border-white/15 bg-black/20" />
-                        <div className="absolute top-3 left-1/2 -translate-x-1/2 w-2 h-8 rounded-full bg-purple-400 shadow-[0_0_16px_rgba(168,85,247,0.65)]" />
-                        <div className="relative w-12 h-12 rounded-2xl border border-white/20 bg-white/10 flex items-center justify-center text-white font-bold">
-                          🔒
-                        </div>
-                      </motion.div>
+                                  ? 26
+                                  : 0,
+                            scale: lastDirectionDigit ? [1, 1.06, 1] : 1,
+                          }}
+                          transition={{ type: 'spring', stiffness: 320, damping: 20 }}
+                          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+                        >
+                          <div className="relative w-20 h-20 rounded-full border border-white/25 bg-gradient-to-br from-red-500/55 to-red-600/20 shadow-[0_0_30px_rgba(244,63,94,0.15)]">
+                            <div className="absolute inset-2 rounded-full border border-white/15 bg-white/5" />
+                            <div className="absolute left-1/2 top-2 -translate-x-1/2 w-2 h-6 rounded-full bg-purple-300/70 shadow-[0_0_14px_rgba(168,85,247,0.55)]" />
+                          </div>
+                        </motion.div>
+                      </div>
                     </div>
 
                     <div className="mt-5 flex flex-col items-center gap-3">
@@ -363,6 +407,29 @@ export function AnswerScreen({
                         {directionDigits.length ? `[${directionDigits.join(', ')}]` : '[ ]'}
                       </div>
                     </div>
+                  </div>
+
+                  <div className="flex items-center justify-center gap-3">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={popDirectionDigit}
+                      className="border-white/25 text-white hover:bg-white/10"
+                      disabled={directionDigits.length === 0}
+                    >
+                      <Delete className="w-4 h-4 mr-2" />
+                      한 칸 삭제
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={resetDirectionDigits}
+                      className="border-white/25 text-white hover:bg-white/10"
+                      disabled={directionDigits.length === 0}
+                    >
+                      <RotateCcw className="w-4 h-4 mr-2" />
+                      초기화
+                    </Button>
                   </div>
 
                   <div className="text-xs text-gray-400">
