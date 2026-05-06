@@ -143,6 +143,12 @@ export default function App() {
     const question = questions.find((entry) => entry.id === selectedQuestionId);
     if (!question) return;
 
+    const currentStatus = questionStatuses.find((status) => status.questionId === selectedQuestionId);
+    if (currentStatus && (currentStatus.locked || currentStatus.solveCount >= 3)) {
+      setError('이미 3팀이 정답 처리하여 잠긴 문제입니다.');
+      return;
+    }
+
     const isCorrect = isCorrectForQuestion(question, answer);
     if (!isCorrect) return;
 
@@ -187,6 +193,19 @@ export default function App() {
 
   const handleAnswerSubmit = async (answer: string, teamId: string) => {
     if (!selectedQuestionId) return;
+
+    // Guard against race: question can become locked after user entered the answer screen.
+    const currentStatus = questionStatuses.find((status) => status.questionId === selectedQuestionId);
+    if (currentStatus && (currentStatus.locked || currentStatus.solveCount >= 3)) {
+      setError('이미 3팀이 정답 처리하여 잠긴 문제입니다.');
+      setTimeout(() => {
+        setCurrentView('main');
+        setSelectedQuestionId(null);
+        setSelectedTeam(null);
+      }, 1200);
+      return;
+    }
+
     if (!isSupabaseConfigured) {
       handleLocalAnswerSubmit(answer, teamId);
     } else {
