@@ -82,6 +82,7 @@ export function MainScreen({
               {questions.map((question) => {
                 const status = questionStatuses.find((s) => s.questionId === question.id);
                 const solveCount = status?.solveCount || 0;
+                const solvedByActiveTeam = Boolean(activeTeam && status?.solvedByTeams?.includes(activeTeam.id));
                 const nextReward =
                   solveCount === 0
                     ? question.coinRewardFirst
@@ -94,6 +95,7 @@ export function MainScreen({
                     questionNumber={question.id}
                     coinReward={nextReward}
                     solveCount={solveCount}
+                    solvedByActiveTeam={solvedByActiveTeam}
                     onClick={() => onQuestionSelect(question.id)}
                   />
                 );

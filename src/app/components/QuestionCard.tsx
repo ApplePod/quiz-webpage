@@ -1,11 +1,12 @@
 import React from 'react';
-import { Circle, X, Trophy, Award, Coins } from 'lucide-react';
+import { Lock, Unlock, X, Coins } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface QuestionCardProps {
   questionNumber: number;
   coinReward: number;
   solveCount: number; // 0-3
+  solvedByActiveTeam?: boolean;
   onClick: () => void;
 }
 
@@ -96,10 +97,12 @@ export function QuestionCard({
   questionNumber,
   coinReward,
   solveCount,
+  solvedByActiveTeam = false,
   onClick,
 }: QuestionCardProps) {
   const isLocked = solveCount >= 3;
   const isSolved = solveCount > 0;
+  const isDisabled = isLocked || solvedByActiveTeam;
   const solvedBorder = solvedBorderMap[questionNumber];
 
   // Determine card state
@@ -141,9 +144,9 @@ export function QuestionCard({
   return (
     <motion.button
       key={`${questionNumber}-${solveCount}`}
-      onClick={isLocked ? undefined : onClick}
-      whileHover={isLocked ? {} : { scale: 1.05, y: -5 }}
-      whileTap={isLocked ? {} : { scale: 0.95 }}
+      onClick={isDisabled ? undefined : onClick}
+      whileHover={isDisabled ? {} : { scale: 1.05, y: -5 }}
+      whileTap={isDisabled ? {} : { scale: 0.95 }}
       animate={
         solveCount > 0 && !isLocked
           ? {
@@ -161,9 +164,9 @@ export function QuestionCard({
       className={`relative p-6 rounded-2xl backdrop-blur-md border transition-all duration-300 ${
         cardStyle.bg
       } ${cardStyle.border} ${cardStyle.shadow} ${
-        isLocked ? 'cursor-not-allowed opacity-60' : `${cardStyle.hoverBg} cursor-pointer`
+        isDisabled ? 'cursor-not-allowed opacity-60' : `${cardStyle.hoverBg} cursor-pointer`
       }`}
-      disabled={isLocked}
+      disabled={isDisabled}
     >
       {/* Locked Overlay */}
       <AnimatePresence>
@@ -217,32 +220,23 @@ export function QuestionCard({
       )}
 
       <div className="flex flex-col items-center gap-3">
-        {/* Icon based on state */}
-        {solveCount === 0 && <Circle className="w-8 h-8 text-purple-300" />}
-        {solveCount === 1 && (
+        {/* Lock icon based on active team status */}
+        {solvedByActiveTeam ? (
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 200 }}
+            transition={{ type: 'spring', stiffness: 220 }}
           >
-            <Trophy className="w-8 h-8 text-green-400" />
+            <Unlock className="w-8 h-8 text-green-400" />
           </motion.div>
+        ) : (
+          <Lock className={`w-8 h-8 ${isLocked ? 'text-gray-500' : 'text-purple-300'}`} />
         )}
-        {solveCount === 2 && (
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 200 }}
-          >
-            <Award className="w-8 h-8 text-orange-400" />
-          </motion.div>
-        )}
-        {solveCount >= 3 && <Circle className="w-8 h-8 text-gray-500" />}
 
         <div className="text-2xl font-bold text-white">Q{questionNumber}</div>
 
         {/* Coin Reward */}
-        {!isLocked && (
+        {!isLocked && !solvedByActiveTeam && (
           <div className="flex items-center gap-1 text-yellow-400 mt-1">
             <Coins className="w-4 h-4" />
             <span className="text-sm font-semibold">{coinReward}</span>

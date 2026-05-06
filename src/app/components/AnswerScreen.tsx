@@ -43,6 +43,7 @@ export function AnswerScreen({
   onBack,
 }: AnswerScreenProps) {
   const [answer, setAnswer] = useState('');
+  const [displayTeamCoins, setDisplayTeamCoins] = useState<number>(team.coins);
   const [directionDigits, setDirectionDigits] = useState<number[]>([]);
   const [lastDirectionDigit, setLastDirectionDigit] = useState<number | null>(null);
   const [showHintDialog, setShowHintDialog] = useState(false);
@@ -83,11 +84,12 @@ export function AnswerScreen({
   useEffect(() => {
     // Reset input when question changes
     setAnswer('');
+    setDisplayTeamCoins(team.coins);
     setDirectionDigits([]);
     setLastDirectionDigit(null);
     setResult(null);
     setHintRevealed(false);
-  }, [question.id]);
+  }, [question.id, team.coins]);
 
   useEffect(() => {
     // directionLock input now uses on-screen buttons (mouse/touch-friendly)
@@ -180,7 +182,7 @@ export function AnswerScreen({
               </div>
               <div className="text-right">
                 <div className="text-sm text-gray-300">Team Coins</div>
-                <div className="text-3xl font-bold text-yellow-400">{team.coins}</div>
+                <div className="text-3xl font-bold text-yellow-400">{displayTeamCoins}</div>
               </div>
             </div>
           </div>

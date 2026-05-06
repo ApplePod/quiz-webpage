@@ -131,6 +131,7 @@ export default function App() {
       setCurrentView('team-auth');
       return;
     }
+    if (status?.solvedByTeams?.includes(selectedTeam.id)) return;
     setSelectedQuestionId(questionId);
     setCurrentView('answer');
   };
