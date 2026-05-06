@@ -28,14 +28,28 @@ export function arrowKeyToDirectionDigit(key: string): number | null {
 }
 
 export function parseDirectionDigits(input: string): number[] {
-  const digits = input
+  const trimmed = input.trim()
+  if (!trimmed) return []
+
+  // Support compact input like "121212" => [1,2,1,2,1,2]
+  if (/^[1-4]+$/.test(trimmed)) {
+    return trimmed.split('').map((char) => Number(char))
+  }
+
+  const digits = trimmed
     .split(/[,\s]+/)
     .map((entry) => entry.trim())
     .filter(Boolean)
-    .map((entry) => Number(entry))
-    .filter((value) => Number.isFinite(value))
-    .map((value) => Math.trunc(value))
-    .filter((value) => value >= 1 && value <= 4)
+    .flatMap((entry) => {
+      // If token itself is a compact digit string, expand it.
+      if (/^[1-4]+$/.test(entry)) {
+        return entry.split('').map((char) => Number(char))
+      }
+      const numeric = Number(entry)
+      if (!Number.isFinite(numeric)) return []
+      const value = Math.trunc(numeric)
+      return value >= 1 && value <= 4 ? [value] : []
+    })
 
   return digits
 }
