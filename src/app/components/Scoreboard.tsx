@@ -15,7 +15,8 @@ export function Scoreboard({ teams }: ScoreboardProps) {
   return (
     <div className="h-full">
       <div className="sticky top-8">
-        <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/30 p-6 shadow-xl">
+        <div className="escape-card">
+          <div className="escape-card-inner p-6">
           <div className="flex items-center gap-3 mb-6">
             <Trophy className="w-6 h-6 text-yellow-400" />
             <h2 className="text-2xl font-bold text-white">Scoreboard</h2>
@@ -73,6 +74,7 @@ export function Scoreboard({ teams }: ScoreboardProps) {
                 </motion.div>
               );
             })}
+          </div>
           </div>
         </div>
       </div>

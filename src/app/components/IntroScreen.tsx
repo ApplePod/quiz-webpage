@@ -11,12 +11,12 @@ type IntroScreenProps = {
 
 export function IntroScreen({ onStart, onAdminClick }: IntroScreenProps) {
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
+    <div className="escape-container">
       <div className="w-full max-w-3xl">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative overflow-hidden bg-white/10 backdrop-blur-md rounded-2xl border border-white/30 p-10 shadow-2xl"
+          className="relative overflow-hidden escape-card"
         >
           {/* Poster-like illustration layer */}
           <div className="pointer-events-none absolute inset-0">
@@ -25,7 +25,7 @@ export function IntroScreen({ onStart, onAdminClick }: IntroScreenProps) {
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(255,255,255,0.08),transparent_55%)]" />
           </div>
 
-          <div className="text-center">
+          <div className="text-center escape-card-inner">
             <div className="mx-auto mb-5 inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/20 px-4 py-2 text-sm text-gray-200">
               <Heart className="h-4 w-4 text-rose-300" />
               소개팅 방탈출
@@ -158,7 +158,7 @@ export function IntroScreen({ onStart, onAdminClick }: IntroScreenProps) {
             <div className="mt-8">
               <Button
                 onClick={onStart}
-                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-7 text-lg"
+                className="escape-btn-primary py-7 text-lg"
               >
                 <Sparkles className="w-5 h-5 mr-2" />
                 시작하기
