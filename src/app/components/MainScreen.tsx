@@ -78,7 +78,7 @@ export function MainScreen({
         <div className="lg:col-span-2">
           <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/20 p-6 shadow-xl">
             <h2 className="text-2xl font-bold text-white mb-6">Questions</h2>
-            <div className="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(108px,1fr))]">
+            <div className="grid grid-cols-5 gap-4">
               {questions.map((question) => {
                 const status = questionStatuses.find((s) => s.questionId === question.id);
                 const solveCount = status?.solveCount || 0;
