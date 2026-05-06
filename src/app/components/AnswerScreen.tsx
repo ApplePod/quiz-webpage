@@ -53,6 +53,7 @@ export function AnswerScreen({
   const [pendingSubmitAnswer, setPendingSubmitAnswer] = useState<string | null>(null);
   const [isSubmittingResult, setIsSubmittingResult] = useState(false);
   const [retryShake, setRetryShake] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
   const [hintInsufficientCoins, setHintInsufficientCoins] = useState(false);
   const [showRechargeDialog, setShowRechargeDialog] = useState(false);
   const rewardForCurrentOrder =
@@ -80,6 +81,7 @@ export function AnswerScreen({
     setResult(isCorrect ? 'correct' : 'incorrect');
     setPendingSubmitAnswer(isCorrect ? answer : null);
     setShowResultDialog(true);
+    setShowConfetti(isCorrect);
     if (!isCorrect) {
       setRetryShake(true);
       setTimeout(() => setRetryShake(false), 450);
@@ -96,6 +98,7 @@ export function AnswerScreen({
     setShowResultDialog(false);
     setPendingSubmitAnswer(null);
     setIsSubmittingResult(false);
+    setShowConfetti(false);
     setHintRevealed(false);
   }, [question.id, team.coins]);
 
@@ -124,6 +127,7 @@ export function AnswerScreen({
         setResult(isCorrect ? 'correct' : 'incorrect');
         setPendingSubmitAnswer(isCorrect ? submitted : null);
         setShowResultDialog(true);
+        setShowConfetti(isCorrect);
         if (!isCorrect) {
           setRetryShake(true);
           setTimeout(() => setRetryShake(false), 450);
@@ -150,6 +154,7 @@ export function AnswerScreen({
     setShowResultDialog(false);
     setPendingSubmitAnswer(null);
     setIsSubmittingResult(false);
+    setShowConfetti(false);
     if (question.answerType === 'text') {
       setAnswer('');
     } else {
@@ -166,6 +171,7 @@ export function AnswerScreen({
     } finally {
       setIsSubmittingResult(false);
       setShowResultDialog(false);
+      setShowConfetti(false);
       onBack();
     }
   };
@@ -193,6 +199,29 @@ export function AnswerScreen({
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
+      {showConfetti && result === 'correct' && (
+        <div className="pointer-events-none fixed inset-0 z-[60] overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_15%,rgba(34,197,94,0.16),transparent_55%)]" />
+          {confettiPieces.map((piece) => (
+            <motion.span
+              key={piece.id}
+              initial={{ y: -60, opacity: 0, x: 0, rotate: piece.rotate }}
+              animate={{ y: '110vh', opacity: [0, 1, 1, 0], x: piece.x, rotate: piece.rotate + 260 }}
+              transition={{ duration: 1.4, delay: piece.delay, ease: 'easeOut' }}
+              style={{
+                left: piece.left,
+                top: 0,
+                position: 'absolute',
+                width: 10,
+                height: 18,
+                borderRadius: 4,
+                background: `hsl(${piece.hue} 90% 65% / 0.95)`,
+                boxShadow: '0 0 18px rgba(255,255,255,0.12)',
+              }}
+            />
+          ))}
+        </div>
+      )}
       <div className="w-full max-w-3xl">
         {/* Back Button */}
         <Button
@@ -483,27 +512,7 @@ export function AnswerScreen({
       <Dialog open={showResultDialog} onOpenChange={(open) => (open ? null : handleRetry())}>
         <DialogContent className="bg-gray-900/95 border-white/20 text-white overflow-hidden">
           {result === 'correct' && (
-            <div className="pointer-events-none absolute inset-0">
-              {confettiPieces.map((piece) => (
-                <motion.span
-                  key={piece.id}
-                  initial={{ y: -40, opacity: 0, x: 0, rotate: piece.rotate }}
-                  animate={{ y: 420, opacity: [0, 1, 1, 0], x: piece.x, rotate: piece.rotate + 240 }}
-                  transition={{ duration: 1.25, delay: piece.delay, ease: 'easeOut' }}
-                  style={{
-                    left: piece.left,
-                    top: 0,
-                    position: 'absolute',
-                    width: 10,
-                    height: 18,
-                    borderRadius: 4,
-                    background: `hsl(${piece.hue} 90% 65% / 0.95)`,
-                    boxShadow: '0 0 18px rgba(255,255,255,0.12)',
-                  }}
-                />
-              ))}
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(34,197,94,0.18),transparent_55%)]" />
-            </div>
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(34,197,94,0.18),transparent_55%)]" />
           )}
 
           <DialogHeader>
