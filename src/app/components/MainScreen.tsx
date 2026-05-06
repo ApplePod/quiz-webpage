@@ -78,28 +78,41 @@ export function MainScreen({
         <div className="lg:col-span-2">
           <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/20 p-6 shadow-xl">
             <h2 className="text-2xl font-bold text-white mb-6">Questions</h2>
-            <div className="grid grid-cols-5 gap-4">
-              {questions.map((question) => {
-                const status = questionStatuses.find((s) => s.questionId === question.id);
-                const solveCount = status?.solveCount || 0;
-                const solvedByActiveTeam = Boolean(activeTeam && status?.solvedByTeams?.includes(activeTeam.id));
-                const nextReward =
-                  solveCount === 0
-                    ? question.coinRewardFirst
-                    : solveCount === 1
-                      ? question.coinRewardSecond
-                      : question.coinRewardThird;
-                return (
-                  <QuestionCard
-                    key={question.id}
-                    questionNumber={question.id}
-                    coinReward={nextReward}
-                    solveCount={solveCount}
-                    solvedByActiveTeam={solvedByActiveTeam}
-                    onClick={() => onQuestionSelect(question.id)}
-                  />
-                );
-              })}
+            {/* 5x5 stays fixed; cells scale with viewport (clamp) and scroll when needed */}
+            <div
+              className="-mx-6 px-6 overflow-x-auto"
+              style={
+                {
+                  ['--cell' as any]: 'clamp(64px, 12vw, 132px)',
+                  ['--gap' as any]: 'clamp(8px, 1.8vw, 16px)',
+                } as React.CSSProperties
+              }
+            >
+              <div className="w-fit mx-auto pb-1">
+                <div className="grid grid-cols-[repeat(5,var(--cell))] gap-[var(--gap)]">
+                  {questions.map((question) => {
+                    const status = questionStatuses.find((s) => s.questionId === question.id);
+                    const solveCount = status?.solveCount || 0;
+                    const solvedByActiveTeam = Boolean(activeTeam && status?.solvedByTeams?.includes(activeTeam.id));
+                    const nextReward =
+                      solveCount === 0
+                        ? question.coinRewardFirst
+                        : solveCount === 1
+                          ? question.coinRewardSecond
+                          : question.coinRewardThird;
+                    return (
+                      <QuestionCard
+                        key={question.id}
+                        questionNumber={question.id}
+                        coinReward={nextReward}
+                        solveCount={solveCount}
+                        solvedByActiveTeam={solvedByActiveTeam}
+                        onClick={() => onQuestionSelect(question.id)}
+                      />
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           </div>
         </div>

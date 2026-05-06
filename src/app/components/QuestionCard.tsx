@@ -161,7 +161,7 @@ export function QuestionCard({
           : {}
       }
       transition={{ duration: 0.6 }}
-      className={`relative p-6 rounded-2xl backdrop-blur-md border transition-all duration-300 ${
+      className={`relative w-[var(--cell)] h-[var(--cell)] rounded-2xl backdrop-blur-md border transition-all duration-300 ${
         cardStyle.bg
       } ${cardStyle.border} ${cardStyle.shadow} ${
         isDisabled ? 'cursor-not-allowed opacity-60' : `${cardStyle.hoverBg} cursor-pointer`
@@ -196,7 +196,7 @@ export function QuestionCard({
                 repeatDelay: 2,
               }}
             >
-              <X className="w-32 h-32 text-gray-300/60 stroke-[1.5]" />
+              <X className="w-[clamp(56px,9vw,128px)] h-[clamp(56px,9vw,128px)] text-gray-300/60 stroke-[1.5]" />
             </motion.div>
           </motion.div>
         )}
@@ -219,7 +219,7 @@ export function QuestionCard({
         </div>
       )}
 
-      <div className="flex flex-col items-center gap-3">
+      <div className="h-full w-full flex flex-col items-center justify-center gap-[clamp(6px,1.2vw,12px)] px-[clamp(8px,1.4vw,16px)]">
         {/* Lock icon based on active team status */}
         {solvedByActiveTeam ? (
           <motion.div
@@ -227,19 +227,23 @@ export function QuestionCard({
             animate={{ scale: 1 }}
             transition={{ type: 'spring', stiffness: 220 }}
           >
-            <Unlock className="w-8 h-8 text-green-400" />
+            <Unlock className="w-[clamp(22px,3.2vw,32px)] h-[clamp(22px,3.2vw,32px)] text-green-400" />
           </motion.div>
         ) : (
-          <Lock className={`w-8 h-8 ${isLocked ? 'text-gray-500' : 'text-purple-300'}`} />
+          <Lock
+            className={`w-[clamp(22px,3.2vw,32px)] h-[clamp(22px,3.2vw,32px)] ${
+              isLocked ? 'text-gray-500' : 'text-purple-300'
+            }`}
+          />
         )}
 
-        <div className="text-2xl font-bold text-white">Q{questionNumber}</div>
+        <div className="text-[clamp(14px,2.4vw,22px)] font-bold text-white">Q{questionNumber}</div>
 
         {/* Coin Reward */}
         {!isLocked && !solvedByActiveTeam && (
           <div className="flex items-center gap-1 text-yellow-400 mt-1">
-            <Coins className="w-4 h-4" />
-            <span className="text-sm font-semibold">{coinReward}</span>
+            <Coins className="w-[clamp(14px,2vw,18px)] h-[clamp(14px,2vw,18px)]" />
+            <span className="text-[clamp(11px,1.6vw,14px)] font-semibold">{coinReward}</span>
           </div>
         )}
       </div>
@@ -250,12 +254,12 @@ export function QuestionCard({
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            className="flex items-center gap-1 bg-black/40 rounded-full px-2 py-1"
+            className="flex items-center gap-1 bg-black/40 rounded-full px-[clamp(6px,1vw,8px)] py-[clamp(4px,0.8vw,6px)]"
           >
             {Array.from({ length: 3 }).map((_, i) => (
               <div
                 key={i}
-                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                className={`w-[clamp(6px,1vw,8px)] h-[clamp(6px,1vw,8px)] rounded-full transition-all duration-300 ${
                   i < solveCount
                     ? solveCount === 1
                       ? 'bg-green-400'
@@ -274,7 +278,7 @@ export function QuestionCard({
           <motion.div
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
-            className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full"
+            className="bg-green-500 text-white text-[clamp(10px,1.4vw,12px)] font-bold px-[clamp(6px,1vw,8px)] py-[clamp(3px,0.7vw,4px)] rounded-full"
           >
             1st
           </motion.div>
@@ -285,7 +289,7 @@ export function QuestionCard({
           <motion.div
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
-            className="bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full"
+            className="bg-orange-500 text-white text-[clamp(10px,1.4vw,12px)] font-bold px-[clamp(6px,1vw,8px)] py-[clamp(3px,0.7vw,4px)] rounded-full"
           >
             2nd
           </motion.div>

@@ -219,6 +219,8 @@ export default function App() {
         team.id === teamId ? { ...team, coins: team.coins + reward } : team,
       ),
     );
+
+    return { reward };
   };
 
   const handleAnswerSubmit = async (answer: string, teamId: string) => {
@@ -236,7 +238,7 @@ export default function App() {
     }
 
     if (!isSupabaseConfigured) {
-      handleLocalAnswerSubmit(answer, teamId);
+      return handleLocalAnswerSubmit(answer, teamId);
     } else {
       try {
         const response = await submitAnswer(teamId, selectedQuestionId, answer);
@@ -246,6 +248,7 @@ export default function App() {
         // Pull latest state immediately so the user sees the update
         // even if Realtime delivery is delayed.
         await syncFromSnapshot();
+        return response;
       } catch (submitError) {
         const message =
           submitError instanceof Error ? submitError.message : 'Failed to submit answer.';

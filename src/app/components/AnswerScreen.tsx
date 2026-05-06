@@ -9,6 +9,7 @@ import {
   XCircle,
   Coins,
   Sparkles,
+  Unlock,
   ChevronUp,
   ChevronDown,
   ChevronLeft,
@@ -30,7 +31,7 @@ interface AnswerScreenProps {
   team: Team;
   question: Question;
   solveCount: number;
-  onSubmit: (answer: string, teamId: string) => Promise<void> | void;
+  onSubmit: (answer: string, teamId: string) => Promise<any> | any;
   onHintRequest: (teamId: string, questionId: number) => void;
   onBack: () => void;
 }
@@ -45,19 +46,22 @@ export function AnswerScreen({
 }: AnswerScreenProps) {
   const confettiCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const confettiRef = useRef<null | ((options: any) => Promise<null | void> | null)>(null);
+  const autoBackTimerRef = useRef<number | null>(null);
   const [answer, setAnswer] = useState('');
   const [displayTeamCoins, setDisplayTeamCoins] = useState<number>(team.coins);
   const [directionDigits, setDirectionDigits] = useState<number[]>([]);
   const [lastDirectionDigit, setLastDirectionDigit] = useState<number | null>(null);
   const [showHintDialog, setShowHintDialog] = useState(false);
   const [hintRevealed, setHintRevealed] = useState(false);
-  const [result, setResult] = useState<'correct' | 'incorrect' | null>(null);
+  const [result, setResult] = useState<'correct' | 'incorrect' | 'locked' | null>(null);
   const [showResultDialog, setShowResultDialog] = useState(false);
   const [pendingSubmitAnswer, setPendingSubmitAnswer] = useState<string | null>(null);
   const [isSubmittingResult, setIsSubmittingResult] = useState(false);
   const [retryShake, setRetryShake] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [showWrongFx, setShowWrongFx] = useState(false);
+  const [showSolvedFx, setShowSolvedFx] = useState(false);
+  const [resolvedReward, setResolvedReward] = useState<number | null>(null);
   const [hintInsufficientCoins, setHintInsufficientCoins] = useState(false);
   const [showRechargeDialog, setShowRechargeDialog] = useState(false);
   const rewardForCurrentOrder =
@@ -77,20 +81,71 @@ export function AnswerScreen({
       ? `${directionDigitsToArrows(question.correctAnswer)} (${question.correctAnswer.join(', ')})`
       : String(question.correctAnswer ?? '');
 
+  const submitCorrectAnswer = async (submittedAnswer: string) => {
+    setIsSubmittingResult(true);
+    setResolvedReward(null);
+    try {
+      const response: any = await onSubmit(submittedAnswer, team.id);
+      if (response?.locked) {
+        setShowConfetti(false);
+        setShowWrongFx(false);
+        setShowSolvedFx(false);
+        setResult('locked');
+        setShowResultDialog(true);
+        return;
+      }
+      if (typeof response?.reward === 'number') {
+        setResolvedReward(response.reward);
+      }
+      setShowSolvedFx(true);
+      setShowConfetti(true);
+      setShowWrongFx(false);
+      setShowResultDialog(true);
+
+      // Auto return home after a short celebration.
+      if (autoBackTimerRef.current) window.clearTimeout(autoBackTimerRef.current);
+      autoBackTimerRef.current = window.setTimeout(() => {
+        onBack();
+      }, 3000);
+    } finally {
+      // Keep the dialog stable; reward text must come from resolvedReward.
+      setIsSubmittingResult(false);
+    }
+  };
+
+  useEffect(() => {
+    // While we're in the "correct" flow, ignore ESC so the user can't accidentally
+    // dismiss/interrupt and think points didn't apply.
+    if (result !== 'correct') return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    };
+    window.addEventListener('keydown', onKeyDown, { capture: true });
+    return () => window.removeEventListener('keydown', onKeyDown, { capture: true } as any);
+  }, [result]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!answer.trim()) return;
 
     const isCorrect = isCorrectForQuestion(question, answer);
     setResult(isCorrect ? 'correct' : 'incorrect');
-    setPendingSubmitAnswer(isCorrect ? answer : null);
-    setShowResultDialog(true);
-    setShowConfetti(isCorrect);
+    setShowSolvedFx(false);
+    setShowResultDialog(false);
+    setShowConfetti(false);
     setShowWrongFx(!isCorrect);
-    if (!isCorrect) {
-      setRetryShake(true);
-      setTimeout(() => setRetryShake(false), 450);
+
+    if (isCorrect) {
+      void submitCorrectAnswer(answer);
+      return;
     }
+
+    setShowResultDialog(true);
+    setRetryShake(true);
+    setTimeout(() => setRetryShake(false), 450);
   };
 
   useEffect(() => {
@@ -116,6 +171,7 @@ export function AnswerScreen({
 
   useEffect(() => {
     // Reset input when question changes
+    if (autoBackTimerRef.current) window.clearTimeout(autoBackTimerRef.current);
     setAnswer('');
     setDisplayTeamCoins(team.coins);
     setDirectionDigits([]);
@@ -126,8 +182,17 @@ export function AnswerScreen({
     setIsSubmittingResult(false);
     setShowConfetti(false);
     setShowWrongFx(false);
+    setShowSolvedFx(false);
+    setResolvedReward(null);
     setHintRevealed(false);
-  }, [question.id, team.coins]);
+  }, [question.id]);
+
+  useEffect(() => {
+    // Keep the coin display in sync while NOT showing result dialogs.
+    // During result dialogs we intentionally "freeze" it for UX stability.
+    if (showResultDialog || result) return;
+    setDisplayTeamCoins(team.coins);
+  }, [team.coins, showResultDialog, result]);
 
   useEffect(() => {
     // directionLock input now uses on-screen buttons (mouse/touch-friendly)
@@ -152,11 +217,15 @@ export function AnswerScreen({
           submitted,
         );
         setResult(isCorrect ? 'correct' : 'incorrect');
-        setPendingSubmitAnswer(isCorrect ? submitted : null);
-        setShowResultDialog(true);
-        setShowConfetti(isCorrect);
+        setShowSolvedFx(false);
+        setShowResultDialog(false);
+        setShowConfetti(false);
         setShowWrongFx(!isCorrect);
-        if (!isCorrect) {
+
+        if (isCorrect) {
+          void submitCorrectAnswer(submitted);
+        } else {
+          setShowResultDialog(true);
           setRetryShake(true);
           setTimeout(() => setRetryShake(false), 450);
         }
@@ -184,6 +253,8 @@ export function AnswerScreen({
     setIsSubmittingResult(false);
     setShowConfetti(false);
     setShowWrongFx(false);
+    setShowSolvedFx(false);
+    setResolvedReward(null);
     if (question.answerType === 'text') {
       setAnswer('');
     } else {
@@ -192,18 +263,12 @@ export function AnswerScreen({
     }
   };
 
-  const handleConfirmCorrect = async () => {
-    if (!pendingSubmitAnswer) return;
-    setIsSubmittingResult(true);
-    try {
-      await onSubmit(pendingSubmitAnswer, team.id);
-    } finally {
-      setIsSubmittingResult(false);
-      setShowResultDialog(false);
-      setShowConfetti(false);
-      setShowWrongFx(false);
-      onBack();
-    }
+  const handleConfirmCorrect = () => {
+    setShowResultDialog(false);
+    setShowConfetti(false);
+    setShowWrongFx(false);
+    setShowSolvedFx(false);
+    onBack();
   };
 
   useEffect(() => {
@@ -335,6 +400,31 @@ export function AnswerScreen({
         className="pointer-events-none fixed inset-0 z-[70] h-full w-full"
         aria-hidden="true"
       />
+      {showSolvedFx && (
+        <div className="pointer-events-none fixed inset-0 z-[60] flex items-center justify-center">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.6, y: 12 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.6, y: 12 }}
+            transition={{ type: 'spring', stiffness: 260, damping: 18 }}
+            className="rounded-2xl border border-green-400/30 bg-black/55 backdrop-blur-md px-6 py-5 shadow-[0_0_40px_rgba(34,197,94,0.25)]"
+            aria-hidden="true"
+          >
+            <div className="flex items-center gap-3">
+              <motion.div
+                animate={{ rotate: [0, -8, 0], scale: [1, 1.08, 1] }}
+                transition={{ duration: 0.5, repeat: 1, repeatType: 'mirror' }}
+              >
+                <Unlock className="w-10 h-10 text-green-300" />
+              </motion.div>
+              <div className="leading-tight">
+                <div className="text-white font-bold">문제가 풀렸어요!</div>
+                <div className="text-sm text-green-100/90">점수는 제출 순간에 확정됩니다.</div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
       <div className="w-full max-w-3xl">
         {/* Back Button */}
         <Button
@@ -386,7 +476,7 @@ export function AnswerScreen({
           </div>
 
           {/* Answer Form */}
-          {!showResultDialog && (
+          {!showResultDialog && !isSubmittingResult && result !== 'correct' && (
             <>
               {question.answerType === 'text' ? (
                 <form onSubmit={handleSubmit} className="space-y-6">
@@ -551,6 +641,18 @@ export function AnswerScreen({
             </>
           )}
 
+          {/* Submit-in-progress / Correct state: hide inputs */}
+          {!showResultDialog && (isSubmittingResult || result === 'correct') && (
+            <div className="rounded-xl border border-white/15 bg-black/20 p-6 text-center">
+              <div className="text-white font-semibold">
+                {isSubmittingResult ? '정답 제출 중...' : '정답 처리 중...'}
+              </div>
+              <div className="mt-2 text-sm text-gray-300">
+                잠시만 기다려주세요. 정답이면 3초 뒤 홈으로 이동합니다.
+              </div>
+            </div>
+          )}
+
           {/* Hint Section */}
           {!result && (
             <div className="mt-6">
@@ -622,8 +724,25 @@ export function AnswerScreen({
       </Dialog>
 
       {/* Result Dialog */}
-      <Dialog open={showResultDialog} onOpenChange={(open) => (open ? null : handleRetry())}>
-        <DialogContent className="bg-gray-900/95 border-white/20 text-white overflow-hidden">
+      <Dialog
+        open={showResultDialog}
+        onOpenChange={(open) => {
+          if (open) return;
+          // Only allow dismiss-to-retry for incorrect answers.
+          if (result === 'incorrect') handleRetry();
+        }}
+      >
+        <DialogContent
+          className={`bg-gray-900/95 border-white/20 text-white overflow-hidden ${
+            result !== 'incorrect' ? '[&>button]:hidden' : ''
+          }`}
+          onEscapeKeyDown={(e) => {
+            if (result !== 'incorrect') e.preventDefault();
+          }}
+          onInteractOutside={(e) => {
+            if (result !== 'incorrect') e.preventDefault();
+          }}
+        >
           {result === 'correct' && (
             <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(34,197,94,0.18),transparent_55%)]" />
           )}
@@ -635,6 +754,11 @@ export function AnswerScreen({
                   <CheckCircle2 className="w-6 h-6 text-green-400" />
                   정답입니다!
                 </>
+              ) : result === 'locked' ? (
+                <>
+                  <XCircle className="w-6 h-6 text-amber-300" />
+                  늦었어요!
+                </>
               ) : (
                 <>
                   <XCircle className="w-6 h-6 text-red-400" />
@@ -643,9 +767,17 @@ export function AnswerScreen({
               )}
             </DialogTitle>
             <DialogDescription className="text-gray-300">
-              {result === 'correct'
-                ? `+${rewardForCurrentOrder} 코인 획득!`
-                : '다시 한 번 도전해보세요.'}
+              {result === 'correct' ? (
+                typeof resolvedReward === 'number' ? (
+                  `+${resolvedReward} 코인 획득!`
+                ) : (
+                  '보상 계산중...'
+                )
+              ) : result === 'locked' ? (
+                '다른 3팀이 먼저 문제를 풀었어요.'
+              ) : (
+                '다시 한 번 도전해보세요.'
+              )}
             </DialogDescription>
           </DialogHeader>
 
@@ -653,6 +785,10 @@ export function AnswerScreen({
             {result === 'correct' ? (
               <div className="text-sm text-gray-200">
                 확인을 누르면 홈으로 이동합니다.
+              </div>
+            ) : result === 'locked' ? (
+              <div className="text-sm text-gray-200">
+                이 문제는 잠겨서 더 이상 제출할 수 없어요. 홈으로 이동합니다.
               </div>
             ) : (
               <div className="text-sm text-gray-200">
@@ -669,6 +805,13 @@ export function AnswerScreen({
                 disabled={isSubmittingResult}
               >
                 확인
+              </Button>
+            ) : result === 'locked' ? (
+              <Button
+                onClick={onBack}
+                className="bg-amber-500 hover:bg-amber-600 text-black font-semibold"
+              >
+                홈으로
               </Button>
             ) : (
               <Button
