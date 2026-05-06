@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { MainScreen } from './components/MainScreen';
-import { TeamSelection } from './components/TeamSelection';
-import { PasswordAuth } from './components/PasswordAuth';
 import { AnswerScreen } from './components/AnswerScreen';
 import { AdminAuth } from './components/AdminAuth';
 import { AdminPanel } from './components/AdminPanel';
+import { IntroScreen } from './components/IntroScreen';
+import { TeamAuthScreen } from './components/TeamAuthScreen';
 import { Team, Question, QuestionStatus, ViewType } from './types';
 import { initialTeams, initialQuestions } from './data/initialData';
 import { isSupabaseConfigured } from '../lib/supabase';
@@ -28,7 +28,7 @@ import {
 import { isCorrectForQuestion } from './utils/answerCodec';
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<ViewType>('main');
+  const [currentView, setCurrentView] = useState<ViewType>('intro');
   const [teams, setTeams] = useState<Team[]>(initialTeams);
   const [questions, setQuestions] = useState<Question[]>(initialQuestions);
   const [selectedQuestionId, setSelectedQuestionId] = useState<number | null>(null);
@@ -41,6 +41,7 @@ export default function App() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
   const tickWriteAccumulator = useRef(0);
+  const STORAGE_TEAM_KEY = 'quiz.activeTeamId';
 
   const handleActionError = (actionError: unknown, fallbackMessage: string) => {
     const message =
@@ -71,6 +72,20 @@ export default function App() {
       setLoading(false);
     })();
   }, [syncFromSnapshot]);
+
+  // Restore active team from localStorage (per device)
+  useEffect(() => {
+    try {
+      const storedId = window.localStorage.getItem(STORAGE_TEAM_KEY);
+      if (!storedId) return;
+      const team = teams.find((t) => t.id === storedId) ?? null;
+      if (team) {
+        setSelectedTeam(team);
+      }
+    } catch {
+      // ignore
+    }
+  }, [teams]);
 
   // Local ticking so the timer visually counts down immediately.
   // When using Supabase, we also persist the remaining time periodically so other clients stay close.
@@ -112,30 +127,44 @@ export default function App() {
   const handleQuestionSelect = (questionId: number) => {
     const status = questionStatuses.find((entry) => entry.questionId === questionId);
     if (status && (status.locked || status.solveCount >= 3)) return;
+    if (!selectedTeam) {
+      setCurrentView('team-auth');
+      return;
+    }
     setSelectedQuestionId(questionId);
-    setCurrentView('team-selection');
+    setCurrentView('answer');
   };
 
-  const handleTeamSelect = (team: Team) => {
-    setSelectedTeam(team);
-    setCurrentView('password');
-  };
-
-  const handlePasswordSuccess = async (password: string) => {
-    if (!selectedTeam) return false;
+  const handleAuthenticateTeam = async (teamId: string, password: string) => {
     try {
-      const isValid = await verifyTeamPassword(selectedTeam.id, password);
-      if (isValid) {
-        setCurrentView('answer');
-        return true;
-      }
-      return false;
+      const isValid = await verifyTeamPassword(teamId, password);
+      return isValid;
     } catch (authError) {
       const message =
         authError instanceof Error ? authError.message : 'Failed to validate team password.';
       setError(message);
       return false;
     }
+  };
+
+  const handleTeamAuthenticated = (team: Team) => {
+    setSelectedTeam(team);
+    try {
+      window.localStorage.setItem(STORAGE_TEAM_KEY, team.id);
+    } catch {
+      // ignore
+    }
+    setCurrentView('main');
+  };
+
+  const handleChangeTeam = () => {
+    setSelectedTeam(null);
+    try {
+      window.localStorage.removeItem(STORAGE_TEAM_KEY);
+    } catch {
+      // ignore
+    }
+    setCurrentView('team-auth');
   };
 
   const handleLocalAnswerSubmit = (answer: string, teamId: string) => {
@@ -224,7 +253,6 @@ export default function App() {
     setTimeout(() => {
       setCurrentView('main');
       setSelectedQuestionId(null);
-      setSelectedTeam(null);
     }, 2000);
   };
 
@@ -254,12 +282,6 @@ export default function App() {
   const handleBackToMain = () => {
     setCurrentView('main');
     setSelectedQuestionId(null);
-    setSelectedTeam(null);
-  };
-
-  const handleBackToTeamSelection = () => {
-    setCurrentView('team-selection');
-    setSelectedTeam(null);
   };
 
   const handleAdminClick = () => {
@@ -494,6 +516,23 @@ export default function App() {
         )}
 
         {/* View Rendering */}
+        {currentView === 'intro' && (
+          <IntroScreen
+            onStart={() => setCurrentView(selectedTeam ? 'main' : 'team-auth')}
+            onAdminClick={handleAdminClick}
+          />
+        )}
+
+        {currentView === 'team-auth' && (
+          <TeamAuthScreen
+            teams={teams}
+            onAuthenticate={handleAuthenticateTeam}
+            onAuthenticated={handleTeamAuthenticated}
+            onBack={() => setCurrentView('intro')}
+            onAdminClick={handleAdminClick}
+          />
+        )}
+
         {currentView === 'main' && (
           <MainScreen
             teams={teams}
@@ -503,25 +542,8 @@ export default function App() {
             timerRunning={timerRunning}
             onQuestionSelect={handleQuestionSelect}
             onAdminClick={handleAdminClick}
-          />
-        )}
-
-        {currentView === 'team-selection' && selectedQuestionId && (
-          <TeamSelection
-            teams={teams}
-            selectedQuestionId={selectedQuestionId}
-            questionStatuses={questionStatuses}
-            onTeamSelect={handleTeamSelect}
-            onBack={handleBackToMain}
-          />
-        )}
-
-        {currentView === 'password' && selectedTeam && selectedQuestionId && (
-          <PasswordAuth
-            team={selectedTeam}
-            selectedQuestionId={selectedQuestionId}
-            onSuccess={handlePasswordSuccess}
-            onBack={handleBackToTeamSelection}
+            activeTeam={selectedTeam}
+            onChangeTeam={handleChangeTeam}
           />
         )}
 

@@ -26,7 +26,7 @@ export interface QuestionStatus {
   locked?: boolean;
 }
 
-export type ViewType = 'main' | 'team-selection' | 'password' | 'answer';
+export type ViewType = 'intro' | 'team-auth' | 'main' | 'answer';
 
 export interface QuizState {
   currentView: ViewType;

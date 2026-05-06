@@ -14,6 +14,8 @@ interface MainScreenProps {
   timerRunning: boolean;
   onQuestionSelect: (questionId: number) => void;
   onAdminClick: () => void;
+  activeTeam?: Team | null;
+  onChangeTeam?: () => void;
 }
 
 export function MainScreen({
@@ -24,6 +26,8 @@ export function MainScreen({
   timerRunning,
   onQuestionSelect,
   onAdminClick,
+  activeTeam,
+  onChangeTeam,
 }: MainScreenProps) {
 
   return (
@@ -45,10 +49,26 @@ export function MainScreen({
           </div>
 
           {/* Right: Timer */}
-          <TimerHeader
-            timeRemaining={timeRemaining}
-            timerRunning={timerRunning}
-          />
+          <div className="flex items-center gap-4">
+            {activeTeam && (
+              <div className="hidden sm:flex items-center gap-3 rounded-xl border border-white/15 bg-white/5 px-4 py-2">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center">
+                  <span className="text-sm font-bold text-white">{activeTeam.id}</span>
+                </div>
+                <div className="leading-tight">
+                  <div className="text-sm font-semibold text-white">{activeTeam.name}</div>
+                  <button
+                    onClick={onChangeTeam}
+                    className="text-xs text-gray-300 hover:text-white underline underline-offset-2"
+                    type="button"
+                  >
+                    팀 변경
+                  </button>
+                </div>
+              </div>
+            )}
+            <TimerHeader timeRemaining={timeRemaining} timerRunning={timerRunning} />
+          </div>
         </div>
       </div>
 
