@@ -237,3 +237,53 @@ html {
 .animate-gradient {
   animation: gradient 3s ease infinite;
 }
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    background-image:
+      radial-gradient(1200px 700px at 15% 10%, rgba(168, 85, 247, 0.14), transparent 55%),
+      radial-gradient(900px 600px at 85% 35%, rgba(244, 63, 94, 0.10), transparent 55%),
+      radial-gradient(800px 500px at 40% 90%, rgba(234, 179, 8, 0.06), transparent 60%),
+      linear-gradient(180deg, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.7));
+    background-attachment: fixed;
+  }
+}
+
+@keyframes fog {
+  0% {
+    transform: translate3d(-6%, -2%, 0) scale(1.02);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translate3d(5%, 2%, 0) scale(1.06);
+    opacity: 0.75;
+  }
+  100% {
+    transform: translate3d(-6%, -2%, 0) scale(1.02);
+    opacity: 0.55;
+  }
+}
+
+.escape-fog {
+  pointer-events: none;
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(closest-side at 30% 40%, rgba(255,255,255,0.08), transparent 60%),
+    radial-gradient(closest-side at 70% 60%, rgba(255,255,255,0.06), transparent 62%),
+    radial-gradient(closest-side at 50% 20%, rgba(255,255,255,0.05), transparent 58%);
+  filter: blur(32px);
+  mix-blend-mode: screen;
+  animation: fog 10s ease-in-out infinite;
+}
+
+.escape-vignette {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(closest-side at 50% 35%, transparent 55%, rgba(0,0,0,0.75) 100%);
+}
