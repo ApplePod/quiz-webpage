@@ -161,7 +161,7 @@ export function QuestionCard({
           : {}
       }
       transition={{ duration: 0.6 }}
-      className={`relative p-6 rounded-2xl backdrop-blur-md border transition-all duration-300 ${
+      className={`relative aspect-square min-h-[108px] p-4 sm:p-6 rounded-2xl backdrop-blur-md border transition-all duration-300 ${
         cardStyle.bg
       } ${cardStyle.border} ${cardStyle.shadow} ${
         isDisabled ? 'cursor-not-allowed opacity-60' : `${cardStyle.hoverBg} cursor-pointer`
