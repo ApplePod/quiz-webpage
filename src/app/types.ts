@@ -22,6 +22,7 @@ export interface Question {
 export interface QuestionStatus {
   questionId: number;
   solvedByTeams: string[]; // Array of team IDs that solved this question
+  hintedByTeams?: string[]; // Array of team IDs that purchased hint
   solveCount: number; // Number of teams that have solved (0-3)
   locked?: boolean;
 }

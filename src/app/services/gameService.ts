@@ -63,6 +63,7 @@ function mapSnapshot(payload: any): GameSnapshot {
     (status: any) => ({
       questionId: status.question_no,
       solvedByTeams: status.solved_by_teams ?? [],
+      hintedByTeams: status.hinted_by_teams ?? [],
       solveCount: status.solve_count ?? 0,
       locked: status.locked ?? false,
     }),

@@ -42,6 +42,23 @@ export default function App() {
   const [error, setError] = useState<string>('');
   const tickWriteAccumulator = useRef(0);
   const STORAGE_TEAM_KEY = 'quiz.activeTeamId';
+  const STORAGE_HINT_KEY_PREFIX = 'quiz.hintPurchased';
+
+  const hasLocalHintPurchase = useCallback((teamId: string, questionId: number) => {
+    try {
+      return window.localStorage.getItem(`${STORAGE_HINT_KEY_PREFIX}:${teamId}:${questionId}`) === '1';
+    } catch {
+      return false;
+    }
+  }, []);
+
+  const setLocalHintPurchase = useCallback((teamId: string, questionId: number) => {
+    try {
+      window.localStorage.setItem(`${STORAGE_HINT_KEY_PREFIX}:${teamId}:${questionId}`, '1');
+    } catch {
+      // ignore
+    }
+  }, []);
 
   const handleActionError = (actionError: unknown, fallbackMessage: string) => {
     const message =
@@ -270,11 +287,49 @@ export default function App() {
           team.id === teamId ? { ...team, coins: Math.max(0, team.coins - question.hintCost) } : team,
         ),
       );
+      setQuestionStatuses((previous) => {
+        const existing = previous.find((status) => status.questionId === questionId);
+        if (!existing) {
+          return [
+            ...previous,
+            { questionId, solvedByTeams: [], hintedByTeams: [teamId], solveCount: 0, locked: false },
+          ];
+        }
+        const already = existing.hintedByTeams?.includes(teamId) ?? false;
+        if (already) return previous;
+        return previous.map((status) =>
+          status.questionId === questionId
+            ? { ...status, hintedByTeams: [...(status.hintedByTeams ?? []), teamId] }
+            : status,
+        );
+      });
+      setLocalHintPurchase(teamId, questionId);
       return;
     }
 
     try {
       await requestHint(teamId, questionId);
+      // Persist locally immediately so re-entering the question keeps showing the hint
+      // even before realtime/snapshot includes hint purchase info.
+      setLocalHintPurchase(teamId, questionId);
+
+      // Also update local status optimistically (snapshot will eventually reconcile).
+      setQuestionStatuses((previous) => {
+        const existing = previous.find((status) => status.questionId === questionId);
+        if (!existing) {
+          return [
+            ...previous,
+            { questionId, solvedByTeams: [], hintedByTeams: [teamId], solveCount: 0, locked: false },
+          ];
+        }
+        const already = existing.hintedByTeams?.includes(teamId) ?? false;
+        if (already) return previous;
+        return previous.map((status) =>
+          status.questionId === questionId
+            ? { ...status, hintedByTeams: [...(status.hintedByTeams ?? []), teamId] }
+            : status,
+        );
+      });
       await syncFromSnapshot();
     } catch (hintError) {
       const message =
@@ -561,6 +616,14 @@ export default function App() {
             onSubmit={handleAnswerSubmit}
             onHintRequest={handleHintRequest}
             onBack={handleBackToMain}
+            hintPurchased={
+              Boolean(
+                selectedTeam &&
+                  questionStatuses
+                    .find((status) => status.questionId === currentQuestion.id)
+                    ?.hintedByTeams?.includes(selectedTeam.id),
+              ) || (selectedTeam ? hasLocalHintPurchase(selectedTeam.id, currentQuestion.id) : false)
+            }
           />
         )}
       </div>

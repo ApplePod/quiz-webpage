@@ -34,6 +34,7 @@ interface AnswerScreenProps {
   onSubmit: (answer: string, teamId: string) => Promise<any> | any;
   onHintRequest: (teamId: string, questionId: number) => void;
   onBack: () => void;
+  hintPurchased?: boolean;
 }
 
 export function AnswerScreen({
@@ -43,6 +44,7 @@ export function AnswerScreen({
   onSubmit,
   onHintRequest,
   onBack,
+  hintPurchased = false,
 }: AnswerScreenProps) {
   const confettiCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const confettiRef = useRef<null | ((options: any) => Promise<null | void> | null)>(null);
@@ -184,8 +186,13 @@ export function AnswerScreen({
     setShowWrongFx(false);
     setShowSolvedFx(false);
     setResolvedReward(null);
-    setHintRevealed(false);
+    setHintRevealed(hintPurchased);
   }, [question.id]);
+
+  useEffect(() => {
+    // If the hint gets purchased (e.g., via realtime/snapshot), keep it visible.
+    if (hintPurchased) setHintRevealed(true);
+  }, [hintPurchased]);
 
   useEffect(() => {
     // Keep the coin display in sync while NOT showing result dialogs.
@@ -680,9 +687,10 @@ export function AnswerScreen({
                       setShowHintDialog(true);
                     }}
                     className="w-full border-yellow-400/50 text-yellow-300 hover:bg-yellow-500/10 hover:text-yellow-200"
+                    disabled={hintPurchased}
                   >
                     <Lightbulb className="w-5 h-5 mr-2" />
-                    View Hint (-{question.hintCost} coins)
+                    {hintPurchased ? 'Hint Purchased' : `View Hint (-${question.hintCost} coins)`}
                   </Button>
                 )}
               </div>
