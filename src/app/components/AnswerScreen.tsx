@@ -525,7 +525,7 @@ export function AnswerScreen({
                       type="button"
                       variant="outline"
                       onClick={popDirectionDigit}
-                      className="border-white/25 text-white hover:bg-white/10"
+                      className="border-white/40 bg-black/30 text-white hover:bg-black/40 hover:border-white/60"
                       disabled={directionDigits.length === 0}
                     >
                       <Delete className="w-4 h-4 mr-2" />
@@ -535,7 +535,7 @@ export function AnswerScreen({
                       type="button"
                       variant="outline"
                       onClick={resetDirectionDigits}
-                      className="border-white/25 text-white hover:bg-white/10"
+                      className="border-white/40 bg-black/30 text-white hover:bg-black/40 hover:border-white/60"
                       disabled={directionDigits.length === 0}
                     >
                       <RotateCcw className="w-4 h-4 mr-2" />
