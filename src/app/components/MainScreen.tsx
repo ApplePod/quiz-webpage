@@ -4,7 +4,7 @@ import { Scoreboard } from './Scoreboard';
 import { TimerHeader } from './TimerHeader';
 import { AdminButton } from './AdminButton';
 import { Team, QuestionStatus, Question } from '../types';
-import { BookOpen } from 'lucide-react';
+import { BookOpen, Heart, KeyRound } from 'lucide-react';
 
 interface MainScreenProps {
   teams: Team[];
@@ -42,9 +42,14 @@ export function MainScreen({
             </div>
             <div>
               <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-300 via-pink-300 to-blue-300 bg-clip-text text-transparent">
-                Quiz Competition
+                소개팅 방탈출
               </h1>
-              <p className="text-gray-300 mt-1">Select a question to begin</p>
+              <p className="text-gray-300 mt-1 flex items-center gap-2">
+                <KeyRound className="w-4 h-4 text-amber-200/90" />
+                단서를 모아
+                <Heart className="w-4 h-4 text-rose-300/90" />
+                마음을 열어라
+              </p>
             </div>
           </div>
 
