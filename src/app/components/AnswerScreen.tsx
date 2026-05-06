@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import confetti from 'canvas-confetti';
 import { Team, Question } from '../types';
 import {
@@ -43,6 +43,8 @@ export function AnswerScreen({
   onHintRequest,
   onBack,
 }: AnswerScreenProps) {
+  const confettiCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const confettiRef = useRef<null | ((options: any) => Promise<null | void> | null)>(null);
   const [answer, setAnswer] = useState('');
   const [displayTeamCoins, setDisplayTeamCoins] = useState<number>(team.coins);
   const [directionDigits, setDirectionDigits] = useState<number[]>([]);
@@ -90,6 +92,27 @@ export function AnswerScreen({
       setTimeout(() => setRetryShake(false), 450);
     }
   };
+
+  useEffect(() => {
+    const canvas = confettiCanvasRef.current;
+    if (!canvas) return;
+
+    // Use dedicated canvas + worker for smoother tablets (iPad/Galaxy Tab).
+    confettiRef.current = confetti.create(canvas, {
+      resize: true,
+      useWorker: true,
+      disableForReducedMotion: true,
+    });
+
+    return () => {
+      try {
+        (confettiRef.current as any)?.reset?.();
+      } catch {
+        // ignore
+      }
+      confettiRef.current = null;
+    };
+  }, []);
 
   useEffect(() => {
     // Reset input when question changes
@@ -211,6 +234,11 @@ export function AnswerScreen({
     }
 
     // Fire from randomized positions for a couple seconds (prettier + more "full screen").
+    const fire = (options: any) => {
+      const fn = confettiRef.current ?? (confetti as any);
+      return fn(options);
+    };
+
     const interval = window.setInterval(() => {
       const timeLeft = end - Date.now();
       if (timeLeft <= 0) {
@@ -219,7 +247,7 @@ export function AnswerScreen({
       }
 
       const particleCount = Math.max(18, Math.floor(65 * (timeLeft / durationMs)));
-      confetti({
+      fire({
         ...base,
         particleCount,
         origin: { x: randomInRange(0.12, 0.88), y: randomInRange(0.05, 0.35) },
@@ -227,12 +255,16 @@ export function AnswerScreen({
     }, 220);
 
     // Extra side cannons at start for impact.
-    confetti({ ...base, particleCount: 80, angle: 60, spread: 65, origin: { x: 0, y: 0.75 } });
-    confetti({ ...base, particleCount: 80, angle: 120, spread: 65, origin: { x: 1, y: 0.75 } });
+    fire({ ...base, particleCount: 80, angle: 60, spread: 65, origin: { x: 0, y: 0.75 } });
+    fire({ ...base, particleCount: 80, angle: 120, spread: 65, origin: { x: 1, y: 0.75 } });
 
     return () => {
       window.clearInterval(interval);
-      confetti.reset();
+      try {
+        (confettiRef.current as any)?.reset?.();
+      } catch {
+        // ignore
+      }
     };
   }, [result, showConfetti]);
 
@@ -255,6 +287,11 @@ export function AnswerScreen({
     if (!showWrongFx) return;
     if (result !== 'incorrect') return;
 
+    const fire = (options: any) => {
+      const fn = confettiRef.current ?? (confetti as any);
+      return fn(options);
+    };
+
     const base = {
       particleCount: 18,
       spread: 55,
@@ -269,10 +306,10 @@ export function AnswerScreen({
     };
 
     if (wrongEmojiShapes?.length) {
-      confetti({ ...base, particleCount: 16, spread: 45, shapes: wrongEmojiShapes as any });
-      confetti({ ...base, particleCount: 12, spread: 70, origin: { x: 0.5, y: 0.25 }, shapes: wrongEmojiShapes as any });
+      fire({ ...base, particleCount: 16, spread: 45, shapes: wrongEmojiShapes as any });
+      fire({ ...base, particleCount: 12, spread: 70, origin: { x: 0.5, y: 0.25 }, shapes: wrongEmojiShapes as any });
     } else {
-      confetti({ ...base, colors: ['#fb7185', '#a855f7', '#60a5fa'], shapes: ['square', 'circle', 'star'] as any });
+      fire({ ...base, colors: ['#fb7185', '#a855f7', '#60a5fa'], shapes: ['square', 'circle', 'star'] as any });
     }
 
     const timer = window.setTimeout(() => setShowWrongFx(false), 450);
@@ -293,6 +330,11 @@ export function AnswerScreen({
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
+      <canvas
+        ref={confettiCanvasRef}
+        className="pointer-events-none fixed inset-0 z-[70] h-full w-full"
+        aria-hidden="true"
+      />
       <div className="w-full max-w-3xl">
         {/* Back Button */}
         <Button
