@@ -287,3 +287,45 @@ html {
   inset: 0;
   background: radial-gradient(closest-side at 50% 35%, transparent 55%, rgba(0,0,0,0.75) 100%);
 }
+
+@layer components {
+  .escape-container {
+    @apply min-h-screen flex items-center justify-center px-4;
+  }
+
+  .escape-card {
+    @apply bg-white/10 backdrop-blur-md rounded-2xl border border-white/25 shadow-2xl;
+  }
+
+  .escape-card-inner {
+    @apply p-8 sm:p-10;
+  }
+
+  .escape-title {
+    @apply text-white tracking-tight;
+  }
+
+  .escape-subtitle {
+    @apply text-gray-300 leading-relaxed;
+  }
+
+  .escape-chip {
+    @apply inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/20 px-4 py-2 text-sm text-gray-200;
+  }
+
+  .escape-divider {
+    @apply border-t border-white/15;
+  }
+
+  .escape-icon-badge {
+    @apply inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-fuchsia-500/70 to-rose-500/70 border border-white/20 shadow-lg;
+  }
+
+  .escape-btn-primary {
+    @apply w-full bg-gradient-to-r from-fuchsia-500 to-rose-500 hover:from-fuchsia-600 hover:to-rose-600 text-white font-semibold;
+  }
+
+  .escape-btn-ghost {
+    @apply text-white hover:bg-white/10 backdrop-blur-sm;
+  }
+}

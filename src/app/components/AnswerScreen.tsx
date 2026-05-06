@@ -145,13 +145,13 @@ export function AnswerScreen({
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
+    <div className="escape-container">
       <div className="w-full max-w-3xl">
         {/* Back Button */}
         <Button
           onClick={onBack}
           variant="ghost"
-          className="mb-6 text-white hover:bg-white/10 backdrop-blur-sm"
+          className="mb-6 escape-btn-ghost"
           disabled={result !== null}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -162,10 +162,10 @@ export function AnswerScreen({
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/30 p-8 shadow-2xl"
+          className="escape-card escape-card-inner"
         >
           {/* Header */}
-          <div className="flex items-center justify-between mb-6 pb-6 border-b border-white/20">
+          <div className="flex items-center justify-between mb-6 pb-6 border-b border-white/15">
             <div>
               <h3 className="text-sm text-gray-300">Question {question.id}</h3>
               <h2 className="text-2xl font-bold text-white">{team.name}</h2>
@@ -187,7 +187,7 @@ export function AnswerScreen({
 
           {/* Question */}
           <div className="mb-8">
-            <div className="bg-white/5 rounded-xl p-6 border border-white/20">
+            <div className="bg-white/5 rounded-xl p-6 border border-white/15">
               <p className="text-xl text-white leading-relaxed">{question.questionText}</p>
             </div>
           </div>
@@ -289,14 +289,14 @@ export function AnswerScreen({
                       value={answer}
                       onChange={(e) => setAnswer(e.target.value)}
                       placeholder="Type your answer here..."
-                      className="bg-white/10 border-white/30 text-white placeholder:text-gray-400 focus:border-purple-400 focus:ring-purple-400 text-lg py-6"
+                      className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-rose-300/60 focus:ring-rose-300/40 text-lg py-6"
                       autoFocus
                     />
                   </div>
 
                   <Button
                     type="submit"
-                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-6 text-lg"
+                    className="escape-btn-primary py-6 text-lg"
                     disabled={!answer.trim()}
                   >
                     <Send className="w-5 h-5 mr-2" />
@@ -320,38 +320,38 @@ export function AnswerScreen({
                     </div>
                   </div>
 
-                  <div className="bg-white/5 rounded-xl border border-white/20 p-6">
+                  <div className="bg-white/5 rounded-xl border border-white/15 p-6">
                     <div className="flex items-center justify-center">
                       <div className="relative w-56 h-56">
-                        <div className="absolute inset-0 rounded-full border border-white/20 bg-gradient-to-br from-white/10 to-white/0 shadow-inner" />
+                        <div className="absolute inset-0 rounded-full border border-white/20 bg-gradient-to-br from-white/10 to-white/0 shadow-inner shadow-[0_0_60px_rgba(244,63,94,0.05)]" />
                         <div className="absolute inset-6 rounded-full border border-white/15 bg-black/20" />
 
                         {/* Buttons */}
                         <button
                           type="button"
                           onClick={() => pushDirectionDigit(1)}
-                          className="absolute left-1/2 top-2 -translate-x-1/2 rounded-full border border-white/20 bg-white/10 backdrop-blur px-4 py-3 text-white hover:bg-white/15 active:scale-95 transition"
+                          className="absolute left-1/2 top-2 -translate-x-1/2 rounded-full border border-white/20 bg-white/10 backdrop-blur px-4 py-3 text-white hover:bg-white/15 active:scale-95 transition shadow-[0_0_18px_rgba(244,63,94,0.06)]"
                         >
                           <ChevronUp className="w-6 h-6" />
                         </button>
                         <button
                           type="button"
                           onClick={() => pushDirectionDigit(2)}
-                          className="absolute left-1/2 bottom-2 -translate-x-1/2 rounded-full border border-white/20 bg-white/10 backdrop-blur px-4 py-3 text-white hover:bg-white/15 active:scale-95 transition"
+                          className="absolute left-1/2 bottom-2 -translate-x-1/2 rounded-full border border-white/20 bg-white/10 backdrop-blur px-4 py-3 text-white hover:bg-white/15 active:scale-95 transition shadow-[0_0_18px_rgba(244,63,94,0.06)]"
                         >
                           <ChevronDown className="w-6 h-6" />
                         </button>
                         <button
                           type="button"
                           onClick={() => pushDirectionDigit(4)}
-                          className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full border border-white/20 bg-white/10 backdrop-blur px-4 py-3 text-white hover:bg-white/15 active:scale-95 transition"
+                          className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full border border-white/20 bg-white/10 backdrop-blur px-4 py-3 text-white hover:bg-white/15 active:scale-95 transition shadow-[0_0_18px_rgba(244,63,94,0.06)]"
                         >
                           <ChevronLeft className="w-6 h-6" />
                         </button>
                         <button
                           type="button"
                           onClick={() => pushDirectionDigit(3)}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full border border-white/20 bg-white/10 backdrop-blur px-4 py-3 text-white hover:bg-white/15 active:scale-95 transition"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full border border-white/20 bg-white/10 backdrop-blur px-4 py-3 text-white hover:bg-white/15 active:scale-95 transition shadow-[0_0_18px_rgba(244,63,94,0.06)]"
                         >
                           <ChevronRight className="w-6 h-6" />
                         </button>
@@ -414,7 +414,7 @@ export function AnswerScreen({
                       type="button"
                       variant="outline"
                       onClick={popDirectionDigit}
-                      className="border-white/25 text-white hover:bg-white/10"
+                      className="border-white/20 text-white hover:bg-white/10"
                       disabled={directionDigits.length === 0}
                     >
                       <Delete className="w-4 h-4 mr-2" />
@@ -424,7 +424,7 @@ export function AnswerScreen({
                       type="button"
                       variant="outline"
                       onClick={resetDirectionDigits}
-                      className="border-white/25 text-white hover:bg-white/10"
+                      className="border-white/20 text-white hover:bg-white/10"
                       disabled={directionDigits.length === 0}
                     >
                       <RotateCcw className="w-4 h-4 mr-2" />

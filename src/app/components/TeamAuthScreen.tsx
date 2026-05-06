@@ -53,7 +53,7 @@ export function TeamAuthScreen({
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
+    <div className="escape-container">
       <div className="w-full max-w-3xl">
         <Button
           onClick={() => {
@@ -66,7 +66,7 @@ export function TeamAuthScreen({
             onBack()
           }}
           variant="ghost"
-          className="mb-6 text-white hover:bg-white/10 backdrop-blur-sm"
+          className="mb-6 escape-btn-ghost"
           disabled={isSubmitting}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -76,12 +76,12 @@ export function TeamAuthScreen({
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/30 p-8 shadow-2xl"
+          className="escape-card escape-card-inner"
         >
           {!selectedTeam ? (
             <>
               <div className="text-center mb-8">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 mb-4">
+                <div className="escape-icon-badge mb-4">
                   <Users className="w-8 h-8 text-white" />
                 </div>
                 <h2 className="text-3xl font-bold text-white mb-2">Select Your Team</h2>
@@ -98,10 +98,10 @@ export function TeamAuthScreen({
                     whileHover={{ scale: 1.03, y: -3 }}
                     whileTap={{ scale: 0.97 }}
                     onClick={() => handleSelectTeam(team.id)}
-                    className="p-6 rounded-xl border transition-all duration-300 bg-gradient-to-br from-purple-500/20 to-pink-500/20 border-purple-400/50 hover:border-purple-400 hover:shadow-lg hover:shadow-purple-500/30"
+                    className="p-6 rounded-xl border transition-all duration-300 bg-gradient-to-br from-fuchsia-500/15 to-rose-500/15 border-white/15 hover:border-white/25 hover:bg-white/5 hover:shadow-lg hover:shadow-rose-500/10"
                   >
                     <div className="text-center">
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center mx-auto mb-3">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-fuchsia-400 to-rose-400 flex items-center justify-center mx-auto mb-3 border border-white/20 shadow-[0_0_20px_rgba(244,63,94,0.08)]">
                         <span className="text-xl font-bold text-white">{team.id}</span>
                       </div>
                       <div className="text-xl font-semibold text-white mb-1">{team.name}</div>
@@ -118,7 +118,7 @@ export function TeamAuthScreen({
           ) : (
             <>
               <div className="text-center mb-8">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 mb-4">
+                <div className="escape-icon-badge mb-4">
                   <Lock className="w-8 h-8 text-white" />
                 </div>
                 <h2 className="text-3xl font-bold text-white mb-2">Team Authentication</h2>
@@ -157,7 +157,7 @@ export function TeamAuthScreen({
 
                 <Button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-6 text-lg"
+                  className="escape-btn-primary py-6 text-lg"
                   disabled={isSubmitting || password.length === 0}
                 >
                   {isSubmitting ? 'Checking...' : 'Continue'}
