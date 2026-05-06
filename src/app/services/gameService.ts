@@ -64,6 +64,7 @@ function mapSnapshot(payload: any): GameSnapshot {
       questionId: status.question_no,
       solvedByTeams: status.solved_by_teams ?? [],
       hintedByTeams: status.hinted_by_teams ?? [],
+      revealedByTeams: status.revealed_by_teams ?? [],
       solveCount: status.solve_count ?? 0,
       locked: status.locked ?? false,
     }),
@@ -150,6 +151,23 @@ export async function requestHint(teamId: string, questionId: number) {
   if (error) {
     throw error
   }
+}
+
+export async function purchaseAnswerReveal(teamId: string, questionId: number, cost = 10) {
+  ensureConfigured()
+  const supabase = requireSupabase()
+  const { data, error } = await supabase.rpc('purchase_answer_reveal', {
+    p_game_code: GAME_CODE,
+    p_team_code: teamId,
+    p_question_no: questionId,
+    p_cost: cost,
+  })
+
+  if (error) {
+    throw error
+  }
+
+  return data as any
 }
 
 export async function updateTeam(teamId: string, updates: Partial<Team>) {

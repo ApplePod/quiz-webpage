@@ -145,6 +145,30 @@ drop policy if exists "Public write hint_purchases_delete" on public.hint_purcha
 create policy "Public write hint_purchases_delete" on public.hint_purchases
 for delete using (true);
 
+-- Answer reveals (only for locked questions; per team, per question)
+create table if not exists public.answer_reveals (
+  id uuid primary key default gen_random_uuid(),
+  game_id uuid not null references public.games(id) on delete cascade,
+  question_id uuid not null references public.questions(id) on delete cascade,
+  team_id uuid not null references public.teams(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  unique (game_id, question_id, team_id)
+);
+
+alter table public.answer_reveals enable row level security;
+
+drop policy if exists "Public read answer_reveals" on public.answer_reveals;
+create policy "Public read answer_reveals" on public.answer_reveals
+for select using (true);
+
+drop policy if exists "Public write answer_reveals_insert" on public.answer_reveals;
+create policy "Public write answer_reveals_insert" on public.answer_reveals
+for insert with check (true);
+
+drop policy if exists "Public write answer_reveals_delete" on public.answer_reveals;
+create policy "Public write answer_reveals_delete" on public.answer_reveals
+for delete using (true);
+
 create or replace function public.touch_updated_at()
 returns trigger
 language plpgsql
@@ -296,6 +320,16 @@ as $$
             ),
             '[]'::jsonb
           ) as hinted_by_teams
+          ,
+          coalesce(
+            (
+              select jsonb_agg(t.team_code order by t.team_code)
+              from answer_reveals ar
+              join teams t on t.id = ar.team_id
+              where ar.question_id = q.id and ar.game_id = q.game_id
+            ),
+            '[]'::jsonb
+          ) as revealed_by_teams
         from questions q
         left join question_status qs
           on qs.question_id = q.id and qs.game_id = q.game_id
@@ -465,6 +499,76 @@ end;
 $$;
 
 grant execute on function public.request_hint(text, text, integer) to anon, authenticated;
+
+create or replace function public.purchase_answer_reveal(
+  p_game_code text,
+  p_team_code text,
+  p_question_no integer,
+  p_cost integer default 10
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_game_id uuid;
+  v_team record;
+  v_question record;
+  v_locked boolean;
+  v_already boolean;
+begin
+  select id into v_game_id from games where code = p_game_code limit 1;
+  if v_game_id is null then
+    raise exception 'Game not found';
+  end if;
+
+  select * into v_team from teams where game_id = v_game_id and team_code = p_team_code limit 1;
+  if v_team.id is null then
+    raise exception 'Team not found';
+  end if;
+
+  select * into v_question from questions where game_id = v_game_id and question_no = p_question_no limit 1;
+  if v_question.id is null then
+    raise exception 'Question not found';
+  end if;
+
+  select coalesce(qs.locked, false)
+  into v_locked
+  from question_status qs
+  where qs.game_id = v_game_id and qs.question_id = v_question.id
+  limit 1;
+
+  if not v_locked then
+    return jsonb_build_object('ok', false, 'reason', 'not_locked');
+  end if;
+
+  select exists(
+    select 1 from answer_reveals
+    where game_id = v_game_id and question_id = v_question.id and team_id = v_team.id
+  ) into v_already;
+
+  if v_already then
+    return jsonb_build_object('ok', true, 'alreadyPurchased', true, 'charged', false);
+  end if;
+
+  if v_team.coins < p_cost then
+    return jsonb_build_object('ok', false, 'reason', 'insufficient_coins');
+  end if;
+
+  update teams
+  set coins = coins - p_cost
+  where id = v_team.id;
+
+  insert into answer_reveals (game_id, question_id, team_id)
+  values (v_game_id, v_question.id, v_team.id)
+  on conflict (game_id, question_id, team_id) do nothing;
+
+  return jsonb_build_object('ok', true, 'alreadyPurchased', false, 'charged', true);
+end;
+$$;
+
+grant execute on function public.purchase_answer_reveal(text, text, integer, integer) to anon, authenticated;
 
 -- Admin/test utilities (MVP)
 -- Note: these are intentionally permissive for quick testing.

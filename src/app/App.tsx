@@ -13,6 +13,7 @@ import {
   adminResetGame,
   adminSetTestMode,
   fetchGameSnapshot,
+  purchaseAnswerReveal,
   requestHint,
   resetAllQuestions,
   resetAllTeams,
@@ -343,6 +344,39 @@ export default function App() {
     setSelectedQuestionId(null);
   };
 
+  const handlePurchaseAnswerReveal = async (teamId: string, questionId: number, cost = 10) => {
+    if (!isSupabaseConfigured) {
+      const team = teams.find((t) => t.id === teamId);
+      if (!team) return { ok: false, reason: 'missing_team' };
+      if (team.coins < cost) return { ok: false, reason: 'insufficient_coins' };
+
+      setTeams((previous) =>
+        previous.map((t) => (t.id === teamId ? { ...t, coins: Math.max(0, t.coins - cost) } : t)),
+      );
+      setQuestionStatuses((previous) => {
+        const existing = previous.find((status) => status.questionId === questionId);
+        if (!existing) {
+          return [
+            ...previous,
+            { questionId, solvedByTeams: [], hintedByTeams: [], revealedByTeams: [teamId], solveCount: 3, locked: true },
+          ];
+        }
+        const already = existing.revealedByTeams?.includes(teamId) ?? false;
+        if (already) return previous;
+        return previous.map((status) =>
+          status.questionId === questionId
+            ? { ...status, revealedByTeams: [...(status.revealedByTeams ?? []), teamId] }
+            : status,
+        );
+      });
+      return { ok: true };
+    }
+
+    const response = await purchaseAnswerReveal(teamId, questionId, cost);
+    await syncFromSnapshot();
+    return response as any;
+  };
+
   const handleAdminClick = () => {
     setShowAdminAuth(true);
   };
@@ -603,6 +637,7 @@ export default function App() {
             onAdminClick={handleAdminClick}
             activeTeam={selectedTeam}
             onChangeTeam={handleChangeTeam}
+            onPurchaseAnswerReveal={handlePurchaseAnswerReveal}
           />
         )}
 

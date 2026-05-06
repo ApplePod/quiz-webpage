@@ -7,6 +7,7 @@ interface QuestionCardProps {
   coinReward: number;
   solveCount: number; // 0-3
   solvedByActiveTeam?: boolean;
+  onLockedClick?: () => void;
   onClick: () => void;
 }
 
@@ -98,6 +99,7 @@ export function QuestionCard({
   coinReward,
   solveCount,
   solvedByActiveTeam = false,
+  onLockedClick,
   onClick,
 }: QuestionCardProps) {
   const isLocked = solveCount >= 3;
@@ -166,7 +168,10 @@ export function QuestionCard({
       } ${cardStyle.border} ${cardStyle.shadow} ${
         isDisabled ? 'cursor-not-allowed opacity-60' : `${cardStyle.hoverBg} cursor-pointer`
       }`}
-      disabled={isDisabled}
+      // Keep the element interactive for locked overlays (X click),
+      // but fully disable for "solved by active team".
+      disabled={solvedByActiveTeam}
+      aria-disabled={isDisabled}
     >
       {/* Locked Overlay */}
       <AnimatePresence>
@@ -186,18 +191,30 @@ export function QuestionCard({
             }}
             className="absolute inset-0 flex items-center justify-center bg-gray-900/70 rounded-2xl backdrop-blur-sm z-10"
           >
-            <motion.div
-              animate={{
-                scale: [1, 1.1, 1],
+            <button
+              type="button"
+              className="pointer-events-auto"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (solvedByActiveTeam) return;
+                onLockedClick?.();
               }}
-              transition={{
-                duration: 0.6,
-                repeat: Infinity,
-                repeatDelay: 2,
-              }}
+              aria-label="Locked question"
             >
-              <X className="w-[clamp(56px,9vw,128px)] h-[clamp(56px,9vw,128px)] text-gray-300/60 stroke-[1.5]" />
-            </motion.div>
+              <motion.div
+                animate={{
+                  scale: [1, 1.1, 1],
+                }}
+                transition={{
+                  duration: 0.6,
+                  repeat: Infinity,
+                  repeatDelay: 2,
+                }}
+              >
+                <X className="w-[clamp(56px,9vw,128px)] h-[clamp(56px,9vw,128px)] text-gray-300/60 stroke-[1.5]" />
+              </motion.div>
+            </button>
           </motion.div>
         )}
       </AnimatePresence>
