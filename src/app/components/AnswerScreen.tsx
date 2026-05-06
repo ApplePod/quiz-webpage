@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import confetti from 'canvas-confetti';
 import { Team, Question } from '../types';
 import {
   ArrowLeft,
@@ -176,14 +177,32 @@ export function AnswerScreen({
     }
   };
 
-  const confettiPieces = Array.from({ length: 26 }).map((_, idx) => ({
-    id: idx,
-    left: `${(idx * 100) / 26}%`,
-    delay: (idx % 9) * 0.03,
-    hue: 200 + (idx * 18) % 140,
-    rotate: (idx * 37) % 180,
-    x: ((idx % 2 === 0 ? -1 : 1) * (10 + (idx % 7) * 6)),
-  }));
+  useEffect(() => {
+    if (!showConfetti) return;
+    if (result !== 'correct') return;
+
+    // Respect user motion preferences (canvas-confetti supports this flag)
+    const optionsBase = {
+      spread: 75,
+      ticks: 180,
+      gravity: 0.9,
+      decay: 0.92,
+      startVelocity: 45,
+      zIndex: 1000,
+      disableForReducedMotion: true,
+    } as const;
+
+    // Two bursts from both sides, similar to library examples
+    confetti({ ...optionsBase, particleCount: 90, angle: 60, origin: { x: 0, y: 0.7 } });
+    confetti({ ...optionsBase, particleCount: 90, angle: 120, origin: { x: 1, y: 0.7 } });
+
+    // A final top burst
+    confetti({ ...optionsBase, particleCount: 70, angle: 90, spread: 110, origin: { x: 0.5, y: 0.15 } });
+
+    return () => {
+      confetti.reset();
+    };
+  }, [result, showConfetti]);
 
   const handleHintConfirm = () => {
     setShowHintDialog(false);
@@ -199,29 +218,6 @@ export function AnswerScreen({
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
-      {showConfetti && result === 'correct' && (
-        <div className="pointer-events-none fixed inset-0 z-[60] overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_15%,rgba(34,197,94,0.16),transparent_55%)]" />
-          {confettiPieces.map((piece) => (
-            <motion.span
-              key={piece.id}
-              initial={{ y: -60, opacity: 0, x: 0, rotate: piece.rotate }}
-              animate={{ y: '110vh', opacity: [0, 1, 1, 0], x: piece.x, rotate: piece.rotate + 260 }}
-              transition={{ duration: 1.4, delay: piece.delay, ease: 'easeOut' }}
-              style={{
-                left: piece.left,
-                top: 0,
-                position: 'absolute',
-                width: 10,
-                height: 18,
-                borderRadius: 4,
-                background: `hsl(${piece.hue} 90% 65% / 0.95)`,
-                boxShadow: '0 0 18px rgba(255,255,255,0.12)',
-              }}
-            />
-          ))}
-        </div>
-      )}
       <div className="w-full max-w-3xl">
         {/* Back Button */}
         <Button
