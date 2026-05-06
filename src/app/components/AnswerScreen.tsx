@@ -55,6 +55,7 @@ export function AnswerScreen({
   const [isSubmittingResult, setIsSubmittingResult] = useState(false);
   const [retryShake, setRetryShake] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [showWrongFx, setShowWrongFx] = useState(false);
   const [hintInsufficientCoins, setHintInsufficientCoins] = useState(false);
   const [showRechargeDialog, setShowRechargeDialog] = useState(false);
   const rewardForCurrentOrder =
@@ -83,6 +84,7 @@ export function AnswerScreen({
     setPendingSubmitAnswer(isCorrect ? answer : null);
     setShowResultDialog(true);
     setShowConfetti(isCorrect);
+    setShowWrongFx(!isCorrect);
     if (!isCorrect) {
       setRetryShake(true);
       setTimeout(() => setRetryShake(false), 450);
@@ -100,6 +102,7 @@ export function AnswerScreen({
     setPendingSubmitAnswer(null);
     setIsSubmittingResult(false);
     setShowConfetti(false);
+    setShowWrongFx(false);
     setHintRevealed(false);
   }, [question.id, team.coins]);
 
@@ -129,6 +132,7 @@ export function AnswerScreen({
         setPendingSubmitAnswer(isCorrect ? submitted : null);
         setShowResultDialog(true);
         setShowConfetti(isCorrect);
+        setShowWrongFx(!isCorrect);
         if (!isCorrect) {
           setRetryShake(true);
           setTimeout(() => setRetryShake(false), 450);
@@ -156,6 +160,7 @@ export function AnswerScreen({
     setPendingSubmitAnswer(null);
     setIsSubmittingResult(false);
     setShowConfetti(false);
+    setShowWrongFx(false);
     if (question.answerType === 'text') {
       setAnswer('');
     } else {
@@ -173,6 +178,7 @@ export function AnswerScreen({
       setIsSubmittingResult(false);
       setShowResultDialog(false);
       setShowConfetti(false);
+      setShowWrongFx(false);
       onBack();
     }
   };
@@ -229,6 +235,49 @@ export function AnswerScreen({
       confetti.reset();
     };
   }, [result, showConfetti]);
+
+  const wrongEmojiShapes = useMemo(() => {
+    const api = confetti as unknown as {
+      shapeFromText?: (options: { text: string; scalar?: number; color?: string; fontFamily?: string }) => any;
+    };
+    if (!api.shapeFromText) return null;
+
+    const scalar = 2;
+    // TODO: change emojis here if you want
+    return [
+      api.shapeFromText({ text: '🤡', scalar }),
+      api.shapeFromText({ text: '💥', scalar }),
+      api.shapeFromText({ text: '💦', scalar }),
+    ];
+  }, []);
+
+  useEffect(() => {
+    if (!showWrongFx) return;
+    if (result !== 'incorrect') return;
+
+    const base = {
+      particleCount: 18,
+      spread: 55,
+      startVelocity: 22,
+      ticks: 140,
+      gravity: 1.15,
+      decay: 0.9,
+      scalar: 1,
+      zIndex: 1000,
+      disableForReducedMotion: true,
+      origin: { x: 0.5, y: 0.3 },
+    };
+
+    if (wrongEmojiShapes?.length) {
+      confetti({ ...base, particleCount: 16, spread: 45, shapes: wrongEmojiShapes as any });
+      confetti({ ...base, particleCount: 12, spread: 70, origin: { x: 0.5, y: 0.25 }, shapes: wrongEmojiShapes as any });
+    } else {
+      confetti({ ...base, colors: ['#fb7185', '#a855f7', '#60a5fa'], shapes: ['square', 'circle', 'star'] as any });
+    }
+
+    const timer = window.setTimeout(() => setShowWrongFx(false), 450);
+    return () => window.clearTimeout(timer);
+  }, [result, showWrongFx, wrongEmojiShapes]);
 
   const handleHintConfirm = () => {
     setShowHintDialog(false);
