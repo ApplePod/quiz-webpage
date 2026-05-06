@@ -231,7 +231,6 @@ export default function App() {
       setTimeout(() => {
         setCurrentView('main');
         setSelectedQuestionId(null);
-        setSelectedTeam(null);
       }, 1200);
       return;
     }
@@ -251,10 +250,8 @@ export default function App() {
       }
     }
 
-    setTimeout(() => {
-      setCurrentView('main');
-      setSelectedQuestionId(null);
-    }, 2000);
+    // Do not auto-navigate here; the answer screen will decide when to return
+    // (e.g. after the user confirms the result dialog).
   };
 
   const handleHintRequest = async (teamId: string, questionId: number) => {

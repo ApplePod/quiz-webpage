@@ -29,7 +29,7 @@ interface AnswerScreenProps {
   team: Team;
   question: Question;
   solveCount: number;
-  onSubmit: (answer: string, teamId: string) => void;
+  onSubmit: (answer: string, teamId: string) => Promise<void> | void;
   onHintRequest: (teamId: string, questionId: number) => void;
   onBack: () => void;
 }
@@ -49,6 +49,10 @@ export function AnswerScreen({
   const [showHintDialog, setShowHintDialog] = useState(false);
   const [hintRevealed, setHintRevealed] = useState(false);
   const [result, setResult] = useState<'correct' | 'incorrect' | null>(null);
+  const [showResultDialog, setShowResultDialog] = useState(false);
+  const [pendingSubmitAnswer, setPendingSubmitAnswer] = useState<string | null>(null);
+  const [isSubmittingResult, setIsSubmittingResult] = useState(false);
+  const [retryShake, setRetryShake] = useState(false);
   const [hintInsufficientCoins, setHintInsufficientCoins] = useState(false);
   const [showRechargeDialog, setShowRechargeDialog] = useState(false);
   const rewardForCurrentOrder =
@@ -74,11 +78,12 @@ export function AnswerScreen({
 
     const isCorrect = isCorrectForQuestion(question, answer);
     setResult(isCorrect ? 'correct' : 'incorrect');
-    
-    // Pass the result to parent after a short delay
-    setTimeout(() => {
-      onSubmit(answer, team.id);
-    }, 2000);
+    setPendingSubmitAnswer(isCorrect ? answer : null);
+    setShowResultDialog(true);
+    if (!isCorrect) {
+      setRetryShake(true);
+      setTimeout(() => setRetryShake(false), 450);
+    }
   };
 
   useEffect(() => {
@@ -88,6 +93,9 @@ export function AnswerScreen({
     setDirectionDigits([]);
     setLastDirectionDigit(null);
     setResult(null);
+    setShowResultDialog(false);
+    setPendingSubmitAnswer(null);
+    setIsSubmittingResult(false);
     setHintRevealed(false);
   }, [question.id, team.coins]);
 
@@ -114,9 +122,12 @@ export function AnswerScreen({
           submitted,
         );
         setResult(isCorrect ? 'correct' : 'incorrect');
-        setTimeout(() => {
-          onSubmit(submitted, team.id);
-        }, 2000);
+        setPendingSubmitAnswer(isCorrect ? submitted : null);
+        setShowResultDialog(true);
+        if (!isCorrect) {
+          setRetryShake(true);
+          setTimeout(() => setRetryShake(false), 450);
+        }
       }
 
       return trimmed;
@@ -133,6 +144,40 @@ export function AnswerScreen({
     setDirectionDigits([]);
     setLastDirectionDigit(null);
   };
+
+  const handleRetry = () => {
+    setResult(null);
+    setShowResultDialog(false);
+    setPendingSubmitAnswer(null);
+    setIsSubmittingResult(false);
+    if (question.answerType === 'text') {
+      setAnswer('');
+    } else {
+      setDirectionDigits([]);
+      setLastDirectionDigit(null);
+    }
+  };
+
+  const handleConfirmCorrect = async () => {
+    if (!pendingSubmitAnswer) return;
+    setIsSubmittingResult(true);
+    try {
+      await onSubmit(pendingSubmitAnswer, team.id);
+    } finally {
+      setIsSubmittingResult(false);
+      setShowResultDialog(false);
+      onBack();
+    }
+  };
+
+  const confettiPieces = Array.from({ length: 26 }).map((_, idx) => ({
+    id: idx,
+    left: `${(idx * 100) / 26}%`,
+    delay: (idx % 9) * 0.03,
+    hue: 200 + (idx * 18) % 140,
+    rotate: (idx * 37) % 180,
+    x: ((idx % 2 === 0 ? -1 : 1) * (10 + (idx % 7) * 6)),
+  }));
 
   const handleHintConfirm = () => {
     setShowHintDialog(false);
@@ -154,7 +199,7 @@ export function AnswerScreen({
           onClick={onBack}
           variant="ghost"
           className="mb-6 text-white hover:bg-white/10 backdrop-blur-sm"
-          disabled={result !== null}
+          disabled={showResultDialog || isSubmittingResult}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back
@@ -189,95 +234,17 @@ export function AnswerScreen({
 
           {/* Question */}
           <div className="mb-8">
-            <div className="bg-white/5 rounded-xl p-6 border border-white/20">
+            <motion.div
+              animate={retryShake ? { x: [-6, 6, -4, 4, -2, 2, 0] } : {}}
+              transition={{ duration: 0.45 }}
+              className="bg-white/5 rounded-xl p-6 border border-white/20"
+            >
               <p className="text-xl text-white leading-relaxed">{question.questionText}</p>
-            </div>
+            </motion.div>
           </div>
 
-          {/* Result Display */}
-          {result && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.5 }}
-              animate={{
-                opacity: 1,
-                scale: [0.5, 1.1, 1],
-                boxShadow: result === 'correct'
-                  ? ['0 0 0px rgba(34, 197, 94, 0)', '0 0 30px rgba(34, 197, 94, 0.8)', '0 0 20px rgba(34, 197, 94, 0.4)']
-                  : ['0 0 0px rgba(239, 68, 68, 0)', '0 0 30px rgba(239, 68, 68, 0.8)', '0 0 20px rgba(239, 68, 68, 0.4)']
-              }}
-              transition={{
-                duration: 0.6,
-                times: [0, 0.5, 1],
-                ease: "easeOut"
-              }}
-              className={`mb-8 p-6 rounded-xl border-2 flex items-center gap-4 ${
-                result === 'correct'
-                  ? 'bg-green-500/20 border-green-400'
-                  : 'bg-red-500/20 border-red-400'
-              }`}
-            >
-              {result === 'correct' ? (
-                <>
-                  <motion.div
-                    initial={{ rotate: -180, scale: 0 }}
-                    animate={{ rotate: 0, scale: 1 }}
-                    transition={{ type: 'spring', stiffness: 200 }}
-                  >
-                    <CheckCircle2 className="w-12 h-12 text-green-400" />
-                  </motion.div>
-                  <div>
-                    <motion.h3
-                      initial={{ x: -20, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      transition={{ delay: 0.2 }}
-                      className="text-2xl font-bold text-green-400"
-                    >
-                      Correct! 🎉
-                    </motion.h3>
-                    <motion.p
-                      initial={{ x: -20, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      transition={{ delay: 0.3 }}
-                      className="text-green-300"
-                    >
-                      Well done! +{rewardForCurrentOrder} coins awarded.
-                    </motion.p>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <motion.div
-                    initial={{ rotate: 180, scale: 0 }}
-                    animate={{ rotate: 0, scale: 1 }}
-                    transition={{ type: 'spring', stiffness: 200 }}
-                  >
-                    <XCircle className="w-12 h-12 text-red-400" />
-                  </motion.div>
-                  <div>
-                    <motion.h3
-                      initial={{ x: -20, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      transition={{ delay: 0.2 }}
-                      className="text-2xl font-bold text-red-400"
-                    >
-                      Incorrect
-                    </motion.h3>
-                    <motion.p
-                      initial={{ x: -20, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      transition={{ delay: 0.3 }}
-                      className="text-red-300"
-                    >
-                      The correct answer was: {correctAnswerLabel}
-                    </motion.p>
-                  </div>
-                </>
-              )}
-            </motion.div>
-          )}
-
           {/* Answer Form */}
-          {!result && (
+          {!showResultDialog && (
             <>
               {question.answerType === 'text' ? (
                 <form onSubmit={handleSubmit} className="space-y-6">
@@ -508,6 +475,87 @@ export function AnswerScreen({
             >
               {hintInsufficientCoins ? 'Yes' : 'Yes, Show Hint'}
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Result Dialog */}
+      <Dialog open={showResultDialog} onOpenChange={(open) => (open ? null : handleRetry())}>
+        <DialogContent className="bg-gray-900/95 border-white/20 text-white overflow-hidden">
+          {result === 'correct' && (
+            <div className="pointer-events-none absolute inset-0">
+              {confettiPieces.map((piece) => (
+                <motion.span
+                  key={piece.id}
+                  initial={{ y: -40, opacity: 0, x: 0, rotate: piece.rotate }}
+                  animate={{ y: 420, opacity: [0, 1, 1, 0], x: piece.x, rotate: piece.rotate + 240 }}
+                  transition={{ duration: 1.25, delay: piece.delay, ease: 'easeOut' }}
+                  style={{
+                    left: piece.left,
+                    top: 0,
+                    position: 'absolute',
+                    width: 10,
+                    height: 18,
+                    borderRadius: 4,
+                    background: `hsl(${piece.hue} 90% 65% / 0.95)`,
+                    boxShadow: '0 0 18px rgba(255,255,255,0.12)',
+                  }}
+                />
+              ))}
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(34,197,94,0.18),transparent_55%)]" />
+            </div>
+          )}
+
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              {result === 'correct' ? (
+                <>
+                  <CheckCircle2 className="w-6 h-6 text-green-400" />
+                  정답입니다!
+                </>
+              ) : (
+                <>
+                  <XCircle className="w-6 h-6 text-red-400" />
+                  틀렸습니다
+                </>
+              )}
+            </DialogTitle>
+            <DialogDescription className="text-gray-300">
+              {result === 'correct'
+                ? `+${rewardForCurrentOrder} 코인 획득!`
+                : '다시 한 번 도전해보세요.'}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="relative z-10 rounded-xl border border-white/10 bg-black/20 p-4">
+            {result === 'correct' ? (
+              <div className="text-sm text-gray-200">
+                확인을 누르면 홈으로 이동합니다.
+              </div>
+            ) : (
+              <div className="text-sm text-gray-200">
+                입력을 초기화하고 바로 다시 풀 수 있어요.
+              </div>
+            )}
+          </div>
+
+          <DialogFooter>
+            {result === 'correct' ? (
+              <Button
+                onClick={handleConfirmCorrect}
+                className="bg-green-600 hover:bg-green-700 text-white"
+                disabled={isSubmittingResult}
+              >
+                확인
+              </Button>
+            ) : (
+              <Button
+                onClick={handleRetry}
+                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+              >
+                다시 풀기
+              </Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>
