@@ -181,25 +181,51 @@ export function AnswerScreen({
     if (!showConfetti) return;
     if (result !== 'correct') return;
 
-    // Respect user motion preferences (canvas-confetti supports this flag)
-    const optionsBase = {
-      spread: 75,
-      ticks: 180,
-      gravity: 0.9,
+    const durationMs = 2600;
+    const end = Date.now() + durationMs;
+
+    const palette = ['#a855f7', '#ec4899', '#fb7185', '#fbbf24', '#22c55e', '#60a5fa'];
+
+    // Base options inspired by the "interval burst" pattern.
+    const base = {
+      startVelocity: 34,
+      spread: 120,
+      ticks: 240,
+      gravity: 0.95,
       decay: 0.92,
-      startVelocity: 45,
+      scalar: 1,
       zIndex: 1000,
+      colors: palette,
+      shapes: ['square', 'circle', 'star'] as const,
       disableForReducedMotion: true,
-    } as const;
+    };
 
-    // Two bursts from both sides, similar to library examples
-    confetti({ ...optionsBase, particleCount: 90, angle: 60, origin: { x: 0, y: 0.7 } });
-    confetti({ ...optionsBase, particleCount: 90, angle: 120, origin: { x: 1, y: 0.7 } });
+    function randomInRange(min: number, max: number) {
+      return Math.random() * (max - min) + min;
+    }
 
-    // A final top burst
-    confetti({ ...optionsBase, particleCount: 70, angle: 90, spread: 110, origin: { x: 0.5, y: 0.15 } });
+    // Fire from randomized positions for a couple seconds (prettier + more "full screen").
+    const interval = window.setInterval(() => {
+      const timeLeft = end - Date.now();
+      if (timeLeft <= 0) {
+        window.clearInterval(interval);
+        return;
+      }
+
+      const particleCount = Math.max(18, Math.floor(65 * (timeLeft / durationMs)));
+      confetti({
+        ...base,
+        particleCount,
+        origin: { x: randomInRange(0.12, 0.88), y: randomInRange(0.05, 0.35) },
+      });
+    }, 220);
+
+    // Extra side cannons at start for impact.
+    confetti({ ...base, particleCount: 80, angle: 60, spread: 65, origin: { x: 0, y: 0.75 } });
+    confetti({ ...base, particleCount: 80, angle: 120, spread: 65, origin: { x: 1, y: 0.75 } });
 
     return () => {
+      window.clearInterval(interval);
       confetti.reset();
     };
   }, [result, showConfetti]);
