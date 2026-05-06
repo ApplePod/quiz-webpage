@@ -15,6 +15,7 @@ export const initialQuestions: Question[] = [
   {
     id: 1,
     questionText: '1',
+    answerType: 'text',
     correctAnswer: '1',
     hint: 'Known as the City of Light',
     hintCost: 10,
@@ -25,6 +26,7 @@ export const initialQuestions: Question[] = [
   {
     id: 2,
     questionText: '1',
+    answerType: 'text',
     correctAnswer: '1',
     hint: 'The result is between 100 and 150',
     hintCost: 10,
@@ -35,6 +37,7 @@ export const initialQuestions: Question[] = [
   {
     id: 3,
     questionText: '1',
+    answerType: 'text',
     correctAnswer: '1',
     hint: 'Famous English playwright from the 16th century',
     hintCost: 10,
@@ -45,6 +48,7 @@ export const initialQuestions: Question[] = [
   {
     id: 4,
     questionText: '1',
+    answerType: 'text',
     correctAnswer: '1',
     hint: 'It borders Asia and the Americas',
     hintCost: 10,
@@ -55,6 +59,7 @@ export const initialQuestions: Question[] = [
   {
     id: 5,
     questionText: '1',
+    answerType: 'text',
     correctAnswer: '1',
     hint: 'From the Latin word "Aurum"',
     hintCost: 10,
@@ -65,6 +70,7 @@ export const initialQuestions: Question[] = [
   {
     id: 6,
     questionText: '1',
+    answerType: 'text',
     correctAnswer: '1',
     hint: 'Asia, Africa, North America, South America, Antarctica, Europe, Australia',
     hintCost: 10,
@@ -75,6 +81,7 @@ export const initialQuestions: Question[] = [
   {
     id: 7,
     questionText: '1',
+    answerType: 'text',
     correctAnswer: '1',
     hint: 'Approximately 3 × 10⁸ m/s',
     hintCost: 10,
@@ -85,6 +92,7 @@ export const initialQuestions: Question[] = [
   {
     id: 8,
     questionText: '1',
+    answerType: 'text',
     correctAnswer: '1',
     hint: 'Italian Renaissance artist',
     hintCost: 10,
@@ -95,6 +103,7 @@ export const initialQuestions: Question[] = [
   {
     id: 9,
     questionText: '1',
+    answerType: 'text',
     correctAnswer: '1',
     hint: 'It\'s a perfect square between 10 and 15',
     hintCost: 10,
@@ -105,6 +114,7 @@ export const initialQuestions: Question[] = [
   {
     id: 10,
     questionText: '1',
+    answerType: 'text',
     correctAnswer: '1',
     hint: 'It\'s the only even prime number',
     hintCost: 10,
@@ -115,6 +125,7 @@ export const initialQuestions: Question[] = [
   {
     id: 11,
     questionText: '1',
+    answerType: 'text',
     correctAnswer: '1',
     hint: 'Between 1940 and 1950',
     hintCost: 10,
@@ -125,6 +136,7 @@ export const initialQuestions: Question[] = [
   {
     id: 12,
     questionText: '1',
+    answerType: 'text',
     correctAnswer: '1',
     hint: 'Located in Africa',
     hintCost: 10,
@@ -135,6 +147,7 @@ export const initialQuestions: Question[] = [
   {
     id: 13,
     questionText: '1',
+    answerType: 'text',
     correctAnswer: '1',
     hint: 'Pluto is no longer classified as a planet',
     hintCost: 10,
@@ -145,6 +158,7 @@ export const initialQuestions: Question[] = [
   {
     id: 14,
     questionText: '1',
+    answerType: 'text',
     correctAnswer: '1',
     hint: 'One of the most populous cities in the world',
     hintCost: 10,
@@ -155,6 +169,7 @@ export const initialQuestions: Question[] = [
   {
     id: 15,
     questionText: '1',
+    answerType: 'text',
     correctAnswer: '1',
     hint: 'Scottish bacteriologist',
     hintCost: 10,
@@ -165,6 +180,7 @@ export const initialQuestions: Question[] = [
   {
     id: 16,
     questionText: '1',
+    answerType: 'text',
     correctAnswer: '1',
     hint: 'At standard atmospheric pressure',
     hintCost: 10,
@@ -175,6 +191,7 @@ export const initialQuestions: Question[] = [
   {
     id: 17,
     questionText: '1',
+    answerType: 'text',
     correctAnswer: '1',
     hint: 'Lives in the ocean',
     hintCost: 10,
@@ -185,6 +202,7 @@ export const initialQuestions: Question[] = [
   {
     id: 18,
     questionText: '1',
+    answerType: 'text',
     correctAnswer: '1',
     hint: 'Think of a honeycomb cell',
     hintCost: 10,
@@ -195,6 +213,7 @@ export const initialQuestions: Question[] = [
   {
     id: 19,
     questionText: '1',
+    answerType: 'text',
     correctAnswer: '1',
     hint: 'Symbol is £',
     hintCost: 10,
@@ -205,6 +224,7 @@ export const initialQuestions: Question[] = [
   {
     id: 20,
     questionText: '1',
+    answerType: 'text',
     correctAnswer: '1',
     hint: 'Apollo 11 mission in 1969',
     hintCost: 10,
@@ -215,6 +235,7 @@ export const initialQuestions: Question[] = [
   {
     id: 21,
     questionText: '1',
+    answerType: 'text',
     correctAnswer: '1',
     hint: 'Located in Rome, Italy',
     hintCost: 10,
@@ -225,6 +246,7 @@ export const initialQuestions: Question[] = [
   {
     id: 22,
     questionText: '1',
+    answerType: 'text',
     correctAnswer: '1',
     hint: 'Used in jewelry and cutting tools',
     hintCost: 10,
@@ -235,6 +257,7 @@ export const initialQuestions: Question[] = [
   {
     id: 23,
     questionText: '1',
+    answerType: 'text',
     correctAnswer: '1',
     hint: 'Between 200 and 210',
     hintCost: 10,
@@ -245,6 +268,7 @@ export const initialQuestions: Question[] = [
   {
     id: 24,
     questionText: '1',
+    answerType: 'text',
     correctAnswer: '1',
     hint: 'It\'s a cold desert',
     hintCost: 10,
@@ -255,6 +279,7 @@ export const initialQuestions: Question[] = [
   {
     id: 25,
     questionText: '1',
+    answerType: 'text',
     correctAnswer: '1',
     hint: 'Used to calculate the circumference of a circle',
     hintCost: 10,

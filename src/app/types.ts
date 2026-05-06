@@ -10,7 +10,8 @@ export interface Team {
 export interface Question {
   id: number;
   questionText: string;
-  correctAnswer: string;
+  answerType: 'text' | 'directionLock';
+  correctAnswer: string | number[];
   hint: string;
   hintCost: number;
   coinRewardFirst: number;

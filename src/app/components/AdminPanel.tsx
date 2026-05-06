@@ -5,6 +5,7 @@ import { Input } from './ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Team, Question, QuestionStatus } from '../types';
 import { motion } from 'motion/react';
+import { formatDirectionDigits, parseDirectionDigits, directionDigitsToArrows } from '../utils/answerCodec';
 
 export type AdminPanelProps = {
   teams: Team[];
@@ -49,6 +50,8 @@ export function AdminPanel({
   const [editingQuestion, setEditingQuestion] = useState<number | null>(null);
   const [teamEdits, setTeamEdits] = useState<Partial<Team>>({});
   const [questionEdits, setQuestionEdits] = useState<Partial<Question>>({});
+  const [answerTypeDraft, setAnswerTypeDraft] = useState<Question['answerType']>('text');
+  const [correctAnswerDraft, setCorrectAnswerDraft] = useState<string>('');
 
   const handleTeamEdit = (teamId: string) => {
     const team = teams.find((t) => t.id === teamId);
@@ -69,13 +72,27 @@ export function AdminPanel({
     if (question) {
       setEditingQuestion(questionId);
       setQuestionEdits(question);
+      setAnswerTypeDraft(question.answerType ?? 'text');
+      if (question.answerType === 'directionLock' && Array.isArray(question.correctAnswer)) {
+        setCorrectAnswerDraft(formatDirectionDigits(question.correctAnswer));
+      } else {
+        setCorrectAnswerDraft(String(question.correctAnswer ?? ''));
+      }
     }
   };
 
   const handleQuestionSave = (questionId: number) => {
-    onUpdateQuestion(questionId, questionEdits);
+    const nextCorrectAnswer: Question['correctAnswer'] =
+      answerTypeDraft === 'directionLock' ? parseDirectionDigits(correctAnswerDraft) : correctAnswerDraft;
+
+    onUpdateQuestion(questionId, {
+      ...questionEdits,
+      answerType: answerTypeDraft,
+      correctAnswer: nextCorrectAnswer,
+    });
     setEditingQuestion(null);
     setQuestionEdits({});
+    setCorrectAnswerDraft('');
   };
 
   const formatTime = (seconds: number) => {
@@ -137,6 +154,7 @@ export function AdminPanel({
                       <tr>
                         <th className="px-4 py-3 text-left text-gray-300 font-semibold">Q#</th>
                         <th className="px-4 py-3 text-left text-gray-300 font-semibold">Question Text</th>
+                        <th className="px-4 py-3 text-left text-gray-300 font-semibold">Type</th>
                         <th className="px-4 py-3 text-left text-gray-300 font-semibold">Answer</th>
                         <th className="px-4 py-3 text-left text-gray-300 font-semibold">Hint</th>
                         <th className="px-4 py-3 text-left text-gray-300 font-semibold">Hint Cost</th>
@@ -171,16 +189,47 @@ export function AdminPanel({
                             </td>
                             <td className="px-4 py-3">
                               {isEditing ? (
+                                <select
+                                  value={answerTypeDraft}
+                                  onChange={(e) => {
+                                    const next = e.target.value as Question['answerType'];
+                                    setAnswerTypeDraft(next);
+                                    setCorrectAnswerDraft((previous) => {
+                                      if (next === 'directionLock') {
+                                        const parsed = parseDirectionDigits(previous);
+                                        return parsed.length ? formatDirectionDigits(parsed) : '1, 2, 3, 4';
+                                      }
+                                      return previous;
+                                    });
+                                  }}
+                                  className="h-9 rounded-md bg-gray-700 border border-gray-600 text-white text-xs px-2"
+                                >
+                                  <option value="text">text</option>
+                                  <option value="directionLock">directionLock</option>
+                                </select>
+                              ) : (
+                                <span className="text-gray-300 text-xs font-mono">
+                                  {question.answerType}
+                                </span>
+                              )}
+                            </td>
+                            <td className="px-4 py-3">
+                              {isEditing ? (
                                 <Input
-                                  value={questionEdits.correctAnswer || ''}
-                                  onChange={(e) =>
-                                    setQuestionEdits({ ...questionEdits, correctAnswer: e.target.value })
+                                  value={correctAnswerDraft}
+                                  onChange={(e) => setCorrectAnswerDraft(e.target.value)}
+                                  placeholder={
+                                    answerTypeDraft === 'directionLock'
+                                      ? 'e.g. 1, 2, 3, 4 (↑↓→←)'
+                                      : 'Type the answer...'
                                   }
                                   className="bg-gray-700 border-gray-600 text-white text-xs"
                                 />
                               ) : (
                                 <span className="text-green-400 font-mono text-xs">
-                                  {question.correctAnswer}
+                                  {question.answerType === 'directionLock' && Array.isArray(question.correctAnswer)
+                                    ? `${directionDigitsToArrows(question.correctAnswer)}  [${question.correctAnswer.join(', ')}]`
+                                    : String(question.correctAnswer ?? '')}
                                 </span>
                               )}
                             </td>

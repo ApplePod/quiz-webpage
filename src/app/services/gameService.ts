@@ -2,6 +2,7 @@ import { RealtimeChannel } from '@supabase/supabase-js'
 import { initialQuestions, initialTeams } from '../data/initialData'
 import { GameMeta, Question, QuestionStatus, Team } from '../types'
 import { isSupabaseConfigured, requireSupabase } from '../../lib/supabase'
+import { decodeCorrectAnswer, encodeCorrectAnswer } from '../utils/answerCodec'
 
 export interface GameSnapshot {
   game: GameMeta
@@ -50,7 +51,7 @@ function mapSnapshot(payload: any): GameSnapshot {
   const questions: Question[] = (payload.questions ?? []).map((question: any) => ({
     id: question.question_no,
     questionText: question.question_text,
-    correctAnswer: question.correct_answer,
+    ...decodeCorrectAnswer(question.correct_answer),
     hint: question.hint,
     hintCost: question.hint_cost,
     coinRewardFirst: question.coin_reward_first ?? question.coin_reward,
@@ -168,11 +169,17 @@ export async function updateTeam(teamId: string, updates: Partial<Team>) {
 export async function updateQuestion(questionId: number, updates: Partial<Question>) {
   ensureConfigured()
   const supabase = requireSupabase()
+
+  const hasAnswerUpdate = updates.answerType !== undefined || updates.correctAnswer !== undefined
+  const answerType: Question['answerType'] = updates.answerType ?? 'text'
+  const correctAnswer: Question['correctAnswer'] =
+    updates.correctAnswer ?? (answerType === 'text' ? '' : [])
+
   const { error } = await supabase
     .from('questions')
     .update({
       question_text: updates.questionText,
-      correct_answer: updates.correctAnswer,
+      correct_answer: hasAnswerUpdate ? encodeCorrectAnswer(answerType, correctAnswer) : undefined,
       hint: updates.hint,
       hint_cost: updates.hintCost,
       coin_reward_first: updates.coinRewardFirst,

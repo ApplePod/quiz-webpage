@@ -25,6 +25,7 @@ import {
   updateTimer,
   verifyTeamPassword,
 } from './services/gameService';
+import { isCorrectForQuestion } from './utils/answerCodec';
 
 export default function App() {
   const [currentView, setCurrentView] = useState<ViewType>('main');
@@ -142,7 +143,7 @@ export default function App() {
     const question = questions.find((entry) => entry.id === selectedQuestionId);
     if (!question) return;
 
-    const isCorrect = answer.trim().toLowerCase() === question.correctAnswer.toLowerCase();
+    const isCorrect = isCorrectForQuestion(question, answer);
     if (!isCorrect) return;
 
     const existingStatus = questionStatuses.find((status) => status.questionId === selectedQuestionId);
@@ -406,7 +407,7 @@ export default function App() {
       if (!isSupabaseConfigured) {
         setTeams((previous) => previous.map((t) => ({ ...t, password: '1' })));
         setQuestions((previous) =>
-          previous.map((q) => ({ ...q, questionText: '1', correctAnswer: '1' })),
+          previous.map((q) => ({ ...q, questionText: '1', answerType: 'text', correctAnswer: '1' })),
         );
         return;
       }

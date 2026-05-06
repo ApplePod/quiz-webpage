@@ -1,10 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Team, Question } from '../types';
 import { ArrowLeft, Lightbulb, Send, CheckCircle2, XCircle, Coins, Sparkles } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog';
 import { motion } from 'motion/react';
+import {
+  arrowKeyToDirectionDigit,
+  directionDigitsToArrows,
+  encodeCorrectAnswer,
+  isCorrectForQuestion,
+} from '../utils/answerCodec';
 
 interface AnswerScreenProps {
   team: Team;
@@ -24,6 +30,8 @@ export function AnswerScreen({
   onBack,
 }: AnswerScreenProps) {
   const [answer, setAnswer] = useState('');
+  const [directionDigits, setDirectionDigits] = useState<number[]>([]);
+  const [lastDirectionDigit, setLastDirectionDigit] = useState<number | null>(null);
   const [showHintDialog, setShowHintDialog] = useState(false);
   const [hintRevealed, setHintRevealed] = useState(false);
   const [result, setResult] = useState<'correct' | 'incorrect' | null>(null);
@@ -36,11 +44,21 @@ export function AnswerScreen({
         ? question.coinRewardSecond
         : question.coinRewardThird;
 
+  const expectedDirectionDigits = useMemo(
+    () => (question.answerType === 'directionLock' && Array.isArray(question.correctAnswer) ? question.correctAnswer : []),
+    [question.answerType, question.correctAnswer],
+  );
+
+  const correctAnswerLabel =
+    question.answerType === 'directionLock' && Array.isArray(question.correctAnswer)
+      ? `${directionDigitsToArrows(question.correctAnswer)} (${question.correctAnswer.join(', ')})`
+      : String(question.correctAnswer ?? '');
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!answer.trim()) return;
 
-    const isCorrect = answer.trim().toLowerCase() === question.correctAnswer.toLowerCase();
+    const isCorrect = isCorrectForQuestion(question, answer);
     setResult(isCorrect ? 'correct' : 'incorrect');
     
     // Pass the result to parent after a short delay
@@ -48,6 +66,64 @@ export function AnswerScreen({
       onSubmit(answer, team.id);
     }, 2000);
   };
+
+  useEffect(() => {
+    // Reset input when question changes
+    setAnswer('');
+    setDirectionDigits([]);
+    setLastDirectionDigit(null);
+    setResult(null);
+    setHintRevealed(false);
+  }, [question.id]);
+
+  useEffect(() => {
+    if (result) return;
+    if (question.answerType !== 'directionLock') return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setDirectionDigits([]);
+        setLastDirectionDigit(null);
+        return;
+      }
+
+      if (event.key === 'Backspace') {
+        event.preventDefault();
+        setDirectionDigits((previous) => previous.slice(0, -1));
+        return;
+      }
+
+      const digit = arrowKeyToDirectionDigit(event.key);
+      if (!digit) return;
+
+      event.preventDefault();
+      setLastDirectionDigit(digit);
+
+      setDirectionDigits((previous) => {
+        const next = [...previous, digit];
+        const targetLength = expectedDirectionDigits.length || next.length;
+        const trimmed = next.slice(0, targetLength);
+
+        if (expectedDirectionDigits.length > 0 && trimmed.length === expectedDirectionDigits.length) {
+          const submitted = encodeCorrectAnswer('directionLock', trimmed);
+          const isCorrect = isCorrectForQuestion(
+            { ...question, answerType: 'directionLock', correctAnswer: expectedDirectionDigits },
+            submitted,
+          );
+          setResult(isCorrect ? 'correct' : 'incorrect');
+          setTimeout(() => {
+            onSubmit(submitted, team.id);
+          }, 2000);
+        }
+
+        return trimmed;
+      });
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [expectedDirectionDigits, onSubmit, question, result, team.id]);
 
   const handleHintConfirm = () => {
     setShowHintDialog(false);
@@ -183,7 +259,7 @@ export function AnswerScreen({
                       transition={{ delay: 0.3 }}
                       className="text-red-300"
                     >
-                      The correct answer was: {question.correctAnswer}
+                      The correct answer was: {correctAnswerLabel}
                     </motion.p>
                   </div>
                 </>
@@ -193,31 +269,108 @@ export function AnswerScreen({
 
           {/* Answer Form */}
           {!result && (
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label htmlFor="answer" className="block text-sm font-medium text-gray-300 mb-2">
-                  Your Answer
-                </label>
-                <Input
-                  id="answer"
-                  type="text"
-                  value={answer}
-                  onChange={(e) => setAnswer(e.target.value)}
-                  placeholder="Type your answer here..."
-                  className="bg-white/10 border-white/30 text-white placeholder:text-gray-400 focus:border-purple-400 focus:ring-purple-400 text-lg py-6"
-                  autoFocus
-                />
-              </div>
+            <>
+              {question.answerType === 'text' ? (
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div>
+                    <label htmlFor="answer" className="block text-sm font-medium text-gray-300 mb-2">
+                      Your Answer
+                    </label>
+                    <Input
+                      id="answer"
+                      type="text"
+                      value={answer}
+                      onChange={(e) => setAnswer(e.target.value)}
+                      placeholder="Type your answer here..."
+                      className="bg-white/10 border-white/30 text-white placeholder:text-gray-400 focus:border-purple-400 focus:ring-purple-400 text-lg py-6"
+                      autoFocus
+                    />
+                  </div>
 
-              <Button
-                type="submit"
-                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-6 text-lg"
-                disabled={!answer.trim()}
-              >
-                <Send className="w-5 h-5 mr-2" />
-                Submit Answer
-              </Button>
-            </form>
+                  <Button
+                    type="submit"
+                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-6 text-lg"
+                    disabled={!answer.trim()}
+                  >
+                    <Send className="w-5 h-5 mr-2" />
+                    Submit Answer
+                  </Button>
+                </form>
+              ) : (
+                <div className="space-y-5">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="text-sm font-medium text-gray-300">Direction Lock</div>
+                      <div className="text-xs text-gray-400 mt-1">
+                        방향키로 입력하세요. <span className="text-gray-300">ESC</span> 초기화, <span className="text-gray-300">Backspace</span> 한 칸 삭제
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-xs text-gray-400">Progress</div>
+                      <div className="text-sm text-white font-mono">
+                        {directionDigits.length}/{expectedDirectionDigits.length || '∞'}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white/5 rounded-xl border border-white/20 p-6">
+                    <div className="flex items-center justify-center">
+                      <motion.div
+                        animate={{
+                          rotate:
+                            lastDirectionDigit === 1
+                              ? 0
+                              : lastDirectionDigit === 3
+                                ? 90
+                                : lastDirectionDigit === 2
+                                  ? 180
+                                  : lastDirectionDigit === 4
+                                    ? -90
+                                    : 0,
+                          scale: lastDirectionDigit ? [1, 1.08, 1] : 1,
+                        }}
+                        transition={{ type: 'spring', stiffness: 260, damping: 18 }}
+                        className="relative w-32 h-32 rounded-full border border-white/25 bg-gradient-to-br from-white/10 to-white/0 shadow-inner flex items-center justify-center"
+                      >
+                        <div className="absolute inset-3 rounded-full border border-white/15 bg-black/20" />
+                        <div className="absolute top-3 left-1/2 -translate-x-1/2 w-2 h-8 rounded-full bg-purple-400 shadow-[0_0_16px_rgba(168,85,247,0.65)]" />
+                        <div className="relative w-12 h-12 rounded-2xl border border-white/20 bg-white/10 flex items-center justify-center text-white font-bold">
+                          🔒
+                        </div>
+                      </motion.div>
+                    </div>
+
+                    <div className="mt-5 flex flex-col items-center gap-3">
+                      <div className="text-2xl text-white tracking-widest">
+                        {directionDigits.length ? directionDigitsToArrows(directionDigits) : '—'}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {Array.from({ length: Math.max(1, expectedDirectionDigits.length || 8) }).slice(
+                          0,
+                          expectedDirectionDigits.length || 8,
+                        ).map((_, idx) => (
+                          <div
+                            key={idx}
+                            className={`h-2.5 w-2.5 rounded-full border ${
+                              idx < directionDigits.length
+                                ? 'bg-purple-400/90 border-purple-300/70 shadow-[0_0_10px_rgba(168,85,247,0.6)]'
+                                : 'bg-white/5 border-white/15'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <div className="text-xs text-gray-400 font-mono">
+                        {directionDigits.length ? `[${directionDigits.join(', ')}]` : '[ ]'}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="text-xs text-gray-400">
+                    입력이 정답 길이에 도달하면 자동으로 제출/판정됩니다.
+                  </div>
+                </div>
+              )}
+            </>
           )}
 
           {/* Hint Section */}
