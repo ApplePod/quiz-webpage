@@ -31,11 +31,11 @@ export function AdminAuth({ onSuccess, onCancel }: AdminAuthProps) {
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-gray-900 border border-gray-700 rounded-2xl p-8 w-full max-w-md shadow-2xl"
+        className="mystery-card p-8 w-full max-w-md"
       >
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center">
+            <div className="w-12 h-12 border border-white/40 bg-black/50 flex items-center justify-center shadow-[0_0_24px_rgba(255,255,255,0.06)]">
               <Shield className="w-6 h-6 text-white" />
             </div>
             <h2 className="text-2xl font-bold text-white">Admin Access</h2>
@@ -61,7 +61,7 @@ export function AdminAuth({ onSuccess, onCancel }: AdminAuthProps) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter admin password"
-                className={`pl-10 bg-gray-800 border-gray-700 text-white placeholder:text-gray-500 focus:border-orange-500 focus:ring-orange-500 ${
+                className={`pl-10 bg-black/40 border-white/25 text-white placeholder:text-white/40 focus:border-white/70 focus:ring-white/30 ${
                   error ? 'border-red-500 shake' : ''
                 }`}
                 autoFocus
@@ -83,13 +83,13 @@ export function AdminAuth({ onSuccess, onCancel }: AdminAuthProps) {
               type="button"
               variant="outline"
               onClick={onCancel}
-              className="flex-1 border-gray-700 text-gray-300 hover:bg-gray-800"
+              className="flex-1 border-white/25 text-white/80 hover:bg-white/10 hover:text-white"
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              className="flex-1 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white"
+              className="flex-1 border border-white/40 bg-transparent text-white hover:bg-white/10"
               disabled={!password}
             >
               Access Admin

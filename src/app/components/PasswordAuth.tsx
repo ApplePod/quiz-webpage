@@ -50,14 +50,14 @@ export function PasswordAuth({
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/30 p-8 shadow-2xl"
+          className="mystery-card p-8"
         >
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 mb-4">
+            <div className="inline-flex items-center justify-center w-16 h-16 border border-white/40 bg-black/50 mb-4 shadow-[0_0_30px_rgba(255,255,255,0.06)]">
               <Lock className="w-8 h-8 text-white" />
             </div>
-            <h2 className="text-3xl font-bold text-white mb-2">Team Authentication</h2>
-            <p className="text-gray-300">
+            <h2 className="text-3xl font-bold mystery-title mb-2">Team Authentication</h2>
+            <p className="mystery-subtitle">
               Question {selectedQuestionId} • {team.name}
             </p>
           </div>
@@ -76,7 +76,7 @@ export function PasswordAuth({
                   setError('');
                 }}
                 placeholder="••••••••"
-                className="bg-white/10 border-white/30 text-white placeholder:text-gray-400 focus:border-purple-400 focus:ring-purple-400"
+                className="bg-black/40 border-white/40 text-white placeholder:text-white/50 focus:border-white/70 focus:ring-white/30"
                 autoFocus
               />
             </div>
@@ -94,7 +94,7 @@ export function PasswordAuth({
 
             <Button
               type="submit"
-              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-6 text-lg"
+              className="w-full border border-white/40 bg-transparent text-white font-semibold py-6 text-lg hover:bg-white/10"
               disabled={isSubmitting}
             >
               {isSubmitting ? 'Checking...' : 'Continue'}

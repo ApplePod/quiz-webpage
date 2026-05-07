@@ -104,10 +104,14 @@ export function MainScreen({
         <div className="flex items-center justify-between flex-wrap gap-6">
           {/* Left: Title Section */}
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 border border-white/40 bg-black/50 flex items-center justify-center shadow-[0_0_30px_rgba(255,255,255,0.08)]">
+            <div className="relative w-14 h-14 border border-white/40 bg-black/50 flex items-center justify-center shadow-[0_0_30px_rgba(255,255,255,0.08)] overflow-hidden">
+              <div className="pointer-events-none absolute inset-0 opacity-[0.18] bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.35),transparent_55%)]" />
               <BookOpen className="w-8 h-8 text-white/90" />
             </div>
             <div>
+              <div className="text-[10px] tracking-[0.35em] text-white/55">
+                YOU SEE, BUT DO NOT OBSERVE.
+              </div>
               <h1 className="text-4xl font-bold text-white tracking-tight">Quiz Competition</h1>
               <p className="text-gray-300 mt-1">Select a question to begin</p>
             </div>
@@ -141,8 +145,8 @@ export function MainScreen({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Section: Question Grid */}
         <div className="lg:col-span-2">
-          <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/20 p-6 shadow-xl">
-            <h2 className="text-2xl font-bold text-white mb-6">Questions</h2>
+          <div className="mystery-card p-6">
+            <h2 className="text-2xl font-bold mystery-title mb-6">Questions</h2>
             {/* 5x5 stays fixed; cells scale with viewport (clamp) and scroll when needed */}
             <div
               className="-mx-6 px-6 overflow-x-auto"
@@ -198,7 +202,7 @@ export function MainScreen({
         <DialogContent className="bg-gray-900/95 border-white/20 text-white overflow-hidden">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-purple-300" />
+              <Sparkles className="w-5 h-5 text-white/80" />
               정답 궁금해요?
             </DialogTitle>
             <DialogDescription className="text-gray-300">

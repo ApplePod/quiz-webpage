@@ -111,10 +111,10 @@ export function QuestionCard({
   const getCardStyle = () => {
     if (solveCount === 0) {
       return {
-        bg: 'bg-white/10',
-        border: 'border-white/30 hover:border-white/50',
-        shadow: 'shadow-lg hover:shadow-purple-500/40',
-        hoverBg: 'hover:bg-white/20',
+        bg: 'bg-black/35',
+        border: 'border-white/20 hover:border-white/45',
+        shadow: 'shadow-[0_0_28px_rgba(255,255,255,0.06)] hover:shadow-[0_0_42px_rgba(255,255,255,0.10)]',
+        hoverBg: 'hover:bg-white/5',
       };
     } else if (solveCount === 1) {
       return {
@@ -135,7 +135,7 @@ export function QuestionCard({
       return {
         bg: 'bg-gray-500/10',
         border: 'border-gray-500/30',
-        shadow: 'shadow-lg',
+        shadow: 'shadow-[0_0_22px_rgba(255,255,255,0.04)]',
         hoverBg: '',
       };
     }
@@ -247,11 +247,7 @@ export function QuestionCard({
             <Unlock className="w-[clamp(22px,3.2vw,32px)] h-[clamp(22px,3.2vw,32px)] text-green-400" />
           </motion.div>
         ) : (
-          <Lock
-            className={`w-[clamp(22px,3.2vw,32px)] h-[clamp(22px,3.2vw,32px)] ${
-              isLocked ? 'text-gray-500' : 'text-purple-300'
-            }`}
-          />
+          <Lock className={`w-[clamp(22px,3.2vw,32px)] h-[clamp(22px,3.2vw,32px)] ${isLocked ? 'text-gray-500' : 'text-white/75'}`} />
         )}
 
         <div className="text-[clamp(14px,2.4vw,22px)] font-bold text-white">Q{questionNumber}</div>

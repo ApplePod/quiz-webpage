@@ -15,10 +15,10 @@ export function Scoreboard({ teams }: ScoreboardProps) {
   return (
     <div className="h-full">
       <div className="sticky top-8">
-        <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/30 p-6 shadow-xl">
+        <div className="mystery-card p-6">
           <div className="flex items-center gap-3 mb-6">
             <Trophy className="w-6 h-6 text-yellow-400" />
-            <h2 className="text-2xl font-bold text-white">Scoreboard</h2>
+            <h2 className="text-2xl font-bold mystery-title">Scoreboard</h2>
           </div>
 
           <div className="space-y-3">
@@ -32,17 +32,17 @@ export function Scoreboard({ teams }: ScoreboardProps) {
                   transition={{ delay: index * 0.1 }}
                   className={`p-4 rounded-xl border transition-all duration-300 ${
                     isTopTeam
-                      ? 'bg-gradient-to-r from-yellow-500/30 to-orange-500/30 border-yellow-400/50 shadow-lg shadow-yellow-500/30'
-                      : 'bg-white/5 border-white/20 hover:bg-white/10'
+                      ? 'bg-yellow-500/10 border-yellow-400/40 shadow-[0_0_30px_rgba(250,204,21,0.18)]'
+                      : 'bg-black/25 border-white/15 hover:bg-white/5 hover:border-white/25'
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div
-                        className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
+                        className={`w-10 h-10 border flex items-center justify-center font-bold ${
                           isTopTeam
-                            ? 'bg-yellow-400 text-yellow-900'
-                            : 'bg-purple-500/50 text-white'
+                            ? 'border-yellow-300/60 bg-yellow-400 text-yellow-900'
+                            : 'border-white/35 bg-black/40 text-white'
                         }`}
                       >
                         {team.name.split(' ')[1]}

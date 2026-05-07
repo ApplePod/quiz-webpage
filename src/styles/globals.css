@@ -82,6 +82,24 @@
   }
 }
 
+@layer components {
+  .mystery-card {
+    @apply border border-white/25 bg-black/45 backdrop-blur-md shadow-[0_0_60px_rgba(255,255,255,0.06)];
+  }
+
+  .mystery-title {
+    @apply text-white tracking-tight;
+  }
+
+  .mystery-subtitle {
+    @apply text-white/65;
+  }
+
+  .mystery-divider {
+    @apply border-t border-white/15;
+  }
+}
+
 /**
  * Base typography. This is not applied to elements which have an ancestor with a Tailwind text class.
  */

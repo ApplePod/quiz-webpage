@@ -531,7 +531,7 @@ export function AnswerScreen({
                   <div className="bg-white/5 rounded-xl border border-white/20 p-6">
                     <div className="flex items-center justify-center">
                       <div className="relative w-56 h-56">
-                        <div className="absolute inset-0 rounded-full border border-white/20 bg-gradient-to-br from-white/10 to-white/0 shadow-inner" />
+                        <div className="absolute inset-0 border border-white/20 bg-white/5 shadow-inner" />
                         <div className="absolute inset-6 rounded-full border border-white/15 bg-black/20" />
 
                         {/* Buttons */}
@@ -584,9 +584,9 @@ export function AnswerScreen({
                           transition={{ type: 'spring', stiffness: 320, damping: 20 }}
                           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
                         >
-                          <div className="relative w-20 h-20 rounded-full border border-white/25 bg-gradient-to-br from-red-500/55 to-red-600/20 shadow-[0_0_30px_rgba(244,63,94,0.15)]">
+                          <div className="relative w-20 h-20 border border-white/30 bg-black/45 shadow-[0_0_30px_rgba(255,255,255,0.08)]">
                             <div className="absolute inset-2 rounded-full border border-white/15 bg-white/5" />
-                            <div className="absolute left-1/2 top-2 -translate-x-1/2 w-2 h-6 rounded-full bg-purple-300/70 shadow-[0_0_14px_rgba(168,85,247,0.55)]" />
+                            <div className="absolute left-1/2 top-2 -translate-x-1/2 w-2 h-6 bg-white/70 shadow-[0_0_14px_rgba(255,255,255,0.25)]" />
                           </div>
                         </motion.div>
                       </div>
@@ -605,7 +605,7 @@ export function AnswerScreen({
                             key={idx}
                             className={`h-2.5 w-2.5 rounded-full border ${
                               idx < directionDigits.length
-                                ? 'bg-purple-400/90 border-purple-300/70 shadow-[0_0_10px_rgba(168,85,247,0.6)]'
+                                ? 'bg-white/70 border-white/50 shadow-[0_0_10px_rgba(255,255,255,0.22)]'
                                 : 'bg-white/5 border-white/15'
                             }`}
                           />
@@ -824,7 +824,7 @@ export function AnswerScreen({
             ) : (
               <Button
                 onClick={handleRetry}
-                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+                className="border border-white/40 bg-transparent text-white hover:bg-white/10"
               >
                 다시 풀기
               </Button>
@@ -835,15 +835,16 @@ export function AnswerScreen({
 
       {/* Recharge 안내 Dialog */}
       <Dialog open={showRechargeDialog} onOpenChange={setShowRechargeDialog}>
-        <DialogContent className="bg-gradient-to-br from-indigo-950 via-purple-950 to-pink-950 border-purple-400/50 text-white">
+        <DialogContent className="bg-black/90 border-white/20 text-white overflow-hidden">
+          <div className="pointer-events-none absolute inset-0 opacity-[0.22] bg-[radial-gradient(circle_at_35%_20%,rgba(255,255,255,0.12),transparent_55%)]" />
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-purple-200">
-              <div className="w-8 h-8 rounded-full bg-purple-500/30 border border-purple-300/40 flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-purple-200" />
+            <DialogTitle className="flex items-center gap-2 text-white">
+              <div className="w-8 h-8 border border-white/30 bg-black/40 flex items-center justify-center">
+                <Sparkles className="w-4 h-4 text-white/80" />
               </div>
               Free Recharge
             </DialogTitle>
-            <DialogDescription className="text-purple-100/90">
+            <DialogDescription className="text-white/70">
               무료 충전을 위해 <span className="font-semibold text-white">카운터로 와주세요</span>.
               <br />
               스태프가 바로 코인을 충전해드릴게요.
@@ -852,7 +853,7 @@ export function AnswerScreen({
           <DialogFooter>
             <Button
               onClick={() => setShowRechargeDialog(false)}
-              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold"
+              className="border border-white/40 bg-transparent text-white font-semibold hover:bg-white/10"
             >
               확인
             </Button>

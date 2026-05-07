@@ -411,7 +411,7 @@ export function AdminPanel({
                         return (
                           <tr key={team.id} className="hover:bg-gray-800/50 transition-colors">
                             <td className="px-4 py-3">
-                              <span className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm">
+                              <span className="w-8 h-8 border border-white/40 bg-black/40 flex items-center justify-center text-white font-bold text-sm">
                                 {team.id}
                               </span>
                             </td>
