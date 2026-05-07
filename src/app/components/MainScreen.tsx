@@ -104,13 +104,11 @@ export function MainScreen({
         <div className="flex items-center justify-between flex-wrap gap-6">
           {/* Left: Title Section */}
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
-              <BookOpen className="w-8 h-8 text-white" />
+            <div className="w-14 h-14 border border-white/40 bg-black/50 flex items-center justify-center shadow-[0_0_30px_rgba(255,255,255,0.08)]">
+              <BookOpen className="w-8 h-8 text-white/90" />
             </div>
             <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-300 via-pink-300 to-blue-300 bg-clip-text text-transparent">
-                Quiz Competition
-              </h1>
+              <h1 className="text-4xl font-bold text-white tracking-tight">Quiz Competition</h1>
               <p className="text-gray-300 mt-1">Select a question to begin</p>
             </div>
           </div>
@@ -119,7 +117,7 @@ export function MainScreen({
           <div className="flex items-center gap-4">
             {activeTeam && (
               <div className="hidden sm:flex items-center gap-3 rounded-xl border border-white/15 bg-white/5 px-4 py-2">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center">
+                <div className="w-8 h-8 border border-white/40 bg-black/40 flex items-center justify-center">
                   <span className="text-sm font-bold text-white">{activeTeam.id}</span>
                 </div>
                 <div className="leading-tight">
@@ -245,7 +243,7 @@ export function MainScreen({
               <Button
                 onClick={handlePurchaseReveal}
                 disabled={!activeTeam || !lockedQuestionId || !onPurchaseAnswerReveal || isPurchasingReveal}
-                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold"
+                className="border border-white/40 bg-transparent text-white font-semibold hover:bg-white/10"
               >
                 {isPurchasingReveal ? '구매 중...' : `정답 보기 (-${REVEAL_COST})`}
               </Button>

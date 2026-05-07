@@ -19,7 +19,7 @@ export function IntroScreen({ onStart, onAdminClick }: IntroScreenProps) {
           className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/30 p-10 shadow-2xl"
         >
           <div className="text-center">
-            <div className="mx-auto mb-6 w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
+            <div className="mx-auto mb-6 w-20 h-20 border border-white/40 bg-black/50 flex items-center justify-center shadow-[0_0_40px_rgba(255,255,255,0.08)]">
               <Compass className="w-10 h-10 text-white" />
             </div>
             <h1 className="text-4xl font-bold text-white">Escape Quiz Room</h1>
@@ -32,7 +32,7 @@ export function IntroScreen({ onStart, onAdminClick }: IntroScreenProps) {
             <div className="mt-8">
               <Button
                 onClick={onStart}
-                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-7 text-lg"
+                className="w-full border border-white/40 bg-transparent text-white font-semibold py-7 text-lg hover:bg-white/10"
               >
                 <Sparkles className="w-5 h-5 mr-2" />
                 시작하기

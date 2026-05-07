@@ -497,14 +497,14 @@ export function AnswerScreen({
                       value={answer}
                       onChange={(e) => setAnswer(e.target.value)}
                       placeholder="Type your answer here..."
-                      className="bg-white/10 border-white/30 text-white placeholder:text-gray-400 focus:border-purple-400 focus:ring-purple-400 text-lg py-6"
+                      className="bg-black/40 border-white/40 text-white placeholder:text-white/50 focus:border-white/70 focus:ring-white/30 text-lg py-6"
                       autoFocus
                     />
                   </div>
 
                   <Button
                     type="submit"
-                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-6 text-lg"
+                    className="w-full border border-white/40 bg-transparent text-white font-semibold py-6 text-lg hover:bg-white/10"
                     disabled={!answer.trim()}
                   >
                     <Send className="w-5 h-5 mr-2" />

@@ -81,7 +81,7 @@ export function TeamAuthScreen({
           {!selectedTeam ? (
             <>
               <div className="text-center mb-8">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 mb-4">
+                <div className="inline-flex items-center justify-center w-16 h-16 border border-white/40 bg-black/50 mb-4">
                   <Users className="w-8 h-8 text-white" />
                 </div>
                 <h2 className="text-3xl font-bold text-white mb-2">Select Your Team</h2>
@@ -98,10 +98,10 @@ export function TeamAuthScreen({
                     whileHover={{ scale: 1.03, y: -3 }}
                     whileTap={{ scale: 0.97 }}
                     onClick={() => handleSelectTeam(team.id)}
-                    className="p-6 rounded-xl border transition-all duration-300 bg-gradient-to-br from-purple-500/20 to-pink-500/20 border-purple-400/50 hover:border-purple-400 hover:shadow-lg hover:shadow-purple-500/30"
+                    className="p-6 border border-white/25 bg-black/35 transition-all duration-300 hover:border-white/50 hover:bg-white/5"
                   >
                     <div className="text-center">
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center mx-auto mb-3">
+                      <div className="w-12 h-12 border border-white/40 bg-black/40 flex items-center justify-center mx-auto mb-3">
                         <span className="text-xl font-bold text-white">{team.id}</span>
                       </div>
                       <div className="text-xl font-semibold text-white mb-1">{team.name}</div>
@@ -118,7 +118,7 @@ export function TeamAuthScreen({
           ) : (
             <>
               <div className="text-center mb-8">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 mb-4">
+                <div className="inline-flex items-center justify-center w-16 h-16 border border-white/40 bg-black/50 mb-4">
                   <Lock className="w-8 h-8 text-white" />
                 </div>
                 <h2 className="text-3xl font-bold text-white mb-2">Team Authentication</h2>
@@ -139,7 +139,7 @@ export function TeamAuthScreen({
                       setError('')
                     }}
                     placeholder="••••••••"
-                    className="bg-white/10 border-white/30 text-white placeholder:text-gray-400 focus:border-purple-400 focus:ring-purple-400"
+                    className="bg-black/40 border-white/40 text-white placeholder:text-white/50 focus:border-white/70 focus:ring-white/30"
                     autoFocus
                   />
                 </div>
@@ -157,7 +157,7 @@ export function TeamAuthScreen({
 
                 <Button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-6 text-lg"
+                  className="w-full border border-white/40 bg-transparent text-white font-semibold py-6 text-lg hover:bg-white/10"
                   disabled={isSubmitting || password.length === 0}
                 >
                   {isSubmitting ? 'Checking...' : 'Continue'}
