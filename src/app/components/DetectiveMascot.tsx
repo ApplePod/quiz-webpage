@@ -4,7 +4,14 @@ import { motion } from 'motion/react';
 /**
  * 방탈출 느낌 탐정 캐리커쳐 — idle / hover / tap 이벤트 모션
  */
-export function DetectiveMascot({ className = '' }: { className?: string }) {
+export function DetectiveMascot({
+  className = '',
+  hideFootnote = false,
+}: {
+  className?: string;
+  /** 인트로 등에서 한 줄 안내 숨김 */
+  hideFootnote?: boolean;
+}) {
   const [hint, setHint] = useState(false);
   const [burstKey, setBurstKey] = useState(0);
 
@@ -181,9 +188,11 @@ export function DetectiveMascot({ className = '' }: { className?: string }) {
           />
         </svg>
 
-        <p className="mt-1 text-center text-[10px] tracking-wide text-white/35">
-          탭 → 짧은 힌트 · 렌즈·연기 계속 움직임
-        </p>
+        {!hideFootnote && (
+          <p className="mt-1 text-center text-[10px] tracking-wide text-white/35">
+            탭 → 짧은 힌트 · 렌즈·연기 계속 움직임
+          </p>
+        )}
       </motion.div>
     </motion.div>
   );
