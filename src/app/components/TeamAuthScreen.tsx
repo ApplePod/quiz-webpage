@@ -1,10 +1,16 @@
 import React, { useMemo, useState } from 'react'
 import { motion } from 'motion/react'
 import { AlertCircle, ArrowLeft, Lock, Users } from 'lucide-react'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { EffectCoverflow, Keyboard, Pagination } from 'swiper/modules'
 import { Team } from '../types'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { AdminButton } from './AdminButton'
+
+import 'swiper/css'
+import 'swiper/css/effect-coverflow'
+import 'swiper/css/pagination'
 
 type TeamAuthScreenProps = {
   teams: Team[]
@@ -88,27 +94,51 @@ export function TeamAuthScreen({
                 <p className="text-gray-300">팀을 선택한 뒤 비밀번호를 한 번만 입력하면 됩니다.</p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {teams.map((team, index) => (
-                  <motion.button
-                    key={team.id}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: index * 0.06 }}
-                    whileHover={{ scale: 1.03, y: -3 }}
-                    whileTap={{ scale: 0.97 }}
-                    onClick={() => handleSelectTeam(team.id)}
-                    className="p-6 border border-white/25 bg-black/35 transition-all duration-300 hover:border-white/50 hover:bg-white/5"
-                  >
-                    <div className="text-center">
-                      <div className="w-12 h-12 border border-white/40 bg-black/40 flex items-center justify-center mx-auto mb-3">
-                        <span className="text-xl font-bold text-white">{team.id}</span>
-                      </div>
-                      <div className="text-xl font-semibold text-white mb-1">{team.name}</div>
-                      <div className="text-sm text-gray-300">{team.coins} coins</div>
-                    </div>
-                  </motion.button>
-                ))}
+              <div className="team-coverflow">
+                <Swiper
+                  modules={[EffectCoverflow, Pagination, Keyboard]}
+                  effect="coverflow"
+                  grabCursor
+                  centeredSlides
+                  slidesPerView="auto"
+                  loop={teams.length >= 3}
+                  keyboard={{ enabled: true }}
+                  pagination={{ clickable: true }}
+                  coverflowEffect={{
+                    rotate: 18,
+                    stretch: 0,
+                    depth: 180,
+                    modifier: 1.2,
+                    slideShadows: false,
+                  }}
+                >
+                  {teams.map((team, index) => (
+                    <SwiperSlide key={team.id} className="team-coverflow-slide">
+                      <motion.button
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: index * 0.05 }}
+                        whileHover={{ scale: 1.03, y: -3 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => handleSelectTeam(team.id)}
+                        type="button"
+                        className="team-coverflow-card"
+                        aria-label={`${team.name} 팀 선택`}
+                      >
+                        <div className="text-center">
+                          <div className="w-14 h-14 border border-white/40 bg-black/40 flex items-center justify-center mx-auto mb-3 shadow-[0_0_30px_rgba(255,255,255,0.08)]">
+                            <span className="text-xl font-bold text-white">{team.id}</span>
+                          </div>
+                          <div className="text-2xl font-semibold text-white mb-1">{team.name}</div>
+                          <div className="text-sm text-gray-300">{team.coins} coins</div>
+                          <div className="mt-4 text-[10px] tracking-[0.35em] text-white/45">
+                            TAP TO SELECT
+                          </div>
+                        </div>
+                      </motion.button>
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
               </div>
 
               <div className="mt-6">

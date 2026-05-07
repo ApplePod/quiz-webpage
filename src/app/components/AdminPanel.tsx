@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { X, FileText, Users, Settings, RotateCcw, Play, Pause, StopCircle, Unlock, Lock, Save, Coins, FlaskConical } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { X, FileText, Users, Settings, RotateCcw, Play, Pause, Lock, Save, Coins, FlaskConical, ListOrdered, Filter, Search } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
@@ -52,6 +52,36 @@ export function AdminPanel({
   const [questionEdits, setQuestionEdits] = useState<Partial<Question>>({});
   const [answerTypeDraft, setAnswerTypeDraft] = useState<Question['answerType']>('text');
   const [correctAnswerDraft, setCorrectAnswerDraft] = useState<string>('');
+  const [solveTeamFilter, setSolveTeamFilter] = useState<string>('all');
+  const [solveOnlySolved, setSolveOnlySolved] = useState<boolean>(false);
+  const [solveQuery, setSolveQuery] = useState<string>('');
+
+  const teamById = useMemo(() => {
+    const map = new Map<string, Team>();
+    for (const team of teams) map.set(team.id, team);
+    return map;
+  }, [teams]);
+
+  const solveRows = useMemo(() => {
+    const qLower = solveQuery.trim().toLowerCase();
+    return questions
+      .slice()
+      .sort((a, b) => a.id - b.id)
+      .map((question) => {
+        const status = questionStatuses.find((s) => s.questionId === question.id);
+        const solvedBy = status?.solvedByTeams ?? [];
+        return { question, status, solvedBy };
+      })
+      .filter(({ question, solvedBy }) => {
+        if (solveOnlySolved && solvedBy.length === 0) return false;
+        if (solveTeamFilter !== 'all' && !solvedBy.includes(solveTeamFilter)) return false;
+        if (!qLower) return true;
+        return (
+          String(question.id).includes(qLower) ||
+          (question.questionText ?? '').toLowerCase().includes(qLower)
+        );
+      });
+  }, [questions, questionStatuses, solveOnlySolved, solveTeamFilter, solveQuery]);
 
   const handleTeamEdit = (teamId: string) => {
     const team = teams.find((t) => t.id === teamId);
@@ -130,6 +160,10 @@ export function AdminPanel({
               <TabsTrigger value="questions" className="data-[state=active]:bg-gray-700">
                 <FileText className="w-4 h-4 mr-2" />
                 Questions
+              </TabsTrigger>
+              <TabsTrigger value="solves" className="data-[state=active]:bg-gray-700">
+                <ListOrdered className="w-4 h-4 mr-2" />
+                풀이 기록
               </TabsTrigger>
               <TabsTrigger value="teams" className="data-[state=active]:bg-gray-700">
                 <Users className="w-4 h-4 mr-2" />
@@ -387,6 +421,144 @@ export function AdminPanel({
                   <RotateCcw className="w-4 h-4 mr-2" />
                   Reset All Questions
                 </Button>
+              </div>
+            </TabsContent>
+
+            {/* Solves Tab */}
+            <TabsContent value="solves" className="mt-6">
+              <div className="bg-gray-800/50 rounded-xl border border-gray-700 overflow-hidden">
+                <div className="p-4 border-b border-gray-700 bg-gray-900/30">
+                  <div className="flex flex-col lg:flex-row lg:items-center gap-3 lg:gap-4">
+                    <div className="flex items-center gap-2 text-white font-semibold">
+                      <Filter className="w-4 h-4 text-white/80" />
+                      필터
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row gap-3 flex-1">
+                      <div className="flex items-center gap-2 flex-1">
+                        <Search className="w-4 h-4 text-gray-400" />
+                        <Input
+                          value={solveQuery}
+                          onChange={(e) => setSolveQuery(e.target.value)}
+                          placeholder="문제 번호 또는 문제 텍스트 검색"
+                          className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400"
+                        />
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-300 whitespace-nowrap">팀</span>
+                        <select
+                          value={solveTeamFilter}
+                          onChange={(e) => setSolveTeamFilter(e.target.value)}
+                          className="h-9 rounded-md bg-gray-700 border border-gray-600 text-white text-sm px-2 min-w-[160px]"
+                        >
+                          <option value="all">전체</option>
+                          {teams
+                            .slice()
+                            .sort((a, b) => a.id.localeCompare(b.id))
+                            .map((team) => (
+                              <option key={team.id} value={team.id}>
+                                {team.id} · {team.name}
+                              </option>
+                            ))}
+                        </select>
+                      </div>
+
+                      <Button
+                        type="button"
+                        variant={solveOnlySolved ? 'default' : 'outline'}
+                        onClick={() => setSolveOnlySolved((prev) => !prev)}
+                        className={
+                          solveOnlySolved
+                            ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                            : 'border-gray-600 text-gray-200 hover:bg-gray-700'
+                        }
+                      >
+                        {solveOnlySolved ? '푼 문제만' : '전체 문제'}
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="mt-3 text-xs text-gray-400 leading-relaxed">
+                    “1st/2nd/3rd”는 서버 기준 풀이 순서입니다. (동시 제출도 순서가 결정되도록 처리됨)
+                  </div>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead className="bg-gray-800 border-b border-gray-700">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-gray-300 font-semibold">Q#</th>
+                        <th className="px-4 py-3 text-left text-gray-300 font-semibold">문제</th>
+                        <th className="px-4 py-3 text-left text-gray-300 font-semibold">1st</th>
+                        <th className="px-4 py-3 text-left text-gray-300 font-semibold">2nd</th>
+                        <th className="px-4 py-3 text-left text-gray-300 font-semibold">3rd</th>
+                        <th className="px-4 py-3 text-left text-gray-300 font-semibold">상태</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-700">
+                      {solveRows.map(({ question, status, solvedBy }) => {
+                        const isLocked = (status?.solveCount ?? 0) >= 3;
+                        const place = (idx: number) => {
+                          const teamId = solvedBy[idx];
+                          if (!teamId) {
+                            return <span className="text-gray-500">-</span>;
+                          }
+                          const team = teamById.get(teamId);
+                          return (
+                            <div className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-black/20 px-2 py-1">
+                              <span className="w-7 h-7 border border-white/30 bg-black/40 flex items-center justify-center text-white font-bold text-xs">
+                                {teamId}
+                              </span>
+                              <div className="leading-tight">
+                                <div className="text-white text-xs font-semibold">{team?.name ?? 'Unknown team'}</div>
+                                <div className="text-[10px] text-gray-400">team {teamId}</div>
+                              </div>
+                            </div>
+                          );
+                        };
+
+                        return (
+                          <tr key={question.id} className="hover:bg-gray-800/50 transition-colors">
+                            <td className="px-4 py-3 text-white font-medium">Q{question.id}</td>
+                            <td className="px-4 py-3">
+                              <div className="text-gray-300 text-xs line-clamp-2 max-w-[520px]">
+                                {question.questionText}
+                              </div>
+                            </td>
+                            <td className="px-4 py-3">{place(0)}</td>
+                            <td className="px-4 py-3">{place(1)}</td>
+                            <td className="px-4 py-3">{place(2)}</td>
+                            <td className="px-4 py-3">
+                              <div className="flex items-center gap-2">
+                                <span
+                                  className={`px-2 py-1 rounded text-xs font-semibold ${
+                                    isLocked
+                                      ? 'bg-red-500/20 text-red-300'
+                                      : solvedBy.length > 0
+                                        ? 'bg-emerald-500/15 text-emerald-200'
+                                        : 'bg-gray-700 text-gray-300'
+                                  }`}
+                                >
+                                  {solvedBy.length}/3
+                                </span>
+                                {isLocked && <Lock className="w-3 h-3 text-red-300" />}
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+
+                      {solveRows.length === 0 && (
+                        <tr>
+                          <td className="px-4 py-8 text-center text-gray-400" colSpan={6}>
+                            조건에 맞는 기록이 없습니다.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </TabsContent>
 
