@@ -8,6 +8,7 @@ import { BookOpen, Coins, Sparkles } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog';
 import { Button } from './ui/button';
 import { directionDigitsToArrows } from '../utils/answerCodec';
+import { DetectiveMascot } from './DetectiveMascot';
 
 interface MainScreenProps {
   teams: Team[];
@@ -138,6 +139,20 @@ export function MainScreen({
             )}
             <TimerHeader timeRemaining={timeRemaining} timerRunning={timerRunning} />
           </div>
+        </div>
+      </div>
+
+      {/* Atmospheric strip: moving mascot + micro-events on tap */}
+      <div className="mb-8 flex flex-col items-stretch gap-4 rounded-xl border border-white/10 bg-black/25 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6 md:px-8 relative overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 opacity-[0.12] bg-[radial-gradient(ellipse_80%_60%_at_70%_40%,rgba(255,255,255,0.35),transparent_60%)]" />
+        <div className="relative z-[1] text-center sm:text-left max-w-lg">
+          <div className="text-[10px] tracking-[0.3em] text-white/45">INVESTIGATION IN PROGRESS</div>
+          <p className="mt-1 text-sm text-white/75 leading-relaxed">
+            격자마다 단서가 숨어 있어요. 탐정을 탭하면 짧은 알림이 떠요 — 분위기용이에요, 실제 힌트는 문제 안에!
+          </p>
+        </div>
+        <div className="relative z-[1] flex justify-center sm:justify-end shrink-0">
+          <DetectiveMascot />
         </div>
       </div>
 
