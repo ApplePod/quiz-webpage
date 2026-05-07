@@ -126,6 +126,35 @@
 
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-family);
+  }
+}
+
+@layer base {
+  /* Sherlock Holmes vibe: dark, cinematic background with subtle vignette/fog */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+      linear-gradient(180deg, rgba(0, 0, 0, 0.78), rgba(0, 0, 0, 0.92)),
+      radial-gradient(circle at 50% 15%, rgba(255, 255, 255, 0.08), transparent 55%),
+      url("https://sherlock-holmes.co.kr/assets/images/main%20visual.png");
+    background-size: cover;
+    background-position: center;
+    filter: grayscale(1) contrast(1.05);
+    opacity: 0.65;
+    pointer-events: none;
+  }
+
+  body::after {
+    content: "";
+    position: fixed;
+    inset: -20%;
+    z-index: -1;
+    background: radial-gradient(circle at 50% 50%, transparent 52%, rgba(0, 0, 0, 0.9) 80%);
+    pointer-events: none;
   }
 }
 
