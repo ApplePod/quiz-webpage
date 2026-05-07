@@ -303,13 +303,29 @@ as $$
           qs.locked,
           coalesce(
             (
-              select jsonb_agg(t.team_code order by t.team_code)
+              select jsonb_agg(t.team_code order by qsv.created_at asc)
               from question_solves qsv
               join teams t on t.id = qsv.team_id
               where qsv.question_id = q.id and qsv.game_id = q.game_id
             ),
             '[]'::jsonb
           ) as solved_by_teams
+          ,
+          coalesce(
+            (
+              select jsonb_agg(
+                jsonb_build_object(
+                  'team_code', t.team_code,
+                  'created_at', qsv.created_at
+                )
+                order by qsv.created_at asc
+              )
+              from question_solves qsv
+              join teams t on t.id = qsv.team_id
+              where qsv.question_id = q.id and qsv.game_id = q.game_id
+            ),
+            '[]'::jsonb
+          ) as solved_by
           ,
           coalesce(
             (

@@ -214,11 +214,16 @@ export default function App() {
       if (existing?.solvedByTeams.includes(teamId)) return previous;
       if (existing) {
         const solvedByTeams = [...existing.solvedByTeams, teamId];
+        const solvedBy = [
+          ...(existing.solvedBy ?? existing.solvedByTeams.map((id) => ({ teamId: id, solvedAt: new Date().toISOString() }))),
+          { teamId, solvedAt: new Date().toISOString() },
+        ];
         return previous.map((status) =>
           status.questionId === selectedQuestionId
             ? {
                 ...status,
                 solvedByTeams,
+                solvedBy,
                 solveCount: solvedByTeams.length,
                 locked: solvedByTeams.length >= 3,
               }
@@ -228,7 +233,13 @@ export default function App() {
 
       return [
         ...previous,
-        { questionId: selectedQuestionId, solvedByTeams: [teamId], solveCount: 1, locked: false },
+        {
+          questionId: selectedQuestionId,
+          solvedByTeams: [teamId],
+          solvedBy: [{ teamId, solvedAt: new Date().toISOString() }],
+          solveCount: 1,
+          locked: false,
+        },
       ];
     });
 

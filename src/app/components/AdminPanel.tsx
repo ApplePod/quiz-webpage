@@ -83,6 +83,17 @@ export function AdminPanel({
       });
   }, [questions, questionStatuses, solveOnlySolved, solveTeamFilter, solveQuery]);
 
+  const formatSolvedAt = (value?: string) => {
+    if (!value) return '';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '';
+    return date.toLocaleTimeString('ko-KR', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    });
+  };
+
   const handleTeamEdit = (teamId: string) => {
     const team = teams.find((t) => t.id === teamId);
     if (team) {
@@ -505,6 +516,8 @@ export function AdminPanel({
                             return <span className="text-gray-500">-</span>;
                           }
                           const team = teamById.get(teamId);
+                          const solvedAt = status?.solvedBy?.[idx]?.solvedAt;
+                          const solvedAtLabel = formatSolvedAt(solvedAt);
                           return (
                             <div className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-black/20 px-2 py-1">
                               <span className="w-7 h-7 border border-white/30 bg-black/40 flex items-center justify-center text-white font-bold text-xs">
@@ -512,7 +525,10 @@ export function AdminPanel({
                               </span>
                               <div className="leading-tight">
                                 <div className="text-white text-xs font-semibold">{team?.name ?? 'Unknown team'}</div>
-                                <div className="text-[10px] text-gray-400">team {teamId}</div>
+                                <div className="text-[10px] text-gray-400">
+                                  team {teamId}
+                                  {solvedAtLabel ? <span className="text-gray-500"> · {solvedAtLabel}</span> : null}
+                                </div>
                               </div>
                             </div>
                           );

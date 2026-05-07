@@ -63,6 +63,14 @@ function mapSnapshot(payload: any): GameSnapshot {
     (status: any) => ({
       questionId: status.question_no,
       solvedByTeams: status.solved_by_teams ?? [],
+      solvedBy: Array.isArray(status.solved_by)
+        ? status.solved_by
+            .map((entry: any) => ({
+              teamId: entry?.team_code,
+              solvedAt: entry?.created_at,
+            }))
+            .filter((entry: any) => Boolean(entry.teamId && entry.solvedAt))
+        : undefined,
       hintedByTeams: status.hinted_by_teams ?? [],
       revealedByTeams: status.revealed_by_teams ?? [],
       solveCount: status.solve_count ?? 0,
