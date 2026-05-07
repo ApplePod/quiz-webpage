@@ -83,6 +83,13 @@ export function AdminPanel({
       });
   }, [questions, questionStatuses, solveOnlySolved, solveTeamFilter, solveQuery]);
 
+  const solveTimeMissing = useMemo(() => {
+    return questionStatuses.some(
+      (status) =>
+        (status.solvedByTeams?.length ?? 0) > 0 && (status.solvedBy?.length ?? 0) === 0,
+    );
+  }, [questionStatuses]);
+
   const formatSolvedAt = (value?: string) => {
     if (!value) return '';
     const date = new Date(value);
@@ -493,6 +500,12 @@ export function AdminPanel({
                   <div className="mt-3 text-xs text-gray-400 leading-relaxed">
                     “1st/2nd/3rd”는 서버 기준 풀이 순서입니다. (동시 제출도 순서가 결정되도록 처리됨)
                   </div>
+                  {solveTimeMissing && (
+                    <div className="mt-2 text-xs text-amber-200/90">
+                      풀이 시간 정보가 아직 내려오지 않습니다. Supabase를 사용 중이면 DB의
+                      <span className="font-mono"> get_game_snapshot</span> 함수를 최신 스키마로 업데이트해야 합니다.
+                    </div>
+                  )}
                 </div>
 
                 <div className="overflow-x-auto">
