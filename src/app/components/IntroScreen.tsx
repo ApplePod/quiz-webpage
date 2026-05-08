@@ -267,11 +267,11 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
             }}
           />
           <div className="relative text-center">
-            <div className="mx-auto mb-5 w-[84px] h-[84px] bg-black/55 flex items-center justify-center shadow-[0_0_50px_rgba(249,192,89,0.14)]">
+            <div className="mx-auto mb-5 w-[104px] h-[104px] border border-white/15 bg-black/40 backdrop-blur-md flex items-center justify-center shadow-[0_0_60px_rgba(249,192,89,0.14)]">
               <img
                 src="/brand/logo-white.png"
                 alt=""
-                className="w-20 h-20 object-contain opacity-95"
+                className="w-24 h-24 object-contain opacity-95"
                 draggable={false}
               />
             </div>
