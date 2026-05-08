@@ -121,6 +121,28 @@
   .intro-participants-carousel .embla__viewport {
     touch-action: pan-x pinch-zoom;
   }
+
+  /* Intro: poster rows drift (odd/even alternate direction) */
+  @keyframes poster-row-drift {
+    from { transform: translateX(0); }
+    to { transform: translateX(-22%); }
+  }
+
+  .intro-poster-row {
+    display: flex;
+    gap: 22px;
+    width: max-content;
+    will-change: transform;
+    animation: poster-row-drift 22s ease-in-out infinite alternate;
+  }
+
+  .intro-poster-row[data-dir="right"] {
+    animation-direction: alternate-reverse;
+  }
+
+  .intro-poster-row[data-speed="slow"] { animation-duration: 26s; }
+  .intro-poster-row[data-speed="mid"] { animation-duration: 22s; }
+  .intro-poster-row[data-speed="fast"] { animation-duration: 18s; }
 }
 
 /**

@@ -163,28 +163,40 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
       <main className="relative flex-1 flex flex-col items-center justify-center gap-10 py-10 px-4 min-h-0 overflow-hidden">
         {/* Poster grid background (sherlock main visual 느낌) */}
         <div className="pointer-events-none absolute inset-0">
-          <motion.div
-            className="absolute -inset-24 opacity-[0.28]"
+          <div
+            className="absolute -inset-24 opacity-[0.33]"
             style={{ rotate: '-18deg' }}
-            animate={{ x: [-80, 80] }}
-            transition={{ duration: 40, repeat: Infinity, repeatType: 'reverse', ease: 'linear' }}
           >
-            <div className="grid grid-cols-4 sm:grid-cols-6 gap-5">
-              {posterImages.concat(posterImages).map((src, idx) => (
-                <div
-                  key={`${src}-${idx}`}
-                  className="w-[110px] sm:w-[140px] h-[160px] sm:h-[190px] overflow-hidden rounded-sm shadow-[0_12px_40px_rgba(0,0,0,0.7)] bg-black/70"
-                >
-                  <img
-                    src={src}
-                    alt=""
-                    className="w-full h-full object-cover"
-                    draggable={false}
-                  />
+            {(['left', 'right', 'left'] as const).map((dir, rowIdx) => {
+              const speed = rowIdx === 0 ? 'fast' : rowIdx === 1 ? 'mid' : 'slow'
+              const rowImages = posterImages.concat(posterImages).concat(posterImages)
+              return (
+                <div key={rowIdx} className={rowIdx === 0 ? '' : 'mt-6'}>
+                  <div className="overflow-hidden">
+                    <div
+                      className="intro-poster-row"
+                      data-dir={dir === 'right' ? 'right' : 'left'}
+                      data-speed={speed}
+                    >
+                      {rowImages.map((src, idx) => (
+                        <div
+                          key={`${rowIdx}-${src}-${idx}`}
+                          className="w-[140px] sm:w-[190px] h-[200px] sm:h-[260px] overflow-hidden rounded-sm shadow-[0_16px_60px_rgba(0,0,0,0.7)] bg-black/70"
+                        >
+                          <img
+                            src={src}
+                            alt=""
+                            className="w-full h-full object-cover"
+                            draggable={false}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-              ))}
-            </div>
-          </motion.div>
+              )
+            })}
+          </div>
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,transparent,rgba(0,0,0,0.9))]" />
         </div>
 
