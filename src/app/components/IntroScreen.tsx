@@ -48,11 +48,17 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
     return Array.from({ length: copies }, () => marqueeTeams).flat()
   }, [marqueeTeams])
 
+  const startIndex = useMemo(() => {
+    // Start from the middle so the carousel can move both directions.
+    return Math.floor(loopTeams.length / 2)
+  }, [loopTeams.length])
+
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: loopTeams.length > 1,
     dragFree: false,
     align: 'center',
     containScroll: false,
+    startIndex,
   })
 
   const femaleCrewTokens = useMemo(() => {
@@ -133,8 +139,10 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
 
   useEffect(() => {
     emblaApi?.reInit()
+    // Ensure we land in the center even after data refresh/re-init.
+    emblaApi?.scrollTo(startIndex, true)
     applyCoverflow()
-  }, [emblaApi, loopTeams, applyCoverflow])
+  }, [emblaApi, loopTeams, applyCoverflow, startIndex])
 
   useEffect(() => {
     if (!emblaApi) return
