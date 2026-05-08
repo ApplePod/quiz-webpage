@@ -98,6 +98,50 @@
   .mystery-divider {
     @apply border-t border-white/15;
   }
+
+  /* Intro: endless horizontal participant cards (Sherlock-style film strip) */
+  @keyframes intro-marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  .intro-marquee-mask {
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      black 6%,
+      black 94%,
+      transparent
+    );
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent,
+      black 6%,
+      black 94%,
+      transparent
+    );
+  }
+
+  .intro-marquee-track {
+    display: flex;
+    width: max-content;
+    gap: 1rem;
+    animation: intro-marquee 50s linear infinite;
+  }
+
+  .intro-marquee-track:hover {
+    animation-play-state: paused;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .intro-marquee-track {
+      animation: none;
+    }
+  }
 }
 
 /**

@@ -1,41 +1,119 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { motion } from 'motion/react'
 import { Sparkles } from 'lucide-react'
 import { Button } from './ui/button'
 import { AdminButton } from './AdminButton'
+import type { Team } from '../types'
 
 type IntroScreenProps = {
+  teams: Team[]
   onStart: () => void
   onAdminClick: () => void
 }
 
-export function IntroScreen({ onStart, onAdminClick }: IntroScreenProps) {
+const gold = '#f9c059'
+
+export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) {
   const title = 'Escape Quiz Room'
   const chars = Array.from(title)
 
+  const marqueeTeams = useMemo(() => {
+    if (teams.length > 0) return teams
+    return [
+      { id: '—', name: '팀 로딩 중', coins: 0, password: '' },
+    ] as Team[]
+  }, [teams])
+
+  const doubled = useMemo(() => [...marqueeTeams, ...marqueeTeams], [marqueeTeams])
+
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
-      <div className="w-full max-w-3xl">
+    <div className="min-h-screen flex flex-col">
+      <header className="shrink-0 border-b border-white/10 bg-black/50 backdrop-blur-md">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-center">
+          <motion.img
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            src="/sherlock/images/common/header_logo.png"
+            alt="SHERLOCK HOLMES"
+            className="h-9 sm:h-11 w-auto object-contain opacity-95"
+            draggable={false}
+          />
+        </div>
+      </header>
+
+      <main className="flex-1 flex flex-col items-center justify-center gap-10 py-10 px-4 min-h-0">
+        <div className="w-full max-w-5xl space-y-3">
+          <p className="text-center text-[10px] sm:text-xs tracking-[0.4em] text-white/45 uppercase">
+            Participants
+          </p>
+          <div className="relative w-screen max-w-[100vw] left-1/2 -translate-x-1/2 overflow-hidden intro-marquee-mask py-2">
+            <div className="intro-marquee-track px-2">
+              {doubled.map((team, idx) => (
+                <div
+                  key={`${team.id}-${idx}`}
+                  className="relative w-[148px] sm:w-[168px] shrink-0 overflow-hidden rounded-sm border border-white/25 bg-black/55 backdrop-blur-sm shadow-[0_0_0_1px_rgba(249,192,89,0.08),0_12px_40px_rgba(0,0,0,0.45)] aspect-[3/4] flex flex-col"
+                >
+                  <div
+                    className="absolute inset-0 opacity-[0.15] bg-cover bg-center pointer-events-none"
+                    style={{
+                      backgroundImage: 'url("/sherlock/assets/images/menu-bg.png")',
+                    }}
+                  />
+                  <div className="relative flex-1 flex flex-col items-center justify-center p-3 text-center gap-2">
+                    <span
+                      className="inline-flex h-11 w-11 items-center justify-center border text-lg font-bold text-white"
+                      style={{ borderColor: `${gold}55` }}
+                    >
+                      {team.id}
+                    </span>
+                    <span className="text-sm font-semibold text-white leading-tight line-clamp-3">
+                      {team.name}
+                    </span>
+                    <span className="text-[10px] tracking-widest uppercase text-white/40">
+                      Crew
+                    </span>
+                  </div>
+                  <div
+                    className="relative border-t border-white/15 px-2 py-2 text-center text-[11px] tabular-nums"
+                    style={{ color: `${gold}cc` }}
+                  >
+                    {team.coins} coins
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mystery-card p-10 relative overflow-hidden"
+          transition={{ duration: 0.55 }}
+          className="w-full max-w-lg mystery-card p-8 sm:p-10 relative overflow-hidden border-[#f9c059]/20"
         >
-          <div className="text-center">
-            <div className="mx-auto lg:mx-0 mb-6 w-20 h-20 border border-white/40 bg-black/50 flex items-center justify-center shadow-[0_0_40px_rgba(255,255,255,0.08)]">
+          <div
+            className="pointer-events-none absolute inset-0 opacity-[0.12]"
+            style={{
+              backgroundImage:
+                'radial-gradient(circle at 30% 20%, rgba(249,192,89,0.35), transparent 45%)',
+            }}
+          />
+          <div className="relative text-center">
+            <div className="mx-auto mb-5 w-[72px] h-[72px] border border-white/35 bg-black/60 flex items-center justify-center shadow-[0_0_40px_rgba(249,192,89,0.12)]">
               <img
                 src="/sherlock/assets/images/favicon.png"
-                alt="logo"
-                className="w-12 h-12 object-contain opacity-95"
+                alt=""
+                className="w-11 h-11 object-contain opacity-95"
                 draggable={false}
               />
             </div>
 
-            <div className="text-xs tracking-[0.35em] text-white/55">
+            <div className="text-xs tracking-[0.35em] text-[#f9c059]/85">
               YOU SEE, BUT DO NOT OBSERVE.
             </div>
 
-            <h1 className="mt-3 text-4xl font-bold mystery-title">
+            <h1 className="mt-3 text-3xl sm:text-4xl font-bold mystery-title">
               <motion.span
                 initial="hidden"
                 animate="show"
@@ -69,30 +147,30 @@ export function IntroScreen({ onStart, onAdminClick }: IntroScreenProps) {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.25, duration: 0.6 }}
-              className="mt-3 mystery-subtitle leading-relaxed"
+              className="mt-3 mystery-subtitle leading-relaxed text-sm sm:text-base"
             >
               신비한 공간에 오신 것을 환영합니다.
               <br />
-              팀을 선택하고 한 번만 인증하면, 이제부터는 비밀번호 입력 없이 문제를 풀 수 있어요.
+              아래에서 팀 인증 후 퀴즈에 입장하세요.
             </motion.p>
 
             <div className="mt-8">
-                <Button
-                  onClick={onStart}
-                  className="w-full border border-white/40 bg-transparent text-white font-semibold py-7 text-lg hover:bg-white/10"
-                >
-                  <Sparkles className="w-5 h-5 mr-2" />
-                  시작하기
-                </Button>
-              </div>
+              <Button
+                onClick={onStart}
+                className="w-full border font-semibold py-7 text-lg bg-black/30 hover:bg-[#f9c059]/12"
+                style={{ borderColor: `${gold}66`, color: '#fff' }}
+              >
+                <Sparkles className="w-5 h-5 mr-2" style={{ color: gold }} />
+                입장하기
+              </Button>
+            </div>
 
-            <div className="mt-6">
+            <div className="mt-5">
               <AdminButton onClick={onAdminClick} />
             </div>
           </div>
         </motion.div>
-      </div>
+      </main>
     </div>
   )
 }
-

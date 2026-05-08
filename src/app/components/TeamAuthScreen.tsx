@@ -53,7 +53,19 @@ export function TeamAuthScreen({
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
+    <div className="min-h-screen flex flex-col">
+      <header className="shrink-0 border-b border-white/10 bg-black/50 backdrop-blur-md">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-center">
+          <img
+            src="/sherlock/images/common/header_logo.png"
+            alt="SHERLOCK HOLMES"
+            className="h-9 sm:h-11 w-auto object-contain opacity-95"
+            draggable={false}
+          />
+        </div>
+      </header>
+
+      <div className="flex-1 flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-3xl">
         <Button
           onClick={() => {
@@ -76,7 +88,7 @@ export function TeamAuthScreen({
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/30 p-8 shadow-2xl"
+          className="mystery-card border-[#f9c059]/20 p-8 shadow-2xl"
         >
           {!selectedTeam ? (
             <>
@@ -172,6 +184,7 @@ export function TeamAuthScreen({
             </>
           )}
         </motion.div>
+      </div>
       </div>
     </div>
   )

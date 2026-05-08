@@ -615,6 +615,7 @@ export default function App() {
         {/* View Rendering */}
         {currentView === 'intro' && (
           <IntroScreen
+            teams={teams}
             onStart={() => setCurrentView(selectedTeam ? 'main' : 'team-auth')}
             onAdminClick={handleAdminClick}
           />
