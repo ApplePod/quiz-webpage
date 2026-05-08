@@ -269,14 +269,14 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
           <div className="relative text-center">
             <div className="mx-auto mb-5 w-[72px] h-[72px] border border-white/35 bg-black/60 flex items-center justify-center shadow-[0_0_40px_rgba(249,192,89,0.12)]">
               <img
-                src="/sherlock/assets/images/favicon.png"
+                src="/brand/logo-white.png"
                 alt=""
-                className="w-11 h-11 object-contain opacity-95"
+                className="w-14 h-14 object-contain opacity-95"
                 draggable={false}
               />
             </div>
 
-            <div className="mx-auto mb-3 inline-flex items-center justify-center border border-white/25 bg-black/50 px-3 py-2 text-[10px] sm:text-xs tracking-[0.35em] text-[#f9c059]/85">
+            <div className="text-xs tracking-[0.35em] text-[#f9c059]/85">
               YOU SEE, BUT DO NOT OBSERVE.
             </div>
 

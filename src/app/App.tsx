@@ -67,6 +67,21 @@ export default function App() {
     setError(message);
   };
 
+  const getUnknownErrorMessage = (value: unknown, fallbackMessage: string) => {
+    if (value instanceof Error) return value.message;
+    if (typeof value === 'string') return value;
+    if (value && typeof value === 'object') {
+      const maybeMessage = (value as any).message;
+      if (typeof maybeMessage === 'string' && maybeMessage.trim()) return maybeMessage;
+      try {
+        return JSON.stringify(value);
+      } catch {
+        // ignore
+      }
+    }
+    return fallbackMessage;
+  };
+
   const syncFromSnapshot = useCallback(async () => {
     try {
       const snapshot = await fetchGameSnapshot();
@@ -77,9 +92,7 @@ export default function App() {
       setTimerRunning(snapshot.game.timerRunning);
       setError('');
     } catch (syncError) {
-      const message =
-        syncError instanceof Error ? syncError.message : 'Failed to sync game state.';
-      setError(message);
+      setError(getUnknownErrorMessage(syncError, 'Failed to sync game state.'));
     }
   }, []);
 
