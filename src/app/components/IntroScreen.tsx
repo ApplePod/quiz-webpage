@@ -55,6 +55,34 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
     containScroll: false,
   })
 
+  const femaleCrewTokens = useMemo(() => {
+    return '준우 비누 슈엘 알려줘21 겨란후라이 에르나 이부리 포틀'
+      .split(' ')
+      .map((s) => s.trim())
+      .filter(Boolean)
+  }, [])
+
+  const maleCrewTokens = useMemo(() => {
+    return '석석 with 프위메 깡지 인계동카카시 몬지 냥녕늉'
+      .split(' ')
+      .map((s) => s.trim())
+      .filter(Boolean)
+  }, [])
+
+  // Teams in initialData are ordered; we treat the first half as 여자, second half as 남자.
+  const femaleCount = Math.max(1, Math.floor(marqueeTeams.length / 2))
+
+  const getGenderAndCrew = (baseIndex: number) => {
+    const isFemale = baseIndex < femaleCount
+    if (isFemale) {
+      const crew = femaleCrewTokens[baseIndex % Math.max(1, femaleCrewTokens.length)]
+      return { genderLabel: '여자', genderIcon: '♀', crewName: crew ?? '—' }
+    }
+    const maleIndex = baseIndex - femaleCount
+    const crew = maleCrewTokens[maleIndex % Math.max(1, maleCrewTokens.length)]
+    return { genderLabel: '남자', genderIcon: '♂', crewName: crew ?? '—' }
+  }
+
   const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n))
 
   const setSlideNode = useCallback((idx: number) => {
@@ -203,12 +231,21 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
                         >
                           {team.id}
                         </span>
-                        <span className="text-sm font-semibold text-white leading-tight line-clamp-3">
-                          {team.name}
-                        </span>
-                        <span className="text-[10px] tracking-widest uppercase text-white/40">
-                          Crew
-                        </span>
+                        {(() => {
+                          const baseIndex = marqueeTeams.length ? idx % marqueeTeams.length : 0
+                          const { genderIcon, genderLabel, crewName } = getGenderAndCrew(baseIndex)
+                          return (
+                            <>
+                              <span className="text-sm font-semibold text-white leading-tight line-clamp-3">
+                                {crewName}
+                              </span>
+                              <span className="text-[10px] tracking-widest uppercase text-white/40 flex items-center gap-1">
+                                <span className="text-white/60">{genderIcon}</span>
+                                {genderLabel}
+                              </span>
+                            </>
+                          )
+                        })()}
                       </div>
                       <div
                         className="relative border-t border-white/15 px-2 py-2 text-center text-[11px] tabular-nums"
