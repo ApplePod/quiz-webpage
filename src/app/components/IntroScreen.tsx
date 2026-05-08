@@ -1,4 +1,5 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo } from 'react'
+import useEmblaCarousel from 'embla-carousel-react'
 import { motion } from 'motion/react'
 import { Sparkles } from 'lucide-react'
 import { Button } from './ui/button'
@@ -24,7 +25,23 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
     ] as Team[]
   }, [teams])
 
-  const doubled = useMemo(() => [...marqueeTeams, ...marqueeTeams], [marqueeTeams])
+  const loopTeams = useMemo(() => {
+    if (marqueeTeams.length === 0) return marqueeTeams
+    if (marqueeTeams.length >= 10) return marqueeTeams
+    const copies = Math.ceil(12 / marqueeTeams.length)
+    return Array.from({ length: copies }, () => marqueeTeams).flat()
+  }, [marqueeTeams])
+
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: loopTeams.length > 1,
+    dragFree: true,
+    align: 'center',
+    containScroll: false,
+  })
+
+  useEffect(() => {
+    emblaApi?.reInit()
+  }, [emblaApi, loopTeams])
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -47,41 +64,56 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
           <p className="text-center text-[10px] sm:text-xs tracking-[0.4em] text-white/45 uppercase">
             Participants
           </p>
-          <div className="relative w-screen max-w-[100vw] left-1/2 -translate-x-1/2 overflow-hidden intro-marquee-mask py-2">
-            <div className="intro-marquee-track px-2">
-              {doubled.map((team, idx) => (
-                <div
-                  key={`${team.id}-${idx}`}
-                  className="relative w-[148px] sm:w-[168px] shrink-0 overflow-hidden rounded-sm border border-white/25 bg-black/55 backdrop-blur-sm shadow-[0_0_0_1px_rgba(249,192,89,0.08),0_12px_40px_rgba(0,0,0,0.45)] aspect-[3/4] flex flex-col"
-                >
+          <p className="text-center text-[11px] text-white/35">
+            손가락 또는 마우스로 좌우로 밀면 넘겨 볼 수 있어요.
+          </p>
+
+          <div className="intro-participants-carousel relative w-screen max-w-[100vw] left-1/2 -translate-x-1/2 py-2">
+            <div
+              className="embla__viewport intro-marquee-mask overflow-hidden cursor-grab active:cursor-grabbing outline-none ring-0"
+              ref={emblaRef}
+              tabIndex={0}
+              role="region"
+              aria-roledescription="carousel"
+              aria-label="참가 팀 카드"
+            >
+              <div className="embla__container flex touch-pan-x gap-4 pl-8 pr-8 py-2">
+                {loopTeams.map((team, idx) => (
                   <div
-                    className="absolute inset-0 opacity-[0.15] bg-cover bg-center pointer-events-none"
-                    style={{
-                      backgroundImage: 'url("/sherlock/assets/images/menu-bg.png")',
-                    }}
-                  />
-                  <div className="relative flex-1 flex flex-col items-center justify-center p-3 text-center gap-2">
-                    <span
-                      className="inline-flex h-11 w-11 items-center justify-center border text-lg font-bold text-white"
-                      style={{ borderColor: `${gold}55` }}
-                    >
-                      {team.id}
-                    </span>
-                    <span className="text-sm font-semibold text-white leading-tight line-clamp-3">
-                      {team.name}
-                    </span>
-                    <span className="text-[10px] tracking-widest uppercase text-white/40">
-                      Crew
-                    </span>
-                  </div>
-                  <div
-                    className="relative border-t border-white/15 px-2 py-2 text-center text-[11px] tabular-nums"
-                    style={{ color: `${gold}cc` }}
+                    className="embla__slide min-w-[148px] sm:min-w-[168px] max-w-[168px] flex-[0_0_auto]"
+                    key={`${team.id}-${team.name}-${idx}`}
                   >
-                    {team.coins} coins
+                    <div className="relative h-full overflow-hidden rounded-sm border border-white/25 bg-black/55 backdrop-blur-sm shadow-[0_0_0_1px_rgba(249,192,89,0.08),0_12px_40px_rgba(0,0,0,0.45)] aspect-[3/4] flex flex-col select-none">
+                      <div
+                        className="absolute inset-0 opacity-[0.15] bg-cover bg-center pointer-events-none"
+                        style={{
+                          backgroundImage: 'url("/sherlock/assets/images/menu-bg.png")',
+                        }}
+                      />
+                      <div className="relative flex-1 flex flex-col items-center justify-center p-3 text-center gap-2">
+                        <span
+                          className="inline-flex h-11 w-11 items-center justify-center border text-lg font-bold text-white"
+                          style={{ borderColor: `${gold}55` }}
+                        >
+                          {team.id}
+                        </span>
+                        <span className="text-sm font-semibold text-white leading-tight line-clamp-3">
+                          {team.name}
+                        </span>
+                        <span className="text-[10px] tracking-widest uppercase text-white/40">
+                          Crew
+                        </span>
+                      </div>
+                      <div
+                        className="relative border-t border-white/15 px-2 py-2 text-center text-[11px] tabular-nums"
+                        style={{ color: `${gold}cc` }}
+                      >
+                        {team.coins} coins
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </div>
