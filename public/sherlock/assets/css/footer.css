@@ -1,0 +1,14 @@
+@charset "UTF-8";
+/*반응형 화면 크기*/
+/*반응형, 브라우저 크기가 767px 이하일때*/
+/*반응형, 브라우저 크기가 768이상, 1023px 이하일때*/
+/*반응형, 브라우저 크기가 1024px 이상일때*/
+
+#footer{
+	display:none;
+}
+@media (max-width: 767px) {
+  #footer {
+    display:block;
+  }
+}

@@ -1,0 +1,20 @@
+@charset "UTF-8";
+/*반응형 화면 크기*/
+/*반응형, 브라우저 크기가 767px 이하일때*/
+/*반응형, 브라우저 크기가 768이상, 1023px 이하일때*/
+/*반응형, 브라우저 크기가 1024px 이상일때*/
+
+.group-nav .theme-area {
+	display:none;
+}
+
+@media (max-width: 767px){
+	#reservation form .btn_group .gray2 {
+		padding: 12px 0 ;
+	}
+}
+@media (max-width: 1230px){
+	#reservation form .btn_group .gray2 {
+		padding: 12px 0 ;
+	}
+}
