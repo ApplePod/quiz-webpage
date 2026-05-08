@@ -159,19 +159,6 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
 
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="shrink-0 border-b border-white/10">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-center">
-          <motion.img
-            initial={{ opacity: 0, y: -6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            src="/brand/logo.png"
-            alt="BAR-O"
-            className="h-10 sm:h-12 w-auto object-contain opacity-95"
-            draggable={false}
-          />
-        </div>
-      </header>
 
       <main className="relative flex-1 flex flex-col items-center justify-center gap-10 py-10 px-4 min-h-0 overflow-hidden">
         {/* Poster grid background (sherlock main visual 느낌) */}
@@ -289,7 +276,7 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
               />
             </div>
 
-            <div className="text-xs tracking-[0.35em] text-[#f9c059]/85">
+            <div className="mx-auto mb-3 inline-flex items-center justify-center border border-white/25 bg-black/50 px-3 py-2 text-[10px] sm:text-xs tracking-[0.35em] text-[#f9c059]/85">
               YOU SEE, BUT DO NOT OBSERVE.
             </div>
 
