@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import useEmblaCarousel from 'embla-carousel-react'
 import { motion } from 'motion/react'
 import { Sparkles } from 'lucide-react'
@@ -32,6 +32,7 @@ const posterImages = [
 export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) {
   const title = 'Escape Quiz Room'
   const chars = Array.from(title)
+  const slideNodesRef = useRef<HTMLElement[]>([])
 
   const marqueeTeams = useMemo(() => {
     if (teams.length > 0) return teams
@@ -49,14 +50,76 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: loopTeams.length > 1,
-    dragFree: true,
+    dragFree: false,
     align: 'center',
     containScroll: false,
   })
 
+  const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n))
+
+  const setSlideNode = useCallback((idx: number) => {
+    return (node: HTMLElement | null) => {
+      if (!node) return
+      slideNodesRef.current[idx] = node
+    }
+  }, [])
+
+  const applyCoverflow = useCallback(() => {
+    if (!emblaApi) return
+
+    const engine = emblaApi.internalEngine()
+    const scrollProgress = emblaApi.scrollProgress()
+    const snaps = emblaApi.scrollSnapList()
+    const slides = slideNodesRef.current
+
+    for (let i = 0; i < snaps.length; i += 1) {
+      const snap = snaps[i]
+      let diffToTarget = snap - scrollProgress
+
+      if (engine.options.loop) {
+        // Adjust diffs for loop so center tilt behaves correctly.
+        engine.slideLooper.loopPoints.forEach((loopPoint) => {
+          const target = loopPoint.target()
+          if (loopPoint.index === i && target !== 0) {
+            const sign = Math.sign(target)
+            if (sign === -1) diffToTarget = snap - (1 + scrollProgress)
+            if (sign === 1) diffToTarget = snap + (1 - scrollProgress)
+          }
+        })
+      }
+
+      const t = clamp(diffToTarget * 2.25, -1, 1)
+      const abs = Math.abs(t)
+      const rotateY = t * -48
+      const translateZ = (1 - abs) * 140
+      const scale = 1 - abs * 0.18
+      const opacity = 0.35 + (1 - abs) * 0.65
+
+      const slide = slides[i]
+      if (!slide) continue
+      slide.style.transform = `perspective(1200px) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`
+      slide.style.opacity = String(opacity)
+      slide.style.zIndex = String(Math.round((1 - abs) * 100))
+    }
+  }, [emblaApi])
+
   useEffect(() => {
     emblaApi?.reInit()
-  }, [emblaApi, loopTeams])
+    applyCoverflow()
+  }, [emblaApi, loopTeams, applyCoverflow])
+
+  useEffect(() => {
+    if (!emblaApi) return
+    applyCoverflow()
+    emblaApi.on('reInit', applyCoverflow)
+    emblaApi.on('scroll', applyCoverflow)
+    emblaApi.on('select', applyCoverflow)
+    return () => {
+      emblaApi.off('reInit', applyCoverflow)
+      emblaApi.off('scroll', applyCoverflow)
+      emblaApi.off('select', applyCoverflow)
+    }
+  }, [emblaApi, applyCoverflow])
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -107,7 +170,7 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
             Participants
           </p>
           <p className="text-center text-[11px] text-white/35">
-            손가락 또는 마우스로 좌우로 밀면 넘겨 볼 수 있어요.
+            손가락으로 휘리릭 넘겨보세요. 가운데 카드가 강조됩니다.
           </p>
 
           <div className="intro-participants-carousel relative w-screen max-w-[100vw] left-1/2 -translate-x-1/2 py-2">
@@ -119,10 +182,11 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
               aria-roledescription="carousel"
               aria-label="참가 팀 카드"
             >
-              <div className="embla__container flex touch-pan-x gap-4 pl-8 pr-8 py-2">
+              <div className="embla__container flex gap-4 pl-8 pr-8 py-6 [transform-style:preserve-3d]">
                 {loopTeams.map((team, idx) => (
                   <div
-                    className="embla__slide min-w-[148px] sm:min-w-[168px] max-w-[168px] flex-[0_0_auto]"
+                    ref={setSlideNode(idx)}
+                    className="embla__slide min-w-[160px] sm:min-w-[200px] max-w-[220px] flex-[0_0_auto] will-change-transform transition-[filter] duration-300 [transform-style:preserve-3d]"
                     key={`${team.id}-${team.name}-${idx}`}
                   >
                     <div className="relative h-full overflow-hidden rounded-sm border border-white/25 bg-black/55 backdrop-blur-sm shadow-[0_0_0_1px_rgba(249,192,89,0.08),0_12px_40px_rgba(0,0,0,0.45)] aspect-[3/4] flex flex-col select-none">
