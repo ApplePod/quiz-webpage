@@ -14,6 +14,21 @@ type IntroScreenProps = {
 
 const gold = '#f9c059'
 
+const posterImages = [
+  '/sherlock/assets/images/gallery/01.jpg',
+  '/sherlock/assets/images/gallery/02.jpg',
+  '/sherlock/assets/images/gallery/03.jpg',
+  '/sherlock/assets/images/gallery/04.jpg',
+  '/sherlock/assets/images/gallery/05.jpg',
+  '/sherlock/assets/images/gallery/06.jpg',
+  '/sherlock/assets/images/gallery/07.jpg',
+  '/sherlock/assets/images/gallery/08.jpg',
+  '/sherlock/assets/images/gallery/09.jpg',
+  '/sherlock/assets/images/gallery/10.jpg',
+  '/sherlock/assets/images/gallery/11.jpg',
+  '/sherlock/assets/images/gallery/12.jpg',
+]
+
 export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) {
   const title = 'Escape Quiz Room'
   const chars = Array.from(title)
@@ -59,8 +74,35 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
         </div>
       </header>
 
-      <main className="flex-1 flex flex-col items-center justify-center gap-10 py-10 px-4 min-h-0">
-        <div className="w-full max-w-5xl space-y-3">
+      <main className="relative flex-1 flex flex-col items-center justify-center gap-10 py-10 px-4 min-h-0 overflow-hidden">
+        {/* Poster grid background (sherlock main visual 느낌) */}
+        <div className="pointer-events-none absolute inset-0">
+          <motion.div
+            className="absolute -inset-24 opacity-[0.28]"
+            style={{ rotate: '-18deg' }}
+            animate={{ x: [-80, 80] }}
+            transition={{ duration: 70, repeat: Infinity, repeatType: 'reverse', ease: 'linear' }}
+          >
+            <div className="grid grid-cols-4 sm:grid-cols-6 gap-5">
+              {posterImages.concat(posterImages).map((src, idx) => (
+                <div
+                  key={`${src}-${idx}`}
+                  className="w-[110px] sm:w-[140px] h-[160px] sm:h-[190px] overflow-hidden rounded-sm shadow-[0_12px_40px_rgba(0,0,0,0.7)] bg-black/70"
+                >
+                  <img
+                    src={src}
+                    alt=""
+                    className="w-full h-full object-cover"
+                    draggable={false}
+                  />
+                </div>
+              ))}
+            </div>
+          </motion.div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,transparent,rgba(0,0,0,0.9))]" />
+        </div>
+
+        <div className="relative z-10 w-full max-w-5xl space-y-3">
           <p className="text-center text-[10px] sm:text-xs tracking-[0.4em] text-white/45 uppercase">
             Participants
           </p>
@@ -122,7 +164,7 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55 }}
-          className="w-full max-w-lg mystery-card p-8 sm:p-10 relative overflow-hidden border-[#f9c059]/20"
+          className="relative z-10 w-full max-w-lg mystery-card p-8 sm:p-10 overflow-hidden border-[#f9c059]/20"
         >
           <div
             className="pointer-events-none absolute inset-0 opacity-[0.12]"
