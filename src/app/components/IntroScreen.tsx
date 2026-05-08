@@ -76,11 +76,11 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
     const isFemale = baseIndex < femaleCount
     if (isFemale) {
       const crew = femaleCrewTokens[baseIndex % Math.max(1, femaleCrewTokens.length)]
-      return { genderLabel: '여자', genderIcon: '♀', crewName: crew ?? '—' }
+      return { genderLabel: 'F', genderIcon: 'F', crewName: crew ?? '—' }
     }
     const maleIndex = baseIndex - femaleCount
     const crew = maleCrewTokens[maleIndex % Math.max(1, maleCrewTokens.length)]
-    return { genderLabel: '남자', genderIcon: '♂', crewName: crew ?? '—' }
+    return { genderLabel: 'M', genderIcon: 'M', crewName: crew ?? '—' }
   }
 
   const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n))
@@ -151,15 +151,15 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
 
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="shrink-0 border-b border-white/10 bg-black/50 backdrop-blur-md">
+      <header className="shrink-0 border-b border-white/10">
         <div className="container mx-auto px-4 py-4 flex items-center justify-center">
           <motion.img
             initial={{ opacity: 0, y: -6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            src="/sherlock/images/common/header_logo.png"
-            alt="SHERLOCK HOLMES"
-            className="h-9 sm:h-11 w-auto object-contain opacity-95"
+            src="/brand/logo.png"
+            alt="BAR-O"
+            className="h-10 sm:h-12 w-auto object-contain opacity-95"
             draggable={false}
           />
         </div>
@@ -172,7 +172,7 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
             className="absolute -inset-24 opacity-[0.28]"
             style={{ rotate: '-18deg' }}
             animate={{ x: [-80, 80] }}
-            transition={{ duration: 70, repeat: Infinity, repeatType: 'reverse', ease: 'linear' }}
+            transition={{ duration: 40, repeat: Infinity, repeatType: 'reverse', ease: 'linear' }}
           >
             <div className="grid grid-cols-4 sm:grid-cols-6 gap-5">
               {posterImages.concat(posterImages).map((src, idx) => (
@@ -196,9 +196,6 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
         <div className="relative z-10 w-full max-w-5xl space-y-3">
           <p className="text-center text-[10px] sm:text-xs tracking-[0.4em] text-white/45 uppercase">
             Participants
-          </p>
-          <p className="text-center text-[11px] text-white/35">
-            손가락으로 휘리릭 넘겨보세요. 가운데 카드가 강조됩니다.
           </p>
 
           <div className="intro-participants-carousel relative w-screen max-w-[100vw] left-1/2 -translate-x-1/2 py-2">
