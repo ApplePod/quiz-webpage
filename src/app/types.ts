@@ -12,7 +12,9 @@ export interface Question {
   questionText: string;
   answerType: 'text' | 'directionLock';
   correctAnswer: string | number[];
+  hintType?: 'text' | 'image';
   hint: string;
+  hintImageUrl?: string;
   hintCost: number;
   coinRewardFirst: number;
   coinRewardSecond: number;

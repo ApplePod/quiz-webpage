@@ -674,7 +674,25 @@ export function AnswerScreen({
                       <Lightbulb className="w-5 h-5 text-yellow-400 mt-0.5" />
                       <div>
                         <h4 className="font-semibold text-yellow-300 mb-1">Hint</h4>
-                        <p className="text-yellow-100">{question.hint}</p>
+                        {question.hintType === 'image' ? (
+                          <div className="space-y-2">
+                            {question.hintImageUrl ? (
+                              <img
+                                src={question.hintImageUrl}
+                                alt="Hint"
+                                className="max-h-[320px] w-auto rounded-lg border border-yellow-400/30"
+                                loading="lazy"
+                              />
+                            ) : (
+                              <p className="text-yellow-100/80 text-sm">이미지 힌트가 설정되지 않았습니다.</p>
+                            )}
+                            {question.hint?.trim() ? (
+                              <p className="text-yellow-100">{question.hint}</p>
+                            ) : null}
+                          </div>
+                        ) : (
+                          <p className="text-yellow-100">{question.hint}</p>
+                        )}
                       </div>
                     </div>
                   </motion.div>

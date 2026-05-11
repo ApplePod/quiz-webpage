@@ -29,6 +29,8 @@ create table if not exists public.questions (
   question_text text not null,
   correct_answer text not null,
   hint text not null,
+  hint_type text not null default 'text' check (hint_type in ('text', 'image')),
+  hint_image_url text,
   hint_cost integer not null default 10 check (hint_cost >= 0),
   coin_reward_first integer not null default 20 check (coin_reward_first >= 0),
   coin_reward_second integer not null default 15 check (coin_reward_second >= 0),
@@ -44,6 +46,30 @@ alter table public.questions
   add column if not exists coin_reward_second integer;
 alter table public.questions
   add column if not exists coin_reward_third integer;
+alter table public.questions
+  add column if not exists hint_type text;
+alter table public.questions
+  add column if not exists hint_image_url text;
+
+do $$
+begin
+  update public.questions
+  set hint_type = coalesce(hint_type, 'text');
+
+  begin
+    alter table public.questions alter column hint_type set not null;
+  exception when others then null; end;
+
+  begin
+    alter table public.questions alter column hint_type set default 'text';
+  exception when others then null; end;
+
+  begin
+    alter table public.questions
+      add constraint questions_hint_type_check
+      check (hint_type in ('text', 'image'));
+  exception when others then null; end;
+end $$;
 
 do $$
 begin
@@ -289,7 +315,7 @@ as $$
     'questions', (
       select coalesce(jsonb_agg(q order by q.question_no), '[]'::jsonb)
       from (
-        select id, question_no, question_text, correct_answer, hint, hint_cost, coin_reward_first, coin_reward_second, coin_reward_third
+        select id, question_no, question_text, correct_answer, hint, hint_type, hint_image_url, hint_cost, coin_reward_first, coin_reward_second, coin_reward_third
         from questions
         where game_id = (select id from games where code = p_game_code limit 1)
       ) q

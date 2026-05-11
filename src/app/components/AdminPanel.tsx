@@ -6,6 +6,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Team, Question, QuestionStatus } from '../types';
 import { motion } from 'motion/react';
 import { formatDirectionDigits, parseDirectionDigits, directionDigitsToArrows } from '../utils/answerCodec';
+import { isSupabaseConfigured } from '../../lib/supabase';
+import { uploadHintImage } from '../services/gameService';
 
 export type AdminPanelProps = {
   teams: Team[];
@@ -15,7 +17,7 @@ export type AdminPanelProps = {
   timerRunning: boolean;
   onClose: () => void;
   onUpdateTeam: (teamId: string, updates: Partial<Team>) => void;
-  onUpdateQuestion: (questionId: number, updates: Partial<Question>) => void;
+  onUpdateQuestion: (questionId: number, updates: Partial<Question>) => Promise<void> | void;
   onResetQuestion: (questionId: number) => void;
   onResetAllQuestions: () => void;
   onResetAllTeams: () => void;
@@ -129,11 +131,11 @@ export function AdminPanel({
     }
   };
 
-  const handleQuestionSave = (questionId: number) => {
+  const handleQuestionSave = async (questionId: number) => {
     const nextCorrectAnswer: Question['correctAnswer'] =
       answerTypeDraft === 'directionLock' ? parseDirectionDigits(correctAnswerDraft) : correctAnswerDraft;
 
-    onUpdateQuestion(questionId, {
+    await onUpdateQuestion(questionId, {
       ...questionEdits,
       answerType: answerTypeDraft,
       correctAnswer: nextCorrectAnswer,
@@ -141,6 +143,28 @@ export function AdminPanel({
     setEditingQuestion(null);
     setQuestionEdits({});
     setCorrectAnswerDraft('');
+  };
+
+  const handleHintTypeChange = (nextType: NonNullable<Question['hintType']>) => {
+    setQuestionEdits((prev) => {
+      const next: Partial<Question> = { ...prev, hintType: nextType };
+      if (nextType === 'text') {
+        next.hintImageUrl = '';
+      }
+      return next;
+    });
+  };
+
+  const handleHintImagePick = async (questionId: number, file: File | null) => {
+    if (!file) return;
+    if (!isSupabaseConfigured) return;
+
+    const url = await uploadHintImage(questionId, file);
+    setQuestionEdits((prev) => ({
+      ...prev,
+      hintType: 'image',
+      hintImageUrl: url,
+    }));
   };
 
   const formatTime = (seconds: number) => {
@@ -287,16 +311,73 @@ export function AdminPanel({
                             </td>
                             <td className="px-4 py-3">
                               {isEditing ? (
-                                <Input
-                                  value={questionEdits.hint || ''}
-                                  onChange={(e) =>
-                                    setQuestionEdits({ ...questionEdits, hint: e.target.value })
-                                  }
-                                  className="bg-gray-700 border-gray-600 text-white text-xs"
-                                />
+                                <div className="space-y-2 min-w-[260px]">
+                                  <div className="flex items-center gap-2">
+                                    <select
+                                      value={(questionEdits.hintType ?? 'text') as any}
+                                      onChange={(e) => handleHintTypeChange(e.target.value as any)}
+                                      className="h-9 rounded-md bg-gray-700 border border-gray-600 text-white text-xs px-2"
+                                    >
+                                      <option value="text">text</option>
+                                      <option value="image">image</option>
+                                    </select>
+                                    {(questionEdits.hintType ?? 'text') === 'image' && (
+                                      <div className="text-[11px] text-gray-300">
+                                        {isSupabaseConfigured ? '업로드 또는 URL' : 'URL만 가능(로컬)'}
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  {(questionEdits.hintType ?? 'text') === 'image' ? (
+                                    <div className="space-y-2">
+                                      {isSupabaseConfigured && (
+                                        <Input
+                                          type="file"
+                                          accept="image/*"
+                                          onChange={(e) => {
+                                            const file = e.target.files?.[0] ?? null;
+                                            void handleHintImagePick(question.id, file);
+                                          }}
+                                          className="bg-gray-700 border-gray-600 text-white text-xs"
+                                        />
+                                      )}
+                                      <Input
+                                        value={questionEdits.hintImageUrl || ''}
+                                        onChange={(e) =>
+                                          setQuestionEdits({ ...questionEdits, hintImageUrl: e.target.value })
+                                        }
+                                        placeholder="Hint image URL (public)"
+                                        className="bg-gray-700 border-gray-600 text-white text-xs"
+                                      />
+                                      <Input
+                                        value={questionEdits.hint || ''}
+                                        onChange={(e) =>
+                                          setQuestionEdits({ ...questionEdits, hint: e.target.value })
+                                        }
+                                        placeholder="(optional) caption text"
+                                        className="bg-gray-700 border-gray-600 text-white text-xs"
+                                      />
+                                      {questionEdits.hintImageUrl ? (
+                                        <img
+                                          src={questionEdits.hintImageUrl}
+                                          alt="Hint preview"
+                                          className="mt-1 max-h-20 w-auto rounded border border-white/10"
+                                        />
+                                      ) : null}
+                                    </div>
+                                  ) : (
+                                    <Input
+                                      value={questionEdits.hint || ''}
+                                      onChange={(e) =>
+                                        setQuestionEdits({ ...questionEdits, hint: e.target.value })
+                                      }
+                                      className="bg-gray-700 border-gray-600 text-white text-xs"
+                                    />
+                                  )}
+                                </div>
                               ) : (
                                 <span className="text-yellow-400 text-xs line-clamp-1">
-                                  {question.hint}
+                                  {question.hintType === 'image' ? (question.hintImageUrl ? '🖼️ image hint' : '🖼️ image (missing)') : question.hint}
                                 </span>
                               )}
                             </td>
@@ -389,7 +470,7 @@ export function AdminPanel({
                                   <>
                                     <Button
                                       size="sm"
-                                      onClick={() => handleQuestionSave(question.id)}
+                                      onClick={() => void handleQuestionSave(question.id)}
                                       className="bg-green-600 hover:bg-green-700 text-white h-7 px-2 text-xs"
                                     >
                                       <Save className="w-3 h-3 mr-1" />

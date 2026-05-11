@@ -12,6 +12,7 @@ export interface GameSnapshot {
 }
 
 const GAME_CODE = import.meta.env.VITE_GAME_CODE ?? 'demo-room'
+const HINT_IMAGE_BUCKET = import.meta.env.VITE_SUPABASE_HINT_IMAGE_BUCKET ?? 'hint-images'
 
 function buildLocalSnapshot(): GameSnapshot {
   return {
@@ -53,6 +54,8 @@ function mapSnapshot(payload: any): GameSnapshot {
     questionText: question.question_text,
     ...decodeCorrectAnswer(question.correct_answer),
     hint: question.hint,
+    hintType: (question.hint_type as Question['hintType']) ?? 'text',
+    hintImageUrl: question.hint_image_url ?? '',
     hintCost: question.hint_cost,
     coinRewardFirst: question.coin_reward_first ?? question.coin_reward,
     coinRewardSecond: question.coin_reward_second ?? Math.max(0, Math.floor((question.coin_reward ?? 0) * 0.6)),
@@ -210,6 +213,8 @@ export async function updateQuestion(questionId: number, updates: Partial<Questi
       question_text: updates.questionText,
       correct_answer: hasAnswerUpdate ? encodeCorrectAnswer(answerType, correctAnswer) : undefined,
       hint: updates.hint,
+      hint_type: updates.hintType,
+      hint_image_url: updates.hintImageUrl,
       hint_cost: updates.hintCost,
       coin_reward_first: updates.coinRewardFirst,
       coin_reward_second: updates.coinRewardSecond,
@@ -220,6 +225,33 @@ export async function updateQuestion(questionId: number, updates: Partial<Questi
   if (error) {
     throw error
   }
+}
+
+export async function uploadHintImage(questionId: number, file: File) {
+  ensureConfigured()
+  const supabase = requireSupabase()
+
+  const ext = file.name.split('.').pop()?.toLowerCase() || 'png'
+  const safeExt = /^[a-z0-9]+$/.test(ext) ? ext : 'png'
+  const path = `${GAME_CODE}/q${String(questionId).padStart(3, '0')}/${Date.now()}.${safeExt}`
+
+  const { error: uploadError } = await supabase.storage
+    .from(HINT_IMAGE_BUCKET)
+    .upload(path, file, {
+      cacheControl: '3600',
+      upsert: true,
+      contentType: file.type || undefined,
+    })
+
+  if (uploadError) throw uploadError
+
+  const { data } = supabase.storage.from(HINT_IMAGE_BUCKET).getPublicUrl(path)
+  const publicUrl = data?.publicUrl
+  if (!publicUrl) {
+    throw new Error('Failed to get public URL for uploaded hint image.')
+  }
+
+  return publicUrl
 }
 
 export async function resetQuestion(questionId: number) {
