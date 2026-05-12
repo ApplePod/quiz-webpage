@@ -30,7 +30,7 @@ function buildMarqueeStrip(urls: readonly string[]): string[] {
 }
 
 export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) {
-  const title = '윤월 소개팅 방탈출'
+  const title = '신개념 방탈출 소개팅(BAR-O)'
   const chars = Array.from(title)
   const slideNodesRef = useRef<HTMLElement[]>([])
 
@@ -291,7 +291,7 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
             </div>
 
             <div className="text-xs tracking-[0.2em] text-[#f9c059]/85">
-              방탈출로 얼음깨기, 소개팅은 덤
+              윤월주관
             </div>
 
             <h1 className="mt-3 text-3xl sm:text-4xl font-bold mystery-title">
@@ -330,9 +330,7 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
               transition={{ delay: 0.25, duration: 0.6 }}
               className="mt-3 mystery-subtitle leading-relaxed text-sm sm:text-base"
             >
-              윤월이 주최하는 방탈출 + 소개팅 벙에 오신 걸 환영합니다.
-              <br />
-              아래에서 팀 인증 후, 문제를 풀면서 자연스럽게 친해져요.
+              아래 팀 인증 후 문제를 풀면서 자연스럽게 친해져요.
             </motion.p>
 
             <div className="mt-8">
