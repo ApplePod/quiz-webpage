@@ -54,8 +54,7 @@ export function AnswerScreen({
   const [displayTeamCoins, setDisplayTeamCoins] = useState<number>(team.coins);
   const [directionDigits, setDirectionDigits] = useState<number[]>([]);
   const [lastDirectionDigit, setLastDirectionDigit] = useState<number | null>(null);
-  const [hintModalOpen, setHintModalOpen] = useState(false);
-  const [hintModalPanel, setHintModalPanel] = useState<'confirm' | 'recharge'>('confirm');
+  const [showHintDialog, setShowHintDialog] = useState(false);
   const [hintRevealed, setHintRevealed] = useState(false);
   const [result, setResult] = useState<'correct' | 'incorrect' | 'locked' | null>(null);
   const [showResultDialog, setShowResultDialog] = useState(false);
@@ -67,6 +66,9 @@ export function AnswerScreen({
   const [showSolvedFx, setShowSolvedFx] = useState(false);
   const [resolvedReward, setResolvedReward] = useState<number | null>(null);
   const [hintInsufficientCoins, setHintInsufficientCoins] = useState(false);
+  const [showRechargeDialog, setShowRechargeDialog] = useState(false);
+  /** Radix: opening a second Dialog in the same tick as closing the first is unreliable; open after close. */
+  const pendingRechargeAfterHintCloseRef = useRef(false);
   const rewardForCurrentOrder =
     solveCount === 0
       ? question.coinRewardFirst
@@ -391,14 +393,27 @@ export function AnswerScreen({
 
   const handleHintConfirm = () => {
     if (hintInsufficientCoins) {
-      setHintModalPanel('recharge');
+      pendingRechargeAfterHintCloseRef.current = true;
+      setShowHintDialog(false);
       return;
     }
 
-    setHintModalOpen(false);
+    setShowHintDialog(false);
     setHintRevealed(true);
     onHintRequest(team.id, question.id);
   };
+
+  useEffect(() => {
+    if (showHintDialog) return;
+    if (!pendingRechargeAfterHintCloseRef.current) return;
+
+    const id = window.setTimeout(() => {
+      pendingRechargeAfterHintCloseRef.current = false;
+      setShowRechargeDialog(true);
+    }, 200);
+
+    return () => window.clearTimeout(id);
+  }, [showHintDialog]);
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
@@ -701,9 +716,9 @@ export function AnswerScreen({
                     type="button"
                     variant="outline"
                     onClick={() => {
-                      setHintInsufficientCoins(displayTeamCoins < question.hintCost);
-                      setHintModalPanel('confirm');
-                      setHintModalOpen(true);
+                      pendingRechargeAfterHintCloseRef.current = false;
+                      setHintInsufficientCoins(team.coins < question.hintCost);
+                      setShowHintDialog(true);
                     }}
                     className="w-full border-amber-900/40 bg-amber-50 text-amber-950 shadow-[0_2px_0_rgba(120,53,15,0.08)] hover:bg-amber-100 hover:border-amber-900/55 hover:text-amber-950"
                     disabled={hintPurchased}
@@ -718,130 +733,81 @@ export function AnswerScreen({
         </motion.div>
       </div>
 
-      {/* 힌트 확인 + 무료충전 안내: 단일 Dialog (Radix 이중 다이얼로그 이슈 방지) */}
+      {/* Hint Confirmation Dialog */}
       <Dialog
-        open={hintModalOpen}
+        open={showHintDialog}
         onOpenChange={(open) => {
-          setHintModalOpen(open);
-          if (!open) setHintModalPanel('confirm');
+          setShowHintDialog(open);
+          if (open) pendingRechargeAfterHintCloseRef.current = false;
         }}
       >
         <DialogContent
-          key={hintModalPanel}
           className={
-            hintModalPanel === 'recharge'
-              ? 'relative overflow-hidden border-2 border-violet-200/90 bg-gradient-to-br from-violet-50/95 via-white to-cyan-50/90 p-6 shadow-[0_22px_50px_-12px_rgba(139,92,246,0.28)] sm:max-w-md [&>button]:text-violet-400 [&>button]:hover:bg-violet-100/80 [&>button]:hover:text-violet-700'
-              : hintInsufficientCoins
-                ? 'border-2 border-red-500 bg-white text-red-600 shadow-xl sm:max-w-md'
-                : 'border border-border bg-white text-foreground shadow-xl'
+            hintInsufficientCoins
+              ? 'border-2 border-red-500 bg-white text-red-600 shadow-xl sm:max-w-md'
+              : 'border border-border bg-white text-foreground shadow-xl'
           }
         >
-          {hintModalPanel === 'recharge' ? (
-            <>
-              <div
-                className="pointer-events-none absolute -right-20 -top-24 h-56 w-56 rounded-full bg-gradient-to-br from-fuchsia-200/55 to-violet-200/45 blur-3xl"
-                aria-hidden
-              />
-              <div
-                className="pointer-events-none absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-gradient-to-tr from-cyan-200/50 to-sky-100/55 blur-3xl"
-                aria-hidden
-              />
-              <div
-                className="pointer-events-none absolute left-1/2 top-1/2 h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full bg-amber-100/35 blur-3xl"
-                aria-hidden
-              />
-
-              <DialogHeader className="relative z-10 gap-4 text-left sm:text-left">
-                <DialogTitle className="flex items-center gap-3 text-xl font-bold tracking-tight text-violet-950 sm:text-2xl">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-200/90 to-fuchsia-200/80 shadow-inner ring-2 ring-white/90">
-                    <Sparkles className="h-6 w-6 text-violet-700" aria-hidden />
-                  </div>
-                  무료충전 안내
-                </DialogTitle>
-                <DialogDescription asChild>
-                  <div className="space-y-3 rounded-2xl border border-violet-100/90 bg-white/55 px-4 py-4 text-[15px] leading-relaxed text-violet-900/85 shadow-sm backdrop-blur-[2px] sm:text-base">
-                    <p className="font-medium text-violet-950">
-                      무료 충전을 위해{' '}
-                      <span className="rounded-md bg-gradient-to-r from-violet-100 to-fuchsia-100 px-1.5 py-0.5 text-violet-900">
-                        카운터로 와주세요
-                      </span>
-                      .
-                    </p>
-                    <p className="text-violet-800/90">스태프가 바로 코인을 충전해드릴게요.</p>
-                  </div>
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter className="relative z-10 pt-2 sm:justify-center">
-                <Button
-                  type="button"
-                  onClick={() => setHintModalOpen(false)}
-                  className="rounded-full border-0 bg-gradient-to-r from-violet-500 via-fuchsia-500 to-violet-500 bg-[length:200%_100%] px-10 font-semibold text-white shadow-lg shadow-violet-300/45 transition-[background-position,transform] hover:bg-[position:100%_0] hover:shadow-violet-400/50 active:scale-[0.98]"
-                >
-                  확인
-                </Button>
-              </DialogFooter>
-            </>
-          ) : (
-            <>
-              <DialogHeader>
-                <DialogTitle
-                  className={
-                    hintInsufficientCoins
-                      ? 'flex items-center gap-2 text-xl font-bold text-red-600'
-                      : 'flex items-center gap-2 text-foreground'
-                  }
-                >
-                  {hintInsufficientCoins ? (
-                    <>
-                      <AlertTriangle className="h-6 w-6 shrink-0 text-red-600" aria-hidden />
-                      경고
-                    </>
-                  ) : (
-                    <>
-                      <Lightbulb className="h-6 w-6 shrink-0 text-amber-600" aria-hidden />
-                      힌트보기
-                    </>
-                  )}
-                </DialogTitle>
-                <DialogDescription
-                  className={
-                    hintInsufficientCoins
-                      ? 'text-lg font-semibold leading-snug text-red-600 sm:text-xl'
-                      : 'text-base text-muted-foreground'
-                  }
-                >
-                  {hintInsufficientCoins
-                    ? '코인이 부족합니다. 무료충전하시겠습니까?'
-                    : `힌트를 보면 팀 코인에서 ${question.hintCost}코인이 차감돼요. 계속할까요?`}
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setHintModalOpen(false)}
-                  className={
-                    hintInsufficientCoins
-                      ? 'border-red-500 text-red-600 hover:bg-red-50'
-                      : 'border-border text-foreground hover:bg-muted/80'
-                  }
-                >
-                  취소
-                </Button>
-                <Button
-                  type="button"
-                  onClick={handleHintConfirm}
-                  className={
-                    hintInsufficientCoins
-                      ? 'bg-red-600 font-semibold text-white hover:bg-red-700'
-                      : 'border border-primary/20 bg-primary font-semibold text-primary-foreground hover:opacity-95'
-                  }
-                >
-                  확인
-                </Button>
-              </DialogFooter>
-            </>
-          )}
+          <DialogHeader>
+            <DialogTitle
+              className={
+                hintInsufficientCoins
+                  ? 'flex items-center gap-2 text-xl font-bold text-red-600'
+                  : 'flex items-center gap-2 text-foreground'
+              }
+            >
+              {hintInsufficientCoins ? (
+                <>
+                  <AlertTriangle className="h-6 w-6 shrink-0 text-red-600" aria-hidden />
+                  경고
+                </>
+              ) : (
+                <>
+                  <Lightbulb className="h-6 w-6 shrink-0 text-amber-600" aria-hidden />
+                  힌트보기
+                </>
+              )}
+            </DialogTitle>
+            <DialogDescription
+              className={
+                hintInsufficientCoins
+                  ? 'text-lg font-semibold leading-snug text-red-600 sm:text-xl'
+                  : 'text-base text-muted-foreground'
+              }
+            >
+              {hintInsufficientCoins
+                ? '코인이 부족합니다. 무료충전하시겠습니까?'
+                : `힌트를 보면 팀 코인에서 ${question.hintCost}코인이 차감돼요. 계속할까요?`}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                pendingRechargeAfterHintCloseRef.current = false;
+                setShowHintDialog(false);
+              }}
+              className={
+                hintInsufficientCoins
+                  ? 'border-red-500 text-red-600 hover:bg-red-50'
+                  : 'border-border text-foreground hover:bg-muted/80'
+              }
+            >
+              취소
+            </Button>
+            <Button
+              type="button"
+              onClick={handleHintConfirm}
+              className={
+                hintInsufficientCoins
+                  ? 'bg-red-600 font-semibold text-white hover:bg-red-700'
+                  : 'border border-primary/20 bg-primary font-semibold text-primary-foreground hover:opacity-95'
+              }
+            >
+              확인
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
@@ -947,6 +913,52 @@ export function AnswerScreen({
         </DialogContent>
       </Dialog>
 
+      {/* Recharge 안내 Dialog */}
+      <Dialog open={showRechargeDialog} onOpenChange={setShowRechargeDialog}>
+        <DialogContent className="relative overflow-hidden border-2 border-violet-200/90 bg-gradient-to-br from-violet-50/95 via-white to-cyan-50/90 p-6 shadow-[0_22px_50px_-12px_rgba(139,92,246,0.28)] sm:max-w-md [&>button]:text-violet-400 [&>button]:hover:bg-violet-100/80 [&>button]:hover:text-violet-700">
+          <div
+            className="pointer-events-none absolute -right-20 -top-24 h-56 w-56 rounded-full bg-gradient-to-br from-fuchsia-200/55 to-violet-200/45 blur-3xl"
+            aria-hidden
+          />
+          <div
+            className="pointer-events-none absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-gradient-to-tr from-cyan-200/50 to-sky-100/55 blur-3xl"
+            aria-hidden
+          />
+          <div
+            className="pointer-events-none absolute left-1/2 top-1/2 h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full bg-amber-100/35 blur-3xl"
+            aria-hidden
+          />
+
+          <DialogHeader className="relative z-10 gap-4 text-left sm:text-left">
+            <DialogTitle className="flex items-center gap-3 text-xl font-bold tracking-tight text-violet-950 sm:text-2xl">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-200/90 to-fuchsia-200/80 shadow-inner ring-2 ring-white/90">
+                <Sparkles className="h-6 w-6 text-violet-700" aria-hidden />
+              </div>
+              무료충전 안내
+            </DialogTitle>
+            <DialogDescription asChild>
+              <div className="space-y-3 rounded-2xl border border-violet-100/90 bg-white/55 px-4 py-4 text-[15px] leading-relaxed text-violet-900/85 shadow-sm backdrop-blur-[2px] sm:text-base">
+                <p className="font-medium text-violet-950">
+                  무료 충전을 위해{' '}
+                  <span className="rounded-md bg-gradient-to-r from-violet-100 to-fuchsia-100 px-1.5 py-0.5 text-violet-900">
+                    카운터로 와주세요
+                  </span>
+                  .
+                </p>
+                <p className="text-violet-800/90">스태프가 바로 코인을 충전해드릴게요.</p>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="relative z-10 pt-2 sm:justify-center">
+            <Button
+              onClick={() => setShowRechargeDialog(false)}
+              className="rounded-full border-0 bg-gradient-to-r from-violet-500 via-fuchsia-500 to-violet-500 bg-[length:200%_100%] px-10 font-semibold text-white shadow-lg shadow-violet-300/45 transition-[background-position,transform] hover:bg-[position:100%_0] hover:shadow-violet-400/50 active:scale-[0.98]"
+            >
+              확인
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
