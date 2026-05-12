@@ -1,13 +1,20 @@
 // Team-based Quiz Application Types
 
+export interface TeamParticipant {
+  name: string;
+  gender?: 'F' | 'M' | null;
+}
+
 export interface Team {
   id: string;
   /** 팀명 (스코어보드·관리자 등; 인트로 카드에는 비표시) */
   name: string;
-  /** 인트로 등에 표시할 참가자 이름 */
+  /** 인트로 등에 표시할 참가자 이름 (레거시·첫 참가자와 동기화 권장) */
   participantName?: string;
-  /** 성별 표시. 비우면 인트로에서 팀 목록 순서로 F/M 추정 */
+  /** 성별 표시 (레거시·첫 참가자와 동기화 권장). 비우면 인트로에서 카드 순서로 F/M 추정 */
   gender?: 'F' | 'M' | null;
+  /** 인트로: 참가자 1명당 카드 1장. 비어 있으면 participantName+gender로 1장 */
+  participants?: TeamParticipant[];
   coins: number;
   password: string;
 }

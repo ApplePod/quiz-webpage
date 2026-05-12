@@ -24,6 +24,7 @@ create table if not exists public.teams (
 
 alter table public.teams add column if not exists participant_name text not null default '';
 alter table public.teams add column if not exists gender text;
+alter table public.teams add column if not exists participants jsonb not null default '[]'::jsonb;
 
 create table if not exists public.questions (
   id uuid primary key default gen_random_uuid(),
@@ -310,7 +311,7 @@ as $$
     'teams', (
       select coalesce(jsonb_agg(t order by t.team_code), '[]'::jsonb)
       from (
-        select id, team_code, name, participant_name, gender, coins, password
+        select id, team_code, name, participant_name, gender, participants, coins, password
         from teams
         where game_id = (select id from games where code = p_game_code limit 1)
       ) t

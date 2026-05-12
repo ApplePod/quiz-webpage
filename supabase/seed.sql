@@ -9,22 +9,82 @@ on conflict (code) do update set
 with game_ref as (
   select id from public.games where code = 'demo-room'
 )
-insert into public.teams (game_id, team_code, name, participant_name, gender, coins, password)
-select game_ref.id, valueset.team_code, valueset.name, valueset.participant_name, nullif(trim(valueset.gender), ''), valueset.coins, valueset.password
+insert into public.teams (game_id, team_code, name, participant_name, gender, participants, coins, password)
+select
+  game_ref.id,
+  v.team_code,
+  v.name,
+  v.participant_name,
+  nullif(trim(v.gender), ''),
+  v.participants,
+  v.coins,
+  v.password
 from game_ref,
 (
   values
-    ('A', 'Group A', '참가자 A', 'F', 0, '1'),
-    ('B', 'Group B', '참가자 B', 'F', 0, '1'),
-    ('C', 'Group C', '참가자 C', 'F', 0, '1'),
-    ('D', 'Group D', '참가자 D', 'M', 0, '1'),
-    ('E', 'Group E', '참가자 E', 'M', 0, '1'),
-    ('F', 'Group F', '참가자 F', 'M', 0, '1')
-) as valueset(team_code, name, participant_name, gender, coins, password)
+    (
+      'A',
+      'Group A',
+      '참가자 A1',
+      'F',
+      jsonb_build_array(
+        jsonb_build_object('name', '참가자 A1', 'gender', 'F'),
+        jsonb_build_object('name', '참가자 A2', 'gender', 'M')
+      ),
+      0,
+      '1'
+    ),
+    (
+      'B',
+      'Group B',
+      '참가자 B',
+      'F',
+      jsonb_build_array(jsonb_build_object('name', '참가자 B', 'gender', 'F')),
+      0,
+      '1'
+    ),
+    (
+      'C',
+      'Group C',
+      '참가자 C',
+      'F',
+      jsonb_build_array(jsonb_build_object('name', '참가자 C', 'gender', 'F')),
+      0,
+      '1'
+    ),
+    (
+      'D',
+      'Group D',
+      '참가자 D',
+      'M',
+      jsonb_build_array(jsonb_build_object('name', '참가자 D', 'gender', 'M')),
+      0,
+      '1'
+    ),
+    (
+      'E',
+      'Group E',
+      '참가자 E',
+      'M',
+      jsonb_build_array(jsonb_build_object('name', '참가자 E', 'gender', 'M')),
+      0,
+      '1'
+    ),
+    (
+      'F',
+      'Group F',
+      '참가자 F',
+      'M',
+      jsonb_build_array(jsonb_build_object('name', '참가자 F', 'gender', 'M')),
+      0,
+      '1'
+    )
+) as v(team_code, name, participant_name, gender, participants, coins, password)
 on conflict (game_id, team_code) do update set
   name = excluded.name,
   participant_name = excluded.participant_name,
   gender = excluded.gender,
+  participants = excluded.participants,
   coins = excluded.coins,
   password = excluded.password;
 

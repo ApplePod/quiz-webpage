@@ -1,6 +1,7 @@
 import { RealtimeChannel } from '@supabase/supabase-js'
 import { initialQuestions, initialTeams } from '../data/initialData'
 import { GameMeta, Question, QuestionStatus, Team, TeamAdminUpdate } from '../types'
+import { mergeParticipantsFromSnapshot } from '../utils/teamParticipants'
 import { isSupabaseConfigured, requireSupabase } from '../../lib/supabase'
 import { decodeCorrectAnswer, encodeCorrectAnswer } from '../utils/answerCodec'
 
@@ -53,14 +54,20 @@ function mapSnapshot(payload: any): GameSnapshot {
     throw new Error('Game snapshot is missing game metadata.')
   }
 
-  const teams: Team[] = (payload.teams ?? []).map((team: any) => ({
-    id: team.team_code,
-    name: team.name,
-    participantName: typeof team.participant_name === 'string' ? team.participant_name : '',
-    gender: team.gender === 'F' || team.gender === 'M' ? team.gender : null,
-    coins: team.coins,
-    password: team.password,
-  }))
+  const teams: Team[] = (payload.teams ?? []).map((team: any) => {
+    const participantName = typeof team.participant_name === 'string' ? team.participant_name : ''
+    const gender = team.gender === 'F' || team.gender === 'M' ? team.gender : null
+    const participants = mergeParticipantsFromSnapshot(team.participants, participantName, team.gender)
+    return {
+      id: team.team_code,
+      name: team.name,
+      participantName,
+      gender,
+      participants,
+      coins: team.coins,
+      password: team.password,
+    }
+  })
 
   const questions: Question[] = (payload.questions ?? []).map((question: any) => ({
     id: normalizeQuestionId(question.question_no),
@@ -200,7 +207,7 @@ export async function updateTeam(teamId: string, updates: TeamAdminUpdate) {
   const patch: Record<string, unknown> = {}
   if (updates.name !== undefined) patch.name = updates.name
   if (updates.participantName !== undefined) patch.participant_name = updates.participantName
-  if (updates.gender !== undefined) patch.gender = updates.gender
+  if (updates.participants !== undefined) patch.participants = updates.participants
   if (updates.coins !== undefined) patch.coins = updates.coins
   if (updates.password !== undefined) patch.password = updates.password
 
@@ -329,6 +336,7 @@ export async function resetAllTeams() {
         name: team.name,
         participant_name: team.participantName ?? '',
         gender: team.gender ?? null,
+        participants: team.participants ?? [],
         password: team.password,
       })
       .eq('team_code', team.id),

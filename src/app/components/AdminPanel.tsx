@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { X, FileText, Users, Settings, RotateCcw, Play, Pause, Lock, Save, Coins, FlaskConical, ListOrdered, Filter, Search } from 'lucide-react';
+import { X, FileText, Users, Settings, RotateCcw, Play, Pause, Lock, Save, Coins, FlaskConical, ListOrdered, Filter, Search, Plus, Trash2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
@@ -8,6 +8,7 @@ import { motion } from 'motion/react';
 import { formatDirectionDigits, parseDirectionDigits, directionDigitsToArrows } from '../utils/answerCodec';
 import { isSupabaseConfigured } from '../../lib/supabase';
 import { uploadHintImage } from '../services/gameService';
+import { draftParticipantsForEdit, participantsListForTeam } from '../utils/teamParticipants';
 
 export type AdminPanelProps = {
   teams: Team[];
@@ -109,7 +110,7 @@ export function AdminPanel({
     const team = teams.find((t) => t.id === teamId);
     if (team) {
       setEditingTeam(teamId);
-      setTeamEdits({ ...team, newTeamCode: team.id });
+      setTeamEdits({ ...team, newTeamCode: team.id, participants: draftParticipantsForEdit(team) });
     }
   };
 
@@ -123,7 +124,20 @@ export function AdminPanel({
       window.alert('이미 사용 중인 팀 코드입니다.');
       return;
     }
-    onUpdateTeam(teamId, { ...teamEdits, newTeamCode: raw });
+    const rawList = (teamEdits.participants ?? [])
+      .map((p) => ({
+        name: (p.name ?? '').trim(),
+        gender: p.gender === 'F' || p.gender === 'M' ? p.gender : null,
+      }))
+      .filter((p) => p.name.length > 0);
+    const first = rawList[0];
+    onUpdateTeam(teamId, {
+      ...teamEdits,
+      newTeamCode: raw,
+      participants: rawList,
+      participantName: first?.name ?? '',
+      gender: first?.gender ?? null,
+    });
     setEditingTeam(null);
     setTeamEdits({});
   };
@@ -686,13 +700,16 @@ export function AdminPanel({
             {/* Teams Tab */}
             <TabsContent value="teams" className="mt-6">
               <div className="mb-4 rounded-xl border border-gray-600 bg-gray-900/40 px-4 py-3 text-sm text-gray-300 leading-relaxed">
-                <p className="font-semibold text-white mb-1">참가자 · 성별 · 팀 지정</p>
+                <p className="font-semibold text-white mb-1">팀 · 참가자 (인트로 카드)</p>
                 <p>
+                  <strong className="text-white">참가자</strong>는 한 팀에 여러 명 둘 수 있으며, 인트로 첫 화면 카드는{' '}
+                  <strong className="text-white">참가자 수만큼</strong> 늘어납니다. 각 줄마다 이름·성별(F/M/자동)을
+                  지정하고 <strong className="text-white">참가자 추가</strong>로 줄을 늘리세요.{' '}
                   아래 표에서 <strong className="text-white">Edit → Save</strong>로 반영합니다.{' '}
-                  <strong className="text-white">팀 코드</strong>는 로그인에 쓰이는 값(A, B, …)이고,{' '}
-                  <strong className="text-white">팀명</strong>은 스코어보드 등에 표시되는 이름입니다.{' '}
-                  <strong className="text-white">참가자 이름</strong>은 첫 화면(인트로) 카드에만 쓰입니다.{' '}
-                  성별은 <strong className="text-white">자동</strong>이면 팀 목록 순서로 F/M을 추정하고, F/M을 고르면 그대로 표시합니다.
+                  <strong className="text-white">팀 코드</strong>는 로그인에 쓰이는 값이고,{' '}
+                  <strong className="text-white">팀명</strong>은 스코어보드 등에 표시됩니다. 성별{' '}
+                  <strong className="text-white">자동</strong>은 인트로 카드 전체 순서에서 앞쪽 절반 F, 뒤 M으로
+                  맞춥니다.
                 </p>
               </div>
               <div className="bg-gray-800/50 rounded-xl border border-gray-700 overflow-hidden">
@@ -702,8 +719,7 @@ export function AdminPanel({
                       <tr>
                         <th className="px-4 py-3 text-left text-gray-300 font-semibold">팀 코드</th>
                         <th className="px-4 py-3 text-left text-gray-300 font-semibold">팀명</th>
-                        <th className="px-4 py-3 text-left text-gray-300 font-semibold">참가자 이름</th>
-                        <th className="px-4 py-3 text-left text-gray-300 font-semibold">성별</th>
+                        <th className="px-4 py-3 text-left text-gray-300 font-semibold">참가자 (인트로 카드)</th>
                         <th className="px-4 py-3 text-left text-gray-300 font-semibold">Coins</th>
                         <th className="px-4 py-3 text-left text-gray-300 font-semibold">Password</th>
                         <th className="px-4 py-3 text-left text-gray-300 font-semibold">Actions</th>
@@ -744,44 +760,87 @@ export function AdminPanel({
                                 <span className="text-white font-semibold">{team.name}</span>
                               )}
                             </td>
-                            <td className="px-4 py-3">
+                            <td className="px-4 py-3 align-top max-w-md">
                               {isEditing ? (
-                                <Input
-                                  value={teamEdits.participantName ?? ''}
-                                  onChange={(e) =>
-                                    setTeamEdits({ ...teamEdits, participantName: e.target.value })
-                                  }
-                                  placeholder="인트로에 표시"
-                                  className="bg-gray-700 border-gray-600 text-white"
-                                />
+                                <div className="space-y-2">
+                                  {(teamEdits.participants ?? [{ name: '', gender: null }]).map((p, i) => (
+                                    <div key={i} className="flex flex-wrap items-end gap-2">
+                                      <Input
+                                        value={p.name}
+                                        onChange={(e) => {
+                                          const next = [...(teamEdits.participants ?? [])];
+                                          next[i] = { ...next[i], name: e.target.value };
+                                          setTeamEdits({ ...teamEdits, participants: next });
+                                        }}
+                                        placeholder="이름"
+                                        className="bg-gray-700 border-gray-600 text-white flex-1 min-w-[120px]"
+                                      />
+                                      <select
+                                        value={p.gender === 'F' || p.gender === 'M' ? p.gender : ''}
+                                        onChange={(e) => {
+                                          const v = e.target.value;
+                                          const next = [...(teamEdits.participants ?? [])];
+                                          next[i] = {
+                                            ...next[i],
+                                            gender: v === '' ? null : (v as 'F' | 'M'),
+                                          };
+                                          setTeamEdits({ ...teamEdits, participants: next });
+                                        }}
+                                        className="h-9 rounded-md bg-gray-700 border border-gray-600 text-white text-sm px-2 min-w-[110px]"
+                                      >
+                                        <option value="">자동</option>
+                                        <option value="F">F</option>
+                                        <option value="M">M</option>
+                                      </select>
+                                      <Button
+                                        type="button"
+                                        size="sm"
+                                        variant="outline"
+                                        className="border-gray-600 text-gray-300 shrink-0"
+                                        onClick={() => {
+                                          const next = [...(teamEdits.participants ?? [])];
+                                          next.splice(i, 1);
+                                          if (next.length === 0) next.push({ name: '', gender: null });
+                                          setTeamEdits({ ...teamEdits, participants: next });
+                                        }}
+                                        aria-label="참가자 줄 삭제"
+                                      >
+                                        <Trash2 className="w-4 h-4" />
+                                      </Button>
+                                    </div>
+                                  ))}
+                                  <Button
+                                    type="button"
+                                    size="sm"
+                                    variant="secondary"
+                                    className="bg-gray-700 text-white hover:bg-gray-600"
+                                    onClick={() =>
+                                      setTeamEdits({
+                                        ...teamEdits,
+                                        participants: [
+                                          ...(teamEdits.participants ?? []),
+                                          { name: '', gender: null },
+                                        ],
+                                      })
+                                    }
+                                  >
+                                    <Plus className="w-4 h-4 mr-1" />
+                                    참가자 추가
+                                  </Button>
+                                </div>
                               ) : (
-                                <span className="text-gray-200">
-                                  {(team.participantName ?? '').trim() || '—'}
-                                </span>
-                              )}
-                            </td>
-                            <td className="px-4 py-3">
-                              {isEditing ? (
-                                <select
-                                  value={teamEdits.gender === 'F' || teamEdits.gender === 'M' ? teamEdits.gender : ''}
-                                  onChange={(e) => {
-                                    const v = e.target.value
-                                    setTeamEdits({
-                                      ...teamEdits,
-                                      gender: v === '' ? null : (v as 'F' | 'M'),
-                                    })
-                                  }}
-                                  className="h-9 rounded-md bg-gray-700 border border-gray-600 text-white text-sm px-2 min-w-[120px]"
-                                >
-                                  <option value="">자동 (목록 순)</option>
-                                  <option value="F">F</option>
-                                  <option value="M">M</option>
-                                </select>
-                              ) : (
-                                <span className="text-gray-300">
-                                  {team.gender === 'F' || team.gender === 'M'
-                                    ? team.gender
-                                    : '자동'}
+                                <span className="text-gray-200 text-sm leading-snug">
+                                  {(() => {
+                                    const list = participantsListForTeam(team);
+                                    if (list.length === 0) return '—';
+                                    return list
+                                      .map((p) =>
+                                        p.gender === 'F' || p.gender === 'M'
+                                          ? `${p.name} (${p.gender})`
+                                          : p.name,
+                                      )
+                                      .join(', ');
+                                  })()}
                                 </span>
                               )}
                             </td>

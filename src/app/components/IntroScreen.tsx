@@ -5,6 +5,7 @@ import { Sparkles } from 'lucide-react'
 import { Button } from './ui/button'
 import { AdminButton } from './AdminButton'
 import type { Team } from '../types'
+import { flattenIntroCardsFromTeams } from '../utils/teamParticipants'
 
 type IntroScreenProps = {
   teams: Team[]
@@ -37,32 +38,42 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
   const marqueeTeams = useMemo(() => {
     if (teams.length > 0) return teams
     return [
-      { id: '—', name: '', participantName: '불러오는 중…', coins: 0, password: '' },
+      {
+        id: '—',
+        name: '',
+        participants: [{ name: '불러오는 중…', gender: null }],
+        coins: 0,
+        password: '',
+      },
     ] as Team[]
   }, [teams])
 
-  const loopTeams = useMemo(() => {
-    if (marqueeTeams.length === 0) return marqueeTeams
-    if (marqueeTeams.length >= 10) return marqueeTeams
-    const copies = Math.ceil(12 / marqueeTeams.length)
-    return Array.from({ length: copies }, () => marqueeTeams).flat()
-  }, [marqueeTeams])
+  const baseIntroCards = useMemo(() => flattenIntroCardsFromTeams(marqueeTeams), [marqueeTeams])
+
+  const loopIntroCards = useMemo(() => {
+    if (baseIntroCards.length === 0) {
+      return [{ key: 'empty', name: '—', gender: null as const }]
+    }
+    if (baseIntroCards.length >= 10) return baseIntroCards
+    const copies = Math.ceil(12 / baseIntroCards.length)
+    return Array.from({ length: copies }, () => baseIntroCards).flat()
+  }, [baseIntroCards])
 
   const startIndex = useMemo(() => {
     // Start from the middle so the carousel can move both directions.
-    return Math.floor(loopTeams.length / 2)
-  }, [loopTeams.length])
+    return Math.floor(loopIntroCards.length / 2)
+  }, [loopIntroCards.length])
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
-    loop: loopTeams.length > 1,
+    loop: loopIntroCards.length > 1,
     dragFree: false,
     align: 'center',
     containScroll: false,
     startIndex,
   })
 
-  // Teams list order: first half → F, second half → M (display letter only once per card).
-  const femaleCount = Math.max(1, Math.floor(marqueeTeams.length / 2))
+  // 카드 순서 기준 자동 성별: 앞쪽 절반 F, 뒤 M (개별 지정이 없을 때만 사용)
+  const femaleCount = Math.max(1, Math.floor(Math.max(1, baseIntroCards.length) / 2))
 
   const getGenderLetter = (teamIndex: number) => {
     const isFemale = teamIndex < femaleCount
@@ -122,7 +133,7 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
     // Ensure we land in the center even after data refresh/re-init.
     emblaApi?.scrollTo(startIndex, true)
     applyCoverflow()
-  }, [emblaApi, loopTeams, applyCoverflow, startIndex])
+  }, [emblaApi, loopIntroCards, applyCoverflow, startIndex])
 
   useEffect(() => {
     if (!emblaApi) return
@@ -197,11 +208,11 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
               aria-label="참가자 카드"
             >
               <div className="embla__container flex gap-4 pl-8 pr-8 py-6 [transform-style:preserve-3d]">
-                {loopTeams.map((team, idx) => (
+                {loopIntroCards.map((card, idx) => (
                   <div
                     ref={setSlideNode(idx)}
                     className="embla__slide min-w-[160px] sm:min-w-[200px] max-w-[220px] flex-[0_0_auto] will-change-transform transition-[filter] duration-300 [transform-style:preserve-3d]"
-                    key={`${team.id}-${team.name}-${idx}`}
+                    key={`${card.key}-${idx}`}
                   >
                     <div className="relative h-full overflow-hidden rounded-lg border border-border bg-white/75 backdrop-blur-md shadow-[0_0_0_1px_rgba(255,79,167,0.10),0_18px_55px_rgba(32,26,34,0.16)] aspect-[3/4] flex flex-col select-none">
                       <div
@@ -214,25 +225,19 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
                       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.88),rgba(255,255,255,0.65),rgba(255,255,255,0.92))]" />
                       <div className="relative flex-1 flex flex-col items-center justify-center p-3 text-center gap-2">
                         {(() => {
-                          const teamIndex =
-                            marqueeTeams.length === 0
-                              ? 0
-                              : Math.max(
-                                  0,
-                                  marqueeTeams.findIndex((t) => t.id === team.id),
-                                )
+                          const baseIndex =
+                            baseIntroCards.length === 0 ? 0 : idx % baseIntroCards.length
                           const genderLetter =
-                            team.gender === 'F' || team.gender === 'M'
-                              ? team.gender
-                              : getGenderLetter(teamIndex)
-                          const displayName = (team.participantName ?? '').trim() || '—'
+                            card.gender === 'F' || card.gender === 'M'
+                              ? card.gender
+                              : getGenderLetter(baseIndex)
                           return (
                             <>
                               <span
                                 className="text-sm font-semibold text-foreground leading-tight line-clamp-4"
                                 style={{ textShadow: '0 1px 0 rgba(255,255,255,0.9)' }}
                               >
-                                {displayName}
+                                {card.name}
                               </span>
                               <span
                                 className="text-[10px] tracking-widest uppercase text-foreground/65"
