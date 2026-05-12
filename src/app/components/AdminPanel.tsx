@@ -175,21 +175,21 @@ export function AdminPanel({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 px-4 py-8 overflow-auto">
+    <div className="fixed inset-0 bg-[rgba(32,26,34,0.28)] backdrop-blur-sm flex items-center justify-center z-50 px-4 py-8 overflow-auto">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-6xl shadow-2xl max-h-[90vh] flex flex-col"
+        className="bg-white/85 border border-border rounded-3xl w-full max-w-6xl shadow-[0_28px_90px_rgba(32,26,34,0.24)] max-h-[90vh] flex flex-col backdrop-blur-md"
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-700">
+        <div className="flex items-center justify-between p-6 border-b border-border/70">
           <div>
-            <h2 className="text-3xl font-bold text-white">Admin Panel</h2>
-            <p className="text-gray-400 mt-1">Manage quiz settings and data</p>
+            <h2 className="text-3xl font-bold text-foreground">Admin Panel</h2>
+            <p className="text-muted-foreground mt-1">Manage quiz settings and data</p>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-white transition-colors"
+            className="text-muted-foreground hover:text-foreground transition-colors"
           >
             <X className="w-6 h-6" />
           </button>
@@ -198,24 +198,24 @@ export function AdminPanel({
         {/* Content */}
         <div className="flex-1 overflow-auto p-6">
           <Tabs defaultValue="questions" className="w-full">
-            <TabsList className="bg-gray-800 border-gray-700">
-              <TabsTrigger value="questions" className="data-[state=active]:bg-gray-700">
+            <TabsList className="bg-white/60 border-border">
+              <TabsTrigger value="questions" className="data-[state=active]:bg-secondary">
                 <FileText className="w-4 h-4 mr-2" />
                 Questions
               </TabsTrigger>
-              <TabsTrigger value="solves" className="data-[state=active]:bg-gray-700">
+              <TabsTrigger value="solves" className="data-[state=active]:bg-secondary">
                 <ListOrdered className="w-4 h-4 mr-2" />
                 풀이 기록
               </TabsTrigger>
-              <TabsTrigger value="teams" className="data-[state=active]:bg-gray-700">
+              <TabsTrigger value="teams" className="data-[state=active]:bg-secondary">
                 <Users className="w-4 h-4 mr-2" />
                 Teams
               </TabsTrigger>
-              <TabsTrigger value="controls" className="data-[state=active]:bg-gray-700">
+              <TabsTrigger value="controls" className="data-[state=active]:bg-secondary">
                 <Settings className="w-4 h-4 mr-2" />
                 Game Controls
               </TabsTrigger>
-              <TabsTrigger value="test" className="data-[state=active]:bg-gray-700">
+              <TabsTrigger value="test" className="data-[state=active]:bg-secondary">
                 <FlaskConical className="w-4 h-4 mr-2" />
                 테스트/리셋
               </TabsTrigger>
@@ -223,20 +223,20 @@ export function AdminPanel({
 
             {/* Questions Tab */}
             <TabsContent value="questions" className="mt-6">
-              <div className="bg-gray-800/50 rounded-xl border border-gray-700 overflow-hidden">
+              <div className="bg-white/65 rounded-2xl border border-border overflow-hidden shadow-[0_16px_44px_rgba(32,26,34,0.10)]">
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
-                    <thead className="bg-gray-800 border-b border-gray-700">
+                    <thead className="bg-white/70 border-b border-border">
                       <tr>
-                        <th className="px-4 py-3 text-left text-gray-300 font-semibold">Q#</th>
-                        <th className="px-4 py-3 text-left text-gray-300 font-semibold">Question Text</th>
-                        <th className="px-4 py-3 text-left text-gray-300 font-semibold">Type</th>
-                        <th className="px-4 py-3 text-left text-gray-300 font-semibold">Answer</th>
-                        <th className="px-4 py-3 text-left text-gray-300 font-semibold">Hint</th>
-                        <th className="px-4 py-3 text-left text-gray-300 font-semibold">Hint Cost</th>
-                        <th className="px-4 py-3 text-left text-gray-300 font-semibold">Reward (1st/2nd/3rd)</th>
-                        <th className="px-4 py-3 text-left text-gray-300 font-semibold">Solves</th>
-                        <th className="px-4 py-3 text-left text-gray-300 font-semibold">Actions</th>
+                        <th className="px-4 py-3 text-left text-muted-foreground font-semibold">Q#</th>
+                        <th className="px-4 py-3 text-left text-muted-foreground font-semibold">Question Text</th>
+                        <th className="px-4 py-3 text-left text-muted-foreground font-semibold">Type</th>
+                        <th className="px-4 py-3 text-left text-muted-foreground font-semibold">Answer</th>
+                        <th className="px-4 py-3 text-left text-muted-foreground font-semibold">Hint</th>
+                        <th className="px-4 py-3 text-left text-muted-foreground font-semibold">Hint Cost</th>
+                        <th className="px-4 py-3 text-left text-muted-foreground font-semibold">Reward (1st/2nd/3rd)</th>
+                        <th className="px-4 py-3 text-left text-muted-foreground font-semibold">Solves</th>
+                        <th className="px-4 py-3 text-left text-muted-foreground font-semibold">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-700">

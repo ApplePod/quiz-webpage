@@ -437,7 +437,7 @@ export function AnswerScreen({
         <Button
           onClick={onBack}
           variant="ghost"
-          className="mb-6 text-white hover:bg-white/10 backdrop-blur-sm"
+          className="mb-6 text-foreground hover:bg-white/70 backdrop-blur-sm"
           disabled={showResultDialog || isSubmittingResult}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -448,25 +448,25 @@ export function AnswerScreen({
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/30 p-8 shadow-2xl"
+          className="bg-white/70 backdrop-blur-md rounded-3xl border border-border p-8 shadow-[0_22px_70px_rgba(32,26,34,0.16)]"
         >
           {/* Header */}
-          <div className="flex items-center justify-between mb-6 pb-6 border-b border-white/20">
+          <div className="flex items-center justify-between mb-6 pb-6 border-b border-border/70">
             <div>
-              <h3 className="text-sm text-gray-300">Question {question.id}</h3>
-              <h2 className="text-2xl font-bold text-white">{team.name}</h2>
+              <h3 className="text-sm text-muted-foreground">Question {question.id}</h3>
+              <h2 className="text-2xl font-bold text-foreground">{team.name}</h2>
             </div>
             <div className="flex gap-6">
               <div className="text-right">
-                <div className="text-sm text-gray-300">Reward</div>
-                <div className="text-3xl font-bold text-green-400 flex items-center gap-2">
+                <div className="text-sm text-muted-foreground">Reward</div>
+                <div className="text-3xl font-bold text-green-500 flex items-center gap-2">
                   <Coins className="w-7 h-7" />
                   {rewardForCurrentOrder}
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-sm text-gray-300">Team Coins</div>
-                <div className="text-3xl font-bold text-yellow-400">{displayTeamCoins}</div>
+                <div className="text-sm text-muted-foreground">Team Coins</div>
+                <div className="text-3xl font-bold text-primary">{displayTeamCoins}</div>
               </div>
             </div>
           </div>
@@ -476,9 +476,9 @@ export function AnswerScreen({
             <motion.div
               animate={retryShake ? { x: [-6, 6, -4, 4, -2, 2, 0] } : {}}
               transition={{ duration: 0.45 }}
-              className="bg-white/5 rounded-xl p-6 border border-white/20"
+              className="bg-white/60 rounded-2xl p-6 border border-border shadow-[0_12px_34px_rgba(32,26,34,0.10)]"
             >
-              <p className="text-xl text-white leading-relaxed">{question.questionText}</p>
+              <p className="text-xl text-foreground leading-relaxed">{question.questionText}</p>
             </motion.div>
           </div>
 
@@ -488,7 +488,7 @@ export function AnswerScreen({
               {question.answerType === 'text' ? (
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div>
-                    <label htmlFor="answer" className="block text-sm font-medium text-gray-300 mb-2">
+                    <label htmlFor="answer" className="block text-sm font-medium text-foreground/80 mb-2">
                       Your Answer
                     </label>
                     <Input
@@ -497,14 +497,14 @@ export function AnswerScreen({
                       value={answer}
                       onChange={(e) => setAnswer(e.target.value)}
                       placeholder="Type your answer here..."
-                      className="bg-black/40 border-white/40 text-white placeholder:text-white/50 focus:border-white/70 focus:ring-white/30 text-lg py-6"
+                      className="bg-white/80 border-border text-foreground placeholder:text-muted-foreground focus:border-primary/50 focus:ring-primary/25 text-lg py-6 rounded-2xl"
                       autoFocus
                     />
                   </div>
 
                   <Button
                     type="submit"
-                    className="w-full border border-white/40 bg-transparent text-white font-semibold py-6 text-lg hover:bg-white/10"
+                    className="w-full border border-primary/25 bg-primary text-primary-foreground font-semibold py-6 text-lg hover:opacity-95"
                     disabled={!answer.trim()}
                   >
                     <Send className="w-5 h-5 mr-2" />
@@ -515,37 +515,37 @@ export function AnswerScreen({
                 <div className="space-y-5">
                   <div className="flex items-center justify-between">
                     <div>
-                      <div className="text-sm font-medium text-gray-300">Direction Lock</div>
-                      <div className="text-xs text-gray-400 mt-1">
+                      <div className="text-sm font-medium text-foreground/85">Direction Lock</div>
+                      <div className="text-xs text-muted-foreground mt-1">
                         버튼(상/하/좌/우)을 눌러 입력하세요.
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-xs text-gray-400">Progress</div>
-                      <div className="text-sm text-white font-mono">
+                      <div className="text-xs text-muted-foreground">Progress</div>
+                      <div className="text-sm text-foreground font-mono">
                         {directionDigits.length}/{expectedDirectionDigits.length || '∞'}
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-white/5 rounded-xl border border-white/20 p-6">
+                  <div className="bg-white/60 rounded-2xl border border-border p-6 shadow-[0_12px_34px_rgba(32,26,34,0.10)]">
                     <div className="flex items-center justify-center">
                       <div className="relative w-56 h-56">
-                        <div className="absolute inset-0 border border-white/20 bg-white/5 shadow-inner" />
-                        <div className="absolute inset-6 rounded-full border border-white/15 bg-black/20" />
+                        <div className="absolute inset-0 border border-border bg-white/70 shadow-inner rounded-2xl" />
+                        <div className="absolute inset-6 rounded-full border border-border/70 bg-white/55" />
 
                         {/* Buttons */}
                         <button
                           type="button"
                           onClick={() => pushDirectionDigit(1)}
-                          className="absolute left-1/2 top-2 -translate-x-1/2 rounded-full border border-white/20 bg-white/10 backdrop-blur px-4 py-3 text-white hover:bg-white/15 active:scale-95 transition"
+                          className="absolute left-1/2 top-2 -translate-x-1/2 rounded-full border border-border bg-white/80 backdrop-blur px-4 py-3 text-foreground hover:bg-white active:scale-95 transition shadow-[0_10px_24px_rgba(32,26,34,0.10)]"
                         >
                           <ChevronUp className="w-6 h-6" />
                         </button>
                         <button
                           type="button"
                           onClick={() => pushDirectionDigit(2)}
-                          className="absolute left-1/2 bottom-2 -translate-x-1/2 rounded-full border border-white/20 bg-white/10 backdrop-blur px-4 py-3 text-white hover:bg-white/15 active:scale-95 transition"
+                          className="absolute left-1/2 bottom-2 -translate-x-1/2 rounded-full border border-border bg-white/80 backdrop-blur px-4 py-3 text-foreground hover:bg-white active:scale-95 transition shadow-[0_10px_24px_rgba(32,26,34,0.10)]"
                         >
                           <ChevronDown className="w-6 h-6" />
                         </button>

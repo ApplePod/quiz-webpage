@@ -104,31 +104,31 @@ export function MainScreen({
         <div className="flex items-center justify-between flex-wrap gap-6">
           {/* Left: Title Section */}
           <div className="flex items-center gap-4">
-            <div className="relative w-14 h-14 border border-white/40 bg-black/50 flex items-center justify-center shadow-[0_0_30px_rgba(255,255,255,0.08)] overflow-hidden">
-              <div className="pointer-events-none absolute inset-0 opacity-[0.18] bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.35),transparent_55%)]" />
-              <BookOpen className="w-8 h-8 text-white/90" />
+            <div className="relative w-14 h-14 border border-border bg-white/65 backdrop-blur flex items-center justify-center shadow-[0_12px_34px_rgba(32,26,34,0.12)] overflow-hidden rounded-2xl">
+              <div className="pointer-events-none absolute inset-0 opacity-[0.85] bg-[radial-gradient(circle_at_30%_20%,rgba(255,79,167,0.18),transparent_55%),radial-gradient(circle_at_80%_70%,rgba(130,102,255,0.14),transparent_58%)]" />
+              <BookOpen className="w-8 h-8 text-foreground/90" />
             </div>
             <div>
-              <div className="text-[10px] tracking-[0.35em] text-white/55">
-                YOU SEE, BUT DO NOT OBSERVE.
+              <div className="text-[10px] tracking-[0.35em] text-foreground/60">
+                윤월주관
               </div>
-              <h1 className="text-4xl font-bold text-white tracking-tight">Quiz Competition</h1>
-              <p className="text-gray-300 mt-1">Select a question to begin</p>
+              <h1 className="text-4xl font-bold text-foreground tracking-tight">BAR-O</h1>
+              <p className="text-muted-foreground mt-1">문제를 골라 게임을 시작해요</p>
             </div>
           </div>
 
           {/* Right: Timer */}
           <div className="flex items-center gap-4">
             {activeTeam && (
-              <div className="hidden sm:flex items-center gap-3 rounded-xl border border-white/15 bg-white/5 px-4 py-2">
-                <div className="w-8 h-8 border border-white/40 bg-black/40 flex items-center justify-center">
-                  <span className="text-sm font-bold text-white">{activeTeam.id}</span>
+              <div className="hidden sm:flex items-center gap-3 rounded-2xl border border-border bg-white/60 backdrop-blur px-4 py-2 shadow-[0_10px_24px_rgba(32,26,34,0.10)]">
+                <div className="w-8 h-8 border border-border bg-white/70 flex items-center justify-center rounded-xl">
+                  <span className="text-sm font-bold text-foreground">{activeTeam.id}</span>
                 </div>
                 <div className="leading-tight">
-                  <div className="text-sm font-semibold text-white">{activeTeam.name}</div>
+                  <div className="text-sm font-semibold text-foreground">{activeTeam.name}</div>
                   <button
                     onClick={onChangeTeam}
-                    className="text-xs text-gray-300 hover:text-white underline underline-offset-2"
+                    className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2"
                     type="button"
                   >
                     팀 변경
@@ -199,13 +199,13 @@ export function MainScreen({
 
       {/* Locked question dialog */}
       <Dialog open={lockedDialogOpen} onOpenChange={setLockedDialogOpen}>
-        <DialogContent className="bg-gray-900/95 border-white/20 text-white overflow-hidden">
+        <DialogContent className="bg-white/90 border-border text-foreground overflow-hidden backdrop-blur-md shadow-[0_22px_70px_rgba(32,26,34,0.20)]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-white/80" />
+              <Sparkles className="w-5 h-5 text-primary/90" />
               정답 궁금해요?
             </DialogTitle>
-            <DialogDescription className="text-gray-300">
+            <DialogDescription className="text-muted-foreground">
               {alreadyRevealedForActiveTeam
                 ? '이미 구매한 정답입니다.'
                 : `궁금하면 ${REVEAL_COST}코인으로 정답을 볼 수 있어요.`}
@@ -219,17 +219,17 @@ export function MainScreen({
           )}
 
           {alreadyRevealedForActiveTeam ? (
-            <div className="rounded-xl border border-white/10 bg-black/20 p-4">
-              <div className="text-sm text-gray-300 mb-2">정답</div>
-              <div className="text-lg font-semibold text-white break-words">{answerLabel}</div>
+            <div className="rounded-2xl border border-border bg-white/70 p-4">
+              <div className="text-sm text-muted-foreground mb-2">정답</div>
+              <div className="text-lg font-semibold text-foreground break-words">{answerLabel}</div>
             </div>
           ) : (
-            <div className="rounded-xl border border-white/10 bg-black/20 p-4">
-              <div className="flex items-center gap-2 text-gray-200">
-                <Coins className="w-5 h-5 text-yellow-300" />
+            <div className="rounded-2xl border border-border bg-white/70 p-4">
+              <div className="flex items-center gap-2 text-foreground/80">
+                <Coins className="w-5 h-5 text-primary/85" />
                 <div>
                   <div className="font-semibold">-{REVEAL_COST} 코인</div>
-                  <div className="text-sm text-gray-400">구매하면 이후엔 무료로 다시 볼 수 있어요.</div>
+                  <div className="text-sm text-muted-foreground">구매하면 이후엔 무료로 다시 볼 수 있어요.</div>
                 </div>
               </div>
             </div>
@@ -239,7 +239,7 @@ export function MainScreen({
             <Button
               variant="outline"
               onClick={() => setLockedDialogOpen(false)}
-              className="border-white/30 text-white hover:bg-white/10"
+              className="border-border text-foreground hover:bg-secondary"
             >
               닫기
             </Button>
@@ -247,7 +247,7 @@ export function MainScreen({
               <Button
                 onClick={handlePurchaseReveal}
                 disabled={!activeTeam || !lockedQuestionId || !onPurchaseAnswerReveal || isPurchasingReveal}
-                className="border border-white/40 bg-transparent text-white font-semibold hover:bg-white/10"
+                className="border border-border bg-white/70 text-foreground font-semibold hover:bg-white/90"
               >
                 {isPurchasingReveal ? '구매 중...' : `정답 보기 (-${REVEAL_COST})`}
               </Button>

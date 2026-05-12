@@ -24,12 +24,12 @@ export function TimerHeader({ timeRemaining, timerRunning }: TimerHeaderProps) {
           ? 'bg-red-600/20 border-red-400/60 shadow-[0_0_40px_rgba(239,68,68,0.25)]'
           : isLowTime
           ? 'bg-orange-500/15 border-orange-300/50 shadow-[0_0_40px_rgba(249,115,22,0.20)]'
-          : 'bg-black/45 border-white/25 shadow-[0_0_40px_rgba(255,255,255,0.06)]'
+          : 'bg-white/65 border-border shadow-[0_16px_44px_rgba(32,26,34,0.12)]'
       }`}
     >
       {/* Subtle scanline + fog */}
       <div className="absolute inset-0 opacity-[0.06] bg-[linear-gradient(transparent_0%,rgba(255,255,255,0.9)_50%,transparent_100%)] bg-[length:100%_8px]" />
-      <div className="absolute inset-0 opacity-[0.22] bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.12),transparent_45%)]" />
+      <div className="absolute inset-0 opacity-[0.85] bg-[radial-gradient(circle_at_30%_20%,rgba(255,79,167,0.14),transparent_45%),radial-gradient(circle_at_80%_70%,rgba(130,102,255,0.12),transparent_52%)]" />
 
       {/* Content */}
       <div className="relative z-10 py-3 px-6">
@@ -53,7 +53,7 @@ export function TimerHeader({ timeRemaining, timerRunning }: TimerHeaderProps) {
             {isCriticalTime ? (
               <AlertCircle className="w-7 h-7 text-red-300" />
             ) : (
-              <Clock className="w-7 h-7 text-white" />
+              <Clock className="w-7 h-7 text-foreground/85" />
             )}
           </motion.div>
 
@@ -72,14 +72,14 @@ export function TimerHeader({ timeRemaining, timerRunning }: TimerHeaderProps) {
                 repeat: Infinity,
               }}
               className={`text-3xl font-bold font-mono tracking-wide ${
-                isCriticalTime ? 'text-red-200' : isLowTime ? 'text-orange-200' : 'text-white'
+                isCriticalTime ? 'text-red-200' : isLowTime ? 'text-orange-200' : 'text-foreground'
               }`}
               style={{
                 textShadow: isCriticalTime
                   ? '0 0 15px rgba(239, 68, 68, 0.6)'
                   : isLowTime
                   ? '0 0 15px rgba(249, 115, 22, 0.6)'
-                  : '0 0 12px rgba(255, 255, 255, 0.18)',
+                  : '0 1px 0 rgba(255, 255, 255, 0.9)',
               }}
             >
               {String(hours).padStart(2, '0')}:{String(minutes).padStart(2, '0')}:
@@ -91,7 +91,7 @@ export function TimerHeader({ timeRemaining, timerRunning }: TimerHeaderProps) {
                   ? 'text-red-300'
                   : isLowTime
                   ? 'text-orange-300'
-                  : 'text-white/55'
+                  : 'text-foreground/60'
               }`}
             >
               {!timerRunning ? (

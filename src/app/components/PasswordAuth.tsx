@@ -40,7 +40,7 @@ export function PasswordAuth({
         <Button
           onClick={onBack}
           variant="ghost"
-          className="mb-6 text-white hover:bg-white/10 backdrop-blur-sm"
+          className="mb-6 text-foreground hover:bg-white/70 backdrop-blur-sm"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Team Selection
@@ -53,8 +53,8 @@ export function PasswordAuth({
           className="mystery-card p-8"
         >
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 border border-white/40 bg-black/50 mb-4 shadow-[0_0_30px_rgba(255,255,255,0.06)]">
-              <Lock className="w-8 h-8 text-white" />
+            <div className="inline-flex items-center justify-center w-16 h-16 border border-border bg-white/70 mb-4 shadow-[0_12px_34px_rgba(32,26,34,0.10)] rounded-2xl">
+              <Lock className="w-8 h-8 text-foreground/85" />
             </div>
             <h2 className="text-3xl font-bold mystery-title mb-2">Team Authentication</h2>
             <p className="mystery-subtitle">
@@ -64,7 +64,7 @@ export function PasswordAuth({
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-foreground/80 mb-2">
                 Enter Team Password
               </label>
               <Input
@@ -76,7 +76,7 @@ export function PasswordAuth({
                   setError('');
                 }}
                 placeholder="••••••••"
-                className="bg-black/40 border-white/40 text-white placeholder:text-white/50 focus:border-white/70 focus:ring-white/30"
+                className="bg-white/80 border-border text-foreground placeholder:text-muted-foreground focus:border-primary/50 focus:ring-primary/25 rounded-2xl"
                 autoFocus
               />
             </div>
@@ -94,7 +94,7 @@ export function PasswordAuth({
 
             <Button
               type="submit"
-              className="w-full border border-white/40 bg-transparent text-white font-semibold py-6 text-lg hover:bg-white/10"
+              className="w-full border border-primary/25 bg-primary text-primary-foreground font-semibold py-6 text-lg hover:opacity-95"
               disabled={isSubmitting}
             >
               {isSubmitting ? 'Checking...' : 'Continue'}
@@ -102,7 +102,7 @@ export function PasswordAuth({
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-muted-foreground">
               Passwords are validated securely against the shared game room.
             </p>
           </div>

@@ -30,25 +30,25 @@ export function Scoreboard({ teams }: ScoreboardProps) {
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className={`p-4 rounded-xl border transition-all duration-300 ${
+                  className={`p-4 rounded-2xl border transition-all duration-300 ${
                     isTopTeam
                       ? 'bg-yellow-500/10 border-yellow-400/40 shadow-[0_0_30px_rgba(250,204,21,0.18)]'
-                      : 'bg-black/25 border-white/15 hover:bg-white/5 hover:border-white/25'
+                      : 'bg-white/60 border-border hover:bg-white/80 shadow-[0_12px_30px_rgba(32,26,34,0.10)]'
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div
-                        className={`w-10 h-10 border flex items-center justify-center font-bold ${
+                        className={`w-10 h-10 border flex items-center justify-center font-bold rounded-xl ${
                           isTopTeam
                             ? 'border-yellow-300/60 bg-yellow-400 text-yellow-900'
-                            : 'border-white/35 bg-black/40 text-white'
+                            : 'border-border bg-white/70 text-foreground'
                         }`}
                       >
                         {team.name.split(' ')[1]}
                       </div>
                       <div>
-                        <div className="font-semibold text-white">{team.name}</div>
+                        <div className="font-semibold text-foreground">{team.name}</div>
                         {index === 0 && (
                           <div className="text-xs text-yellow-400 flex items-center gap-1">
                             <Trophy className="w-3 h-3" />
@@ -62,9 +62,9 @@ export function Scoreboard({ teams }: ScoreboardProps) {
                       <motion.span
                         key={team.coins}
                         initial={{ scale: 1.3, color: '#facc15' }}
-                        animate={{ scale: 1, color: '#ffffff' }}
+                        animate={{ scale: 1, color: '#201a22' }}
                         transition={{ duration: 0.5 }}
-                        className="text-xl font-bold text-white"
+                        className="text-xl font-bold text-foreground"
                       >
                         {team.coins}
                       </motion.span>

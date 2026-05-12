@@ -54,14 +54,12 @@ export function TeamAuthScreen({
 
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="shrink-0 border-b border-white/10 bg-black/50 backdrop-blur-md">
+      <header className="shrink-0 border-b border-border bg-white/70 backdrop-blur-md">
         <div className="container mx-auto px-4 py-4 flex items-center justify-center">
-          <img
-            src="/sherlock/images/common/header_logo.png"
-            alt="SHERLOCK HOLMES"
-            className="h-9 sm:h-11 w-auto object-contain opacity-95"
-            draggable={false}
-          />
+          <div className="text-center">
+            <div className="text-[10px] tracking-[0.35em] text-foreground/60">BAR-O</div>
+            <div className="text-lg sm:text-xl font-bold text-foreground tracking-tight">Team Check-in</div>
+          </div>
         </div>
       </header>
 
@@ -78,7 +76,7 @@ export function TeamAuthScreen({
             onBack()
           }}
           variant="ghost"
-          className="mb-6 text-white hover:bg-white/10 backdrop-blur-sm"
+          className="mb-6 text-foreground hover:bg-white/70 backdrop-blur-sm"
           disabled={isSubmitting}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -88,16 +86,16 @@ export function TeamAuthScreen({
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mystery-card border-[#f9c059]/20 p-8 shadow-2xl"
+          className="mystery-card p-8 shadow-[0_22px_70px_rgba(32,26,34,0.16)]"
         >
           {!selectedTeam ? (
             <>
               <div className="text-center mb-8">
-                <div className="inline-flex items-center justify-center w-16 h-16 border border-white/40 bg-black/50 mb-4">
-                  <Users className="w-8 h-8 text-white" />
+                <div className="inline-flex items-center justify-center w-16 h-16 border border-border bg-white/70 mb-4 rounded-2xl shadow-[0_12px_34px_rgba(32,26,34,0.10)]">
+                  <Users className="w-8 h-8 text-foreground/85" />
                 </div>
-                <h2 className="text-3xl font-bold text-white mb-2">Select Your Team</h2>
-                <p className="text-gray-300">팀을 선택한 뒤 비밀번호를 한 번만 입력하면 됩니다.</p>
+                <h2 className="text-3xl font-bold text-foreground mb-2">팀 선택</h2>
+                <p className="text-muted-foreground">팀을 선택한 뒤 비밀번호를 한 번만 입력하면 됩니다.</p>
               </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -110,16 +108,16 @@ export function TeamAuthScreen({
                   whileHover={{ scale: 1.03, y: -3 }}
                   whileTap={{ scale: 0.97 }}
                   onClick={() => handleSelectTeam(team.id)}
-                  className="p-6 border border-white/25 bg-black/35 transition-all duration-300 hover:border-white/50 hover:bg-white/5"
+                  className="p-6 border border-border bg-white/65 backdrop-blur transition-all duration-300 hover:bg-white/85 shadow-[0_12px_34px_rgba(32,26,34,0.10)] rounded-2xl"
                   type="button"
                   aria-label={`${team.name} 팀 선택`}
                 >
                   <div className="text-center">
-                    <div className="w-12 h-12 border border-white/40 bg-black/40 flex items-center justify-center mx-auto mb-3">
-                      <span className="text-xl font-bold text-white">{team.id}</span>
+                    <div className="w-12 h-12 border border-border bg-white/75 flex items-center justify-center mx-auto mb-3 rounded-xl">
+                      <span className="text-xl font-bold text-foreground">{team.id}</span>
                     </div>
-                    <div className="text-xl font-semibold text-white mb-1">{team.name}</div>
-                    <div className="text-sm text-gray-300">{team.coins} coins</div>
+                    <div className="text-xl font-semibold text-foreground mb-1">{team.name}</div>
+                    <div className="text-sm text-muted-foreground">{team.coins} coins</div>
                   </div>
                 </motion.button>
               ))}
@@ -132,16 +130,16 @@ export function TeamAuthScreen({
           ) : (
             <>
               <div className="text-center mb-8">
-                <div className="inline-flex items-center justify-center w-16 h-16 border border-white/40 bg-black/50 mb-4">
-                  <Lock className="w-8 h-8 text-white" />
+                <div className="inline-flex items-center justify-center w-16 h-16 border border-border bg-white/70 mb-4 rounded-2xl shadow-[0_12px_34px_rgba(32,26,34,0.10)]">
+                  <Lock className="w-8 h-8 text-foreground/85" />
                 </div>
-                <h2 className="text-3xl font-bold text-white mb-2">Team Authentication</h2>
-                <p className="text-gray-300">{selectedTeam.name}</p>
+                <h2 className="text-3xl font-bold text-foreground mb-2">팀 인증</h2>
+                <p className="text-muted-foreground">{selectedTeam.name}</p>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
+                  <label htmlFor="password" className="block text-sm font-medium text-foreground/80 mb-2">
                     Enter Team Password
                   </label>
                   <Input
@@ -153,7 +151,7 @@ export function TeamAuthScreen({
                       setError('')
                     }}
                     placeholder="••••••••"
-                    className="bg-black/40 border-white/40 text-white placeholder:text-white/50 focus:border-white/70 focus:ring-white/30"
+                    className="bg-white/80 border-border text-foreground placeholder:text-muted-foreground focus:border-primary/50 focus:ring-primary/25 rounded-2xl"
                     autoFocus
                   />
                 </div>
@@ -171,7 +169,7 @@ export function TeamAuthScreen({
 
                 <Button
                   type="submit"
-                  className="w-full border border-white/40 bg-transparent text-white font-semibold py-6 text-lg hover:bg-white/10"
+                  className="w-full border border-primary/25 bg-primary text-primary-foreground font-semibold py-6 text-lg hover:opacity-95"
                   disabled={isSubmitting || password.length === 0}
                 >
                   {isSubmitting ? 'Checking...' : 'Continue'}
