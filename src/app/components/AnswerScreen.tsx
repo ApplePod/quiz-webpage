@@ -86,8 +86,18 @@ export function AnswerScreen({
       ? `${directionDigitsToArrows(question.correctAnswer)} (${question.correctAnswer.join(', ')})`
       : String(question.correctAnswer ?? '');
 
-  /** Result dialog must sit above recharge portal (z-100) and confetti layers; close other overlays. */
-  const openResultDialog = React.useCallback(() => {
+  /** Close overlays; optionally stop confetti (keep for correct celebration). */
+  const openResultDialog = React.useCallback((opts?: { clearConfetti?: boolean }) => {
+    const clear = opts?.clearConfetti !== false;
+    if (clear) {
+      try {
+        (confettiRef.current as any)?.reset?.();
+      } catch {
+        /* ignore */
+      }
+      setShowConfetti(false);
+      setShowWrongFx(false);
+    }
     setHintModalOpen(false);
     setShowRechargeNotice(false);
     setShowResultDialog(true);
@@ -110,9 +120,9 @@ export function AnswerScreen({
         setResolvedReward(response.reward);
       }
       setShowSolvedFx(true);
-      setShowConfetti(true);
       setShowWrongFx(false);
-      openResultDialog();
+      openResultDialog({ clearConfetti: false });
+      setShowConfetti(true);
 
       // Auto return home after a short celebration.
       if (autoBackTimerRef.current) window.clearTimeout(autoBackTimerRef.current);
@@ -426,7 +436,9 @@ export function AnswerScreen({
     <div className="min-h-screen flex items-center justify-center px-4">
       <canvas
         ref={confettiCanvasRef}
-        className="pointer-events-none fixed inset-0 z-[70] h-full w-full"
+        className={`pointer-events-none fixed inset-0 h-full w-full transition-opacity duration-200 ${
+          showResultDialog || hintModalOpen || showRechargeNotice ? 'z-0 opacity-0' : 'z-[70] opacity-100'
+        }`}
         aria-hidden="true"
       />
       {showSolvedFx && (
