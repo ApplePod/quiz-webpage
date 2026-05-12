@@ -985,7 +985,7 @@ export function AdminPanel({
                         if (!ok) return;
                         onAdminSetAllQuestionsSolveTier(1);
                       }}
-                      className="w-full bg-pink-700/90 hover:bg-pink-600 text-white"
+                      className="w-full bg-sky-700/90 hover:bg-sky-600 text-white"
                     >
                       전체 1차
                     </Button>
@@ -997,7 +997,7 @@ export function AdminPanel({
                         if (!ok) return;
                         onAdminSetAllQuestionsSolveTier(2);
                       }}
-                      className="w-full bg-sky-700/90 hover:bg-sky-600 text-white"
+                      className="w-full bg-pink-700/90 hover:bg-pink-600 text-white"
                     >
                       전체 2차
                     </Button>
