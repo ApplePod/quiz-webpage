@@ -201,7 +201,7 @@ export function QuestionCard({
               stiffness: 200,
               damping: 20,
             }}
-            className="absolute inset-0 flex items-center justify-center bg-zinc-800/78 rounded-2xl z-10"
+            className="absolute inset-0 flex items-center justify-center bg-zinc-800/48 rounded-2xl z-10"
           >
             <button
               type="button"
