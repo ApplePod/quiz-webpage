@@ -24,58 +24,79 @@ from game_ref,
   values
     (
       'A',
-      'Group A',
-      '참가자 A1',
+      '팀 A',
+      '준우',
       'F',
       jsonb_build_array(
-        jsonb_build_object('name', '참가자 A1', 'gender', 'F'),
-        jsonb_build_object('name', '참가자 A2', 'gender', 'M')
+        jsonb_build_object('name', '준우', 'gender', 'F'),
+        jsonb_build_object('name', '비누', 'gender', 'F'),
+        jsonb_build_object('name', 'with', 'gender', 'M')
       ),
       0,
       '1'
     ),
     (
       'B',
-      'Group B',
-      '참가자 B',
+      '팀 B',
+      '알려줘21',
       'F',
-      jsonb_build_array(jsonb_build_object('name', '참가자 B', 'gender', 'F')),
+      jsonb_build_array(
+        jsonb_build_object('name', '알려줘21', 'gender', 'F'),
+        jsonb_build_object('name', '겨란후라이', 'gender', 'F'),
+        jsonb_build_object('name', '프위메', 'gender', 'M')
+      ),
       0,
       '1'
     ),
     (
       'C',
-      'Group C',
-      '참가자 C',
+      '팀 C',
+      '에르나',
       'F',
-      jsonb_build_array(jsonb_build_object('name', '참가자 C', 'gender', 'F')),
+      jsonb_build_array(
+        jsonb_build_object('name', '에르나', 'gender', 'F'),
+        jsonb_build_object('name', '이부리', 'gender', 'F'),
+        jsonb_build_object('name', '깡지', 'gender', 'M')
+      ),
       0,
       '1'
     ),
     (
       'D',
-      'Group D',
-      '참가자 D',
-      'M',
-      jsonb_build_array(jsonb_build_object('name', '참가자 D', 'gender', 'M')),
+      '팀 D',
+      '포틀',
+      'F',
+      jsonb_build_array(
+        jsonb_build_object('name', '포틀', 'gender', 'F'),
+        jsonb_build_object('name', '체리2', 'gender', 'F'),
+        jsonb_build_object('name', '인계동카카시', 'gender', 'M')
+      ),
       0,
       '1'
     ),
     (
       'E',
-      'Group E',
-      '참가자 E',
+      '팀 E',
+      '몬지(논알콜)',
       'M',
-      jsonb_build_array(jsonb_build_object('name', '참가자 E', 'gender', 'M')),
+      jsonb_build_array(
+        jsonb_build_object('name', '몬지(논알콜)', 'gender', 'M'),
+        jsonb_build_object('name', '냥녕늉', 'gender', 'M'),
+        jsonb_build_object('name', '변산', 'gender', 'M')
+      ),
       0,
       '1'
     ),
     (
       'F',
-      'Group F',
-      '참가자 F',
+      '팀 F',
+      '무명씨',
       'M',
-      jsonb_build_array(jsonb_build_object('name', '참가자 F', 'gender', 'M')),
+      jsonb_build_array(
+        jsonb_build_object('name', '무명씨', 'gender', 'M'),
+        jsonb_build_object('name', '해피독', 'gender', 'M'),
+        jsonb_build_object('name', '붉은충격', 'gender', 'M')
+      ),
       0,
       '1'
     )
