@@ -889,25 +889,44 @@ export function AnswerScreen({
 
       {/* Recharge 안내 Dialog */}
       <Dialog open={showRechargeDialog} onOpenChange={setShowRechargeDialog}>
-        <DialogContent className="bg-black/90 border-white/20 text-white overflow-hidden">
-          <div className="pointer-events-none absolute inset-0 opacity-[0.22] bg-[radial-gradient(circle_at_35%_20%,rgba(255,255,255,0.12),transparent_55%)]" />
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-white">
-              <div className="w-8 h-8 border border-white/30 bg-black/40 flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-white/80" />
+        <DialogContent className="relative overflow-hidden border-2 border-violet-200/90 bg-gradient-to-br from-violet-50/95 via-white to-cyan-50/90 p-6 shadow-[0_22px_50px_-12px_rgba(139,92,246,0.28)] sm:max-w-md [&>button]:text-violet-400 [&>button]:hover:bg-violet-100/80 [&>button]:hover:text-violet-700">
+          <div
+            className="pointer-events-none absolute -right-20 -top-24 h-56 w-56 rounded-full bg-gradient-to-br from-fuchsia-200/55 to-violet-200/45 blur-3xl"
+            aria-hidden
+          />
+          <div
+            className="pointer-events-none absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-gradient-to-tr from-cyan-200/50 to-sky-100/55 blur-3xl"
+            aria-hidden
+          />
+          <div
+            className="pointer-events-none absolute left-1/2 top-1/2 h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full bg-amber-100/35 blur-3xl"
+            aria-hidden
+          />
+
+          <DialogHeader className="relative z-10 gap-4 text-left sm:text-left">
+            <DialogTitle className="flex items-center gap-3 text-xl font-bold tracking-tight text-violet-950 sm:text-2xl">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-200/90 to-fuchsia-200/80 shadow-inner ring-2 ring-white/90">
+                <Sparkles className="h-6 w-6 text-violet-700" aria-hidden />
               </div>
-              Free Recharge
+              무료충전 안내
             </DialogTitle>
-            <DialogDescription className="text-white/70">
-              무료 충전을 위해 <span className="font-semibold text-white">카운터로 와주세요</span>.
-              <br />
-              스태프가 바로 코인을 충전해드릴게요.
+            <DialogDescription asChild>
+              <div className="space-y-3 rounded-2xl border border-violet-100/90 bg-white/55 px-4 py-4 text-[15px] leading-relaxed text-violet-900/85 shadow-sm backdrop-blur-[2px] sm:text-base">
+                <p className="font-medium text-violet-950">
+                  무료 충전을 위해{' '}
+                  <span className="rounded-md bg-gradient-to-r from-violet-100 to-fuchsia-100 px-1.5 py-0.5 text-violet-900">
+                    카운터로 와주세요
+                  </span>
+                  .
+                </p>
+                <p className="text-violet-800/90">스태프가 바로 코인을 충전해드릴게요.</p>
+              </div>
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter>
+          <DialogFooter className="relative z-10 pt-2 sm:justify-center">
             <Button
               onClick={() => setShowRechargeDialog(false)}
-              className="border border-white/40 bg-transparent text-white font-semibold hover:bg-white/10"
+              className="rounded-full border-0 bg-gradient-to-r from-violet-500 via-fuchsia-500 to-violet-500 bg-[length:200%_100%] px-10 font-semibold text-white shadow-lg shadow-violet-300/45 transition-[background-position,transform] hover:bg-[position:100%_0] hover:shadow-violet-400/50 active:scale-[0.98]"
             >
               확인
             </Button>
