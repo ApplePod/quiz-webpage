@@ -1,6 +1,6 @@
 import React from 'react';
 import { Team } from '../types';
-import { Trophy, Coins } from 'lucide-react';
+import { Trophy, Coins, Flame } from 'lucide-react';
 import { motion } from 'motion/react';
 
 interface ScoreboardProps {
@@ -18,7 +18,7 @@ export function Scoreboard({ teams }: ScoreboardProps) {
         <div className="mystery-card p-6">
           <div className="flex items-center gap-3 mb-6">
             <Trophy className="w-6 h-6 text-yellow-400" />
-            <h2 className="text-2xl font-bold mystery-title">Scoreboard</h2>
+            <h2 className="text-2xl font-bold mystery-title">랭킹</h2>
           </div>
 
           <div className="space-y-3">
@@ -50,9 +50,32 @@ export function Scoreboard({ teams }: ScoreboardProps) {
                       <div>
                         <div className="font-semibold text-foreground">{team.name}</div>
                         {index === 0 && (
-                          <div className="text-xs text-yellow-400 flex items-center gap-1">
-                            <Trophy className="w-3 h-3" />
-                            Leading
+                          <div className="text-xs text-orange-500 flex items-center gap-1.5 font-medium">
+                            <motion.span
+                              className="inline-flex"
+                              animate={{
+                                scale: [1, 1.2, 0.92, 1.12, 1],
+                                rotate: [-4, 5, -3, 4, 0],
+                                y: [0, -1, 1, -0.5, 0],
+                              }}
+                              transition={{
+                                duration: 1.15,
+                                repeat: Infinity,
+                                ease: 'easeInOut',
+                              }}
+                            >
+                              <Flame
+                                className="w-3.5 h-3.5 shrink-0 drop-shadow-[0_0_6px_rgba(249,115,22,0.75)]"
+                                fill="currentColor"
+                                strokeWidth={1.5}
+                              />
+                            </motion.span>
+                            <motion.span
+                              animate={{ opacity: [1, 0.82, 1, 0.9, 1] }}
+                              transition={{ duration: 1.15, repeat: Infinity, ease: 'easeInOut' }}
+                            >
+                              불타는중
+                            </motion.span>
                           </div>
                         )}
                       </div>

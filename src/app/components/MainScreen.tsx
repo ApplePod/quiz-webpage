@@ -130,7 +130,6 @@ export function MainScreen({
                 윤월주관
               </div>
               <h1 className="text-4xl font-bold text-foreground tracking-tight">BAR-O</h1>
-              <p className="text-muted-foreground mt-1">문제를 골라 게임을 시작해요</p>
             </div>
           </div>
 
@@ -163,7 +162,6 @@ export function MainScreen({
         {/* Left Section: Question Grid */}
         <div className="lg:col-span-2">
           <div className="mystery-card-solid rounded-2xl p-6">
-            <h2 className="text-2xl font-bold mystery-title mb-6">Questions</h2>
             {/* 5x5 stays fixed; cells scale with viewport (clamp) and scroll when needed */}
             <div
               className="-mx-6 px-6 overflow-x-auto"
