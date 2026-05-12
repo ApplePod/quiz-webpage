@@ -14,6 +14,17 @@ export interface GameSnapshot {
 const GAME_CODE = import.meta.env.VITE_GAME_CODE ?? 'demo-room'
 const HINT_IMAGE_BUCKET = import.meta.env.VITE_SUPABASE_HINT_IMAGE_BUCKET ?? 'hint-images'
 
+/** Supabase/JSON sometimes returns question_no as string; strict === breaks only for Q1-style lookups. */
+function normalizeQuestionId(value: unknown): number {
+  const n = Number(value)
+  return Number.isFinite(n) ? n : 0
+}
+
+function normalizeTeamIdList(value: unknown): string[] {
+  if (!Array.isArray(value)) return []
+  return value.map((id) => String(id))
+}
+
 function buildLocalSnapshot(): GameSnapshot {
   return {
     game: {
@@ -50,7 +61,7 @@ function mapSnapshot(payload: any): GameSnapshot {
   }))
 
   const questions: Question[] = (payload.questions ?? []).map((question: any) => ({
-    id: question.question_no,
+    id: normalizeQuestionId(question.question_no),
     questionText: question.question_text,
     ...decodeCorrectAnswer(question.correct_answer),
     hint: question.hint,
@@ -64,18 +75,18 @@ function mapSnapshot(payload: any): GameSnapshot {
 
   const questionStatuses: QuestionStatus[] = (payload.question_status ?? []).map(
     (status: any) => ({
-      questionId: status.question_no,
-      solvedByTeams: status.solved_by_teams ?? [],
+      questionId: normalizeQuestionId(status.question_no),
+      solvedByTeams: normalizeTeamIdList(status.solved_by_teams),
       solvedBy: Array.isArray(status.solved_by)
         ? status.solved_by
             .map((entry: any) => ({
-              teamId: entry?.team_code,
+              teamId: String(entry?.team_code ?? ''),
               solvedAt: entry?.created_at,
             }))
             .filter((entry: any) => Boolean(entry.teamId && entry.solvedAt))
         : undefined,
-      hintedByTeams: status.hinted_by_teams ?? [],
-      revealedByTeams: status.revealed_by_teams ?? [],
+      hintedByTeams: normalizeTeamIdList(status.hinted_by_teams),
+      revealedByTeams: normalizeTeamIdList(status.revealed_by_teams),
       solveCount: status.solve_count ?? 0,
       locked: status.locked ?? false,
     }),

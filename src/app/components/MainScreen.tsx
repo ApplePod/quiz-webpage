@@ -8,6 +8,7 @@ import { BookOpen, Coins, Sparkles } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog';
 import { Button } from './ui/button';
 import { directionDigitsToArrows } from '../utils/answerCodec';
+import { sameQuestionId } from '../utils/questionIds';
 
 interface MainScreenProps {
   teams: Team[];
@@ -20,6 +21,15 @@ interface MainScreenProps {
   activeTeam?: Team | null;
   onChangeTeam?: () => void;
   onPurchaseAnswerReveal?: (teamId: string, questionId: number, cost?: number) => Promise<any> | any;
+}
+
+function activeTeamSolvedQuestion(
+  activeTeam: Team | null | undefined,
+  status: QuestionStatus | undefined,
+) {
+  if (!activeTeam || !status?.solvedByTeams?.length) return false;
+  const aid = String(activeTeam.id);
+  return status.solvedByTeams.some((tid) => String(tid) === aid);
 }
 
 export function MainScreen({
@@ -41,20 +51,20 @@ export function MainScreen({
   const REVEAL_COST = 10;
 
   const lockedQuestion = useMemo(
-    () => (lockedQuestionId ? questions.find((q) => q.id === lockedQuestionId) ?? null : null),
+    () => (lockedQuestionId ? questions.find((q) => sameQuestionId(q.id, lockedQuestionId)) ?? null : null),
     [lockedQuestionId, questions],
   );
 
   const lockedQuestionStatus = useMemo(
     () =>
       lockedQuestionId
-        ? questionStatuses.find((s) => s.questionId === lockedQuestionId) ?? null
+        ? questionStatuses.find((s) => sameQuestionId(s.questionId, lockedQuestionId)) ?? null
         : null,
     [lockedQuestionId, questionStatuses],
   );
 
   const alreadyRevealedForActiveTeam = Boolean(
-    activeTeam && lockedQuestionStatus?.revealedByTeams?.includes(activeTeam.id),
+    activeTeam && lockedQuestionStatus?.revealedByTeams?.some((id) => String(id) === String(activeTeam.id)),
   );
 
   const answerLabel = useMemo(() => {
@@ -67,8 +77,8 @@ export function MainScreen({
 
   const openLockedDialog = (questionId: number) => {
     // Already-solved teams should not see the reveal prompt.
-    const status = questionStatuses.find((s) => s.questionId === questionId);
-    if (activeTeam && status?.solvedByTeams?.includes(activeTeam.id)) return;
+    const status = questionStatuses.find((s) => sameQuestionId(s.questionId, questionId));
+    if (activeTeam && activeTeamSolvedQuestion(activeTeam, status)) return;
     setRevealError('');
     setLockedQuestionId(questionId);
     setLockedDialogOpen(true);
@@ -160,9 +170,9 @@ export function MainScreen({
               <div className="w-fit mx-auto pb-1">
                 <div className="grid grid-cols-[repeat(5,var(--cell))] gap-[var(--gap)]">
                   {questions.map((question) => {
-                    const status = questionStatuses.find((s) => s.questionId === question.id);
+                    const status = questionStatuses.find((s) => sameQuestionId(s.questionId, question.id));
                     const solveCount = status?.solveCount || 0;
-                    const solvedByActiveTeam = Boolean(activeTeam && status?.solvedByTeams?.includes(activeTeam.id));
+                    const solvedByActiveTeam = activeTeamSolvedQuestion(activeTeam, status);
                     const nextReward =
                       solveCount === 0
                         ? question.coinRewardFirst

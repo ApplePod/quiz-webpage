@@ -27,6 +27,7 @@ import {
   verifyTeamPassword,
 } from './services/gameService';
 import { isCorrectForQuestion } from './utils/answerCodec';
+import { sameQuestionId } from './utils/questionIds';
 
 export default function App() {
   const [currentView, setCurrentView] = useState<ViewType>('intro');
@@ -156,7 +157,7 @@ export default function App() {
   }, [syncFromSnapshot]);
 
   const handleQuestionSelect = (questionId: number) => {
-    const status = questionStatuses.find((entry) => entry.questionId === questionId);
+    const status = questionStatuses.find((entry) => sameQuestionId(entry.questionId, questionId));
     if (status && (status.locked || status.solveCount >= 3)) return;
     if (!selectedTeam) {
       setCurrentView('team-auth');
@@ -204,7 +205,7 @@ export default function App() {
     const question = questions.find((entry) => entry.id === selectedQuestionId);
     if (!question) return;
 
-    const currentStatus = questionStatuses.find((status) => status.questionId === selectedQuestionId);
+    const currentStatus = questionStatuses.find((status) => sameQuestionId(status.questionId, selectedQuestionId));
     if (currentStatus && (currentStatus.locked || currentStatus.solveCount >= 3)) {
       setError('이미 3팀이 정답 처리하여 잠긴 문제입니다.');
       return;
@@ -213,7 +214,7 @@ export default function App() {
     const isCorrect = isCorrectForQuestion(question, answer);
     if (!isCorrect) return;
 
-    const existingStatus = questionStatuses.find((status) => status.questionId === selectedQuestionId);
+    const existingStatus = questionStatuses.find((status) => sameQuestionId(status.questionId, selectedQuestionId));
     const solveCount = existingStatus?.solveCount ?? 0;
     const reward =
       solveCount === 0
@@ -223,8 +224,8 @@ export default function App() {
           : question.coinRewardThird;
 
     setQuestionStatuses((previous) => {
-      const existing = previous.find((status) => status.questionId === selectedQuestionId);
-      if (existing?.solvedByTeams.includes(teamId)) return previous;
+      const existing = previous.find((status) => sameQuestionId(status.questionId, selectedQuestionId));
+      if (existing?.solvedByTeams.some((id) => String(id) === String(teamId))) return previous;
       if (existing) {
         const solvedByTeams = [...existing.solvedByTeams, teamId];
         const solvedBy = [
@@ -232,7 +233,7 @@ export default function App() {
           { teamId, solvedAt: new Date().toISOString() },
         ];
         return previous.map((status) =>
-          status.questionId === selectedQuestionId
+          sameQuestionId(status.questionId, selectedQuestionId)
             ? {
                 ...status,
                 solvedByTeams,
@@ -269,7 +270,7 @@ export default function App() {
     if (!selectedQuestionId) return;
 
     // Guard against race: question can become locked after user entered the answer screen.
-    const currentStatus = questionStatuses.find((status) => status.questionId === selectedQuestionId);
+    const currentStatus = questionStatuses.find((status) => sameQuestionId(status.questionId, selectedQuestionId));
     if (currentStatus && (currentStatus.locked || currentStatus.solveCount >= 3)) {
       setError('이미 3팀이 정답 처리하여 잠긴 문제입니다.');
       setTimeout(() => {
@@ -313,7 +314,7 @@ export default function App() {
         ),
       );
       setQuestionStatuses((previous) => {
-        const existing = previous.find((status) => status.questionId === questionId);
+        const existing = previous.find((status) => sameQuestionId(status.questionId, questionId));
         if (!existing) {
           return [
             ...previous,
@@ -323,7 +324,7 @@ export default function App() {
         const already = existing.hintedByTeams?.includes(teamId) ?? false;
         if (already) return previous;
         return previous.map((status) =>
-          status.questionId === questionId
+          sameQuestionId(status.questionId, questionId)
             ? { ...status, hintedByTeams: [...(status.hintedByTeams ?? []), teamId] }
             : status,
         );
@@ -340,7 +341,7 @@ export default function App() {
 
       // Also update local status optimistically (snapshot will eventually reconcile).
       setQuestionStatuses((previous) => {
-        const existing = previous.find((status) => status.questionId === questionId);
+        const existing = previous.find((status) => sameQuestionId(status.questionId, questionId));
         if (!existing) {
           return [
             ...previous,
@@ -350,7 +351,7 @@ export default function App() {
         const already = existing.hintedByTeams?.includes(teamId) ?? false;
         if (already) return previous;
         return previous.map((status) =>
-          status.questionId === questionId
+          sameQuestionId(status.questionId, questionId)
             ? { ...status, hintedByTeams: [...(status.hintedByTeams ?? []), teamId] }
             : status,
         );
@@ -378,7 +379,7 @@ export default function App() {
         previous.map((t) => (t.id === teamId ? { ...t, coins: Math.max(0, t.coins - cost) } : t)),
       );
       setQuestionStatuses((previous) => {
-        const existing = previous.find((status) => status.questionId === questionId);
+        const existing = previous.find((status) => sameQuestionId(status.questionId, questionId));
         if (!existing) {
           return [
             ...previous,
@@ -388,7 +389,7 @@ export default function App() {
         const already = existing.revealedByTeams?.includes(teamId) ?? false;
         if (already) return previous;
         return previous.map((status) =>
-          status.questionId === questionId
+          sameQuestionId(status.questionId, questionId)
             ? { ...status, revealedByTeams: [...(status.revealedByTeams ?? []), teamId] }
             : status,
         );
@@ -524,12 +525,12 @@ export default function App() {
     try {
       if (!isSupabaseConfigured) {
         setQuestionStatuses((previous) => {
-          const existing = previous.find((status) => status.questionId === questionId);
+          const existing = previous.find((status) => sameQuestionId(status.questionId, questionId));
           if (!existing) {
             return [...previous, { questionId, solvedByTeams: [], solveCount: locked ? 3 : 0, locked }];
           }
           return previous.map((status) =>
-            status.questionId === questionId
+            sameQuestionId(status.questionId, questionId)
               ? { ...status, solveCount: locked ? 3 : 0, locked }
               : status,
           );
@@ -664,7 +665,8 @@ export default function App() {
             team={selectedTeam}
             question={currentQuestion}
             solveCount={
-              questionStatuses.find((status) => status.questionId === currentQuestion.id)?.solveCount || 0
+              questionStatuses.find((status) => sameQuestionId(status.questionId, currentQuestion.id))
+                ?.solveCount || 0
             }
             onSubmit={handleAnswerSubmit}
             onHintRequest={handleHintRequest}
@@ -673,8 +675,8 @@ export default function App() {
               Boolean(
                 selectedTeam &&
                   questionStatuses
-                    .find((status) => status.questionId === currentQuestion.id)
-                    ?.hintedByTeams?.includes(selectedTeam.id),
+                    .find((status) => sameQuestionId(status.questionId, currentQuestion.id))
+                    ?.hintedByTeams?.some((id) => String(id) === String(selectedTeam.id)),
               ) || (selectedTeam ? hasLocalHintPurchase(selectedTeam.id, currentQuestion.id) : false)
             }
           />

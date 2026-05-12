@@ -154,15 +154,15 @@ export function QuestionCard({
     : 'text-white';
   const lockClassWhenOpen = onTintedSolvedCard
     ? solveCount === 1
-      ? 'text-emerald-950 stroke-[2.35]'
-      : 'text-orange-950 stroke-[2.35]'
+      ? 'text-emerald-950'
+      : 'text-orange-950'
     : isLocked
       ? 'text-neutral-500'
       : 'text-white/80';
   const unlockIconWhenTeamSolved = onTintedSolvedCard
     ? solveCount === 1
-      ? 'text-emerald-950 stroke-[2.35]'
-      : 'text-orange-950 stroke-[2.35]'
+      ? 'text-emerald-950'
+      : 'text-orange-950'
     : 'text-green-400';
   const coinRowClass = onTintedSolvedCard
     ? solveCount === 1
@@ -247,7 +247,7 @@ export function QuestionCard({
         </div>
       )}
 
-      <div className="h-full w-full flex flex-col items-center justify-center gap-[clamp(6px,1.2vw,12px)] px-[clamp(8px,1.4vw,16px)]">
+      <div className="relative z-30 h-full w-full flex flex-col items-center justify-center gap-[clamp(6px,1.2vw,12px)] px-[clamp(8px,1.4vw,16px)]">
         {/* Lock icon based on active team status */}
         {solvedByActiveTeam ? (
           <motion.div
@@ -255,10 +255,16 @@ export function QuestionCard({
             animate={{ scale: 1 }}
             transition={{ type: 'spring', stiffness: 220 }}
           >
-            <Unlock className={`w-[clamp(22px,3.2vw,32px)] h-[clamp(22px,3.2vw,32px)] ${unlockIconWhenTeamSolved}`} />
+            <Unlock
+              strokeWidth={2.5}
+              className={`w-[clamp(22px,3.2vw,32px)] h-[clamp(22px,3.2vw,32px)] ${unlockIconWhenTeamSolved}`}
+            />
           </motion.div>
         ) : (
-          <Lock className={`w-[clamp(22px,3.2vw,32px)] h-[clamp(22px,3.2vw,32px)] ${lockClassWhenOpen}`} />
+          <Lock
+            strokeWidth={2.5}
+            className={`w-[clamp(22px,3.2vw,32px)] h-[clamp(22px,3.2vw,32px)] ${lockClassWhenOpen}`}
+          />
         )}
 
         <div className={`text-[clamp(14px,2.4vw,22px)] font-bold ${qLabelClass}`}>Q{questionNumber}</div>
