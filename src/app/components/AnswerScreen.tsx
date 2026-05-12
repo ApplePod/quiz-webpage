@@ -389,7 +389,10 @@ export function AnswerScreen({
     return () => window.clearTimeout(timer);
   }, [result, showWrongFx, wrongEmojiShapes]);
 
-  const handleHintConfirm = () => {
+  const handleHintConfirm = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
     if (hintInsufficientCoins) {
       setHintModalPanel('recharge');
       return;
@@ -727,7 +730,6 @@ export function AnswerScreen({
         }}
       >
         <DialogContent
-          key={hintModalPanel}
           className={
             hintModalPanel === 'recharge'
               ? 'relative overflow-hidden border-2 border-violet-200/90 bg-gradient-to-br from-violet-50/95 via-white to-cyan-50/90 p-6 shadow-[0_22px_50px_-12px_rgba(139,92,246,0.28)] sm:max-w-md [&>button]:text-violet-400 [&>button]:hover:bg-violet-100/80 [&>button]:hover:text-violet-700'
@@ -774,7 +776,11 @@ export function AnswerScreen({
               <DialogFooter className="relative z-10 pt-2 sm:justify-center">
                 <Button
                   type="button"
-                  onClick={() => setHintModalOpen(false)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setHintModalOpen(false);
+                  }}
                   className="rounded-full border-0 bg-gradient-to-r from-violet-500 via-fuchsia-500 to-violet-500 bg-[length:200%_100%] px-10 font-semibold text-white shadow-lg shadow-violet-300/45 transition-[background-position,transform] hover:bg-[position:100%_0] hover:shadow-violet-400/50 active:scale-[0.98]"
                 >
                   확인
