@@ -70,7 +70,7 @@ export function TeamAuthScreen({
           disabled={isSubmitting}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          {selectedTeamId ? 'Back to Teams' : 'Back'}
+          뒤로가기
         </Button>
 
         <motion.div
@@ -123,14 +123,14 @@ export function TeamAuthScreen({
                 <div className="inline-flex items-center justify-center w-16 h-16 border border-border bg-white/70 mb-4 rounded-2xl shadow-[0_12px_34px_rgba(32,26,34,0.10)]">
                   <Lock className="w-8 h-8 text-foreground/85" />
                 </div>
-                <h2 className="text-3xl font-bold text-foreground mb-2">팀 인증</h2>
+                <h2 className="text-3xl font-bold text-foreground mb-2">팀 인증번호</h2>
                 <p className="text-muted-foreground">{selectedTeam.name}</p>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <label htmlFor="password" className="block text-sm font-medium text-foreground/80 mb-2">
-                    Enter Team Password
+                    비밀번호 입력하기
                   </label>
                   <Input
                     id="password"
@@ -162,7 +162,7 @@ export function TeamAuthScreen({
                   className="w-full border border-primary/25 bg-primary text-primary-foreground font-semibold py-6 text-lg hover:opacity-95"
                   disabled={isSubmitting || password.length === 0}
                 >
-                  {isSubmitting ? 'Checking...' : 'Continue'}
+                  {isSubmitting ? '확인 중…' : '확인'}
                 </Button>
               </form>
 
