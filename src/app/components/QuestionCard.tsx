@@ -111,10 +111,12 @@ export function QuestionCard({
   const getCardStyle = () => {
     if (solveCount === 0) {
       return {
-        bg: 'bg-black/35',
-        border: 'border-white/20 hover:border-white/45',
-        shadow: 'shadow-[0_0_28px_rgba(255,255,255,0.06)] hover:shadow-[0_0_42px_rgba(255,255,255,0.10)]',
-        hoverBg: 'hover:bg-white/5',
+        // Solid dark tile on pastel grid (reads as “black card”, not gray wash)
+        bg: 'bg-gradient-to-b from-neutral-900 to-neutral-950',
+        border: 'border-neutral-800 hover:border-primary/40',
+        shadow:
+          'shadow-[0_14px_32px_rgba(0,0,0,0.38)] ring-1 ring-inset ring-white/10 hover:shadow-[0_18px_40px_rgba(0,0,0,0.45)]',
+        hoverBg: 'hover:brightness-[1.06]',
       };
     } else if (solveCount === 1) {
       return {
@@ -133,9 +135,9 @@ export function QuestionCard({
     } else {
       // Locked (3 solves)
       return {
-        bg: 'bg-gray-500/10',
-        border: 'border-gray-500/30',
-        shadow: 'shadow-[0_0_22px_rgba(255,255,255,0.04)]',
+        bg: 'bg-gradient-to-b from-neutral-800 to-neutral-900',
+        border: 'border-neutral-700',
+        shadow: 'shadow-[0_10px_26px_rgba(0,0,0,0.28)] ring-1 ring-inset ring-white/5',
         hoverBg: '',
       };
     }
@@ -189,7 +191,7 @@ export function QuestionCard({
               stiffness: 200,
               damping: 20,
             }}
-            className="absolute inset-0 flex items-center justify-center bg-gray-900/70 rounded-2xl backdrop-blur-sm z-10"
+            className="absolute inset-0 flex items-center justify-center bg-neutral-950/85 rounded-2xl backdrop-blur-sm z-10"
           >
             <button
               type="button"
@@ -247,7 +249,7 @@ export function QuestionCard({
             <Unlock className="w-[clamp(22px,3.2vw,32px)] h-[clamp(22px,3.2vw,32px)] text-green-400" />
           </motion.div>
         ) : (
-          <Lock className={`w-[clamp(22px,3.2vw,32px)] h-[clamp(22px,3.2vw,32px)] ${isLocked ? 'text-gray-500' : 'text-white/75'}`} />
+          <Lock className={`w-[clamp(22px,3.2vw,32px)] h-[clamp(22px,3.2vw,32px)] ${isLocked ? 'text-neutral-500' : 'text-white/80'}`} />
         )}
 
         <div className="text-[clamp(14px,2.4vw,22px)] font-bold text-white">Q{questionNumber}</div>
@@ -267,7 +269,7 @@ export function QuestionCard({
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            className="flex items-center gap-1 bg-black/40 rounded-full px-[clamp(6px,1vw,8px)] py-[clamp(4px,0.8vw,6px)]"
+            className="flex items-center gap-1 bg-black/50 rounded-full px-[clamp(6px,1vw,8px)] py-[clamp(4px,0.8vw,6px)] ring-1 ring-white/10"
           >
             {Array.from({ length: 3 }).map((_, i) => (
               <div
@@ -277,7 +279,7 @@ export function QuestionCard({
                     ? solveCount === 1
                       ? 'bg-green-400'
                       : 'bg-orange-400'
-                    : 'bg-gray-600'
+                    : 'bg-neutral-600'
                 }`}
               />
             ))}
