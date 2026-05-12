@@ -38,7 +38,7 @@ export function AdminAuth({ onSuccess, onCancel }: AdminAuthProps) {
             <div className="w-12 h-12 border border-border bg-white/70 flex items-center justify-center shadow-[0_12px_34px_rgba(32,26,34,0.12)] rounded-2xl">
               <Shield className="w-6 h-6 text-foreground/85" />
             </div>
-            <h2 className="text-2xl font-bold text-foreground">Admin Access</h2>
+            <h2 className="mystery-title text-2xl font-bold tracking-tight">Admin Access</h2>
           </div>
           <button
             onClick={onCancel}
@@ -50,7 +50,7 @@ export function AdminAuth({ onSuccess, onCancel }: AdminAuthProps) {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="admin-password" className="block text-sm font-medium text-foreground/80 mb-2">
+            <label htmlFor="admin-password" className="mystery-subtitle mb-2 block text-sm font-medium">
               Admin Password
             </label>
             <div className="relative">
