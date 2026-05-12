@@ -1,5 +1,15 @@
 @custom-variant dark (&:is(.dark *));
 
+@font-face {
+  font-family: "Jalnan2";
+  src:
+    url("/fonts/Jalnan2.otf") format("opentype"),
+    url("/fonts/Jalnan2TTF.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Theme tokens live in `default_theme.css`. Keep this file for global base + utilities only. */
 
 @theme inline {
@@ -51,6 +61,7 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-family: var(--font-family);
+    letter-spacing: 0.01em;
   }
 }
 
