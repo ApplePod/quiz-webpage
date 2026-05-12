@@ -67,6 +67,8 @@ export function AnswerScreen({
   const [resolvedReward, setResolvedReward] = useState<number | null>(null);
   const [hintInsufficientCoins, setHintInsufficientCoins] = useState(false);
   const [showRechargeDialog, setShowRechargeDialog] = useState(false);
+  /** Radix: opening a second Dialog in the same tick as closing the first is unreliable; open after close. */
+  const pendingRechargeAfterHintCloseRef = useRef(false);
   const rewardForCurrentOrder =
     solveCount === 0
       ? question.coinRewardFirst
@@ -390,19 +392,28 @@ export function AnswerScreen({
   }, [result, showWrongFx, wrongEmojiShapes]);
 
   const handleHintConfirm = () => {
-    setShowHintDialog(false);
-
     if (hintInsufficientCoins) {
-      // Open after the hint dialog unmounts — Radix can skip opening a second dialog in the same tick.
-      window.setTimeout(() => {
-        setShowRechargeDialog(true);
-      }, 0);
+      pendingRechargeAfterHintCloseRef.current = true;
+      setShowHintDialog(false);
       return;
     }
 
+    setShowHintDialog(false);
     setHintRevealed(true);
     onHintRequest(team.id, question.id);
   };
+
+  useEffect(() => {
+    if (showHintDialog) return;
+    if (!pendingRechargeAfterHintCloseRef.current) return;
+
+    const id = window.setTimeout(() => {
+      pendingRechargeAfterHintCloseRef.current = false;
+      setShowRechargeDialog(true);
+    }, 200);
+
+    return () => window.clearTimeout(id);
+  }, [showHintDialog]);
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
@@ -705,6 +716,7 @@ export function AnswerScreen({
                     type="button"
                     variant="outline"
                     onClick={() => {
+                      pendingRechargeAfterHintCloseRef.current = false;
                       setHintInsufficientCoins(team.coins < question.hintCost);
                       setShowHintDialog(true);
                     }}
@@ -722,7 +734,13 @@ export function AnswerScreen({
       </div>
 
       {/* Hint Confirmation Dialog */}
-      <Dialog open={showHintDialog} onOpenChange={setShowHintDialog}>
+      <Dialog
+        open={showHintDialog}
+        onOpenChange={(open) => {
+          setShowHintDialog(open);
+          if (open) pendingRechargeAfterHintCloseRef.current = false;
+        }}
+      >
         <DialogContent
           className={
             hintInsufficientCoins
@@ -764,8 +782,12 @@ export function AnswerScreen({
           </DialogHeader>
           <DialogFooter>
             <Button
+              type="button"
               variant="outline"
-              onClick={() => setShowHintDialog(false)}
+              onClick={() => {
+                pendingRechargeAfterHintCloseRef.current = false;
+                setShowHintDialog(false);
+              }}
               className={
                 hintInsufficientCoins
                   ? 'border-red-500 text-red-600 hover:bg-red-50'
@@ -775,6 +797,7 @@ export function AnswerScreen({
               취소
             </Button>
             <Button
+              type="button"
               onClick={handleHintConfirm}
               className={
                 hintInsufficientCoins
