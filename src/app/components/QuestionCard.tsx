@@ -248,90 +248,87 @@ export function QuestionCard({
         </div>
       )}
 
-      <div className="relative z-30 h-full w-full flex flex-col items-center justify-center gap-[clamp(6px,1.2vw,12px)] px-[clamp(8px,1.4vw,16px)]">
-        {/* Lock icon based on active team status */}
-        {solvedByActiveTeam ? (
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 220 }}
-          >
-            <Unlock
-              strokeWidth={2.5}
-              className={`w-[clamp(22px,3.2vw,32px)] h-[clamp(22px,3.2vw,32px)] ${unlockIconWhenTeamSolved}`}
-            />
-          </motion.div>
-        ) : (
-          <Lock
-            strokeWidth={2.5}
-            className={`w-[clamp(22px,3.2vw,32px)] h-[clamp(22px,3.2vw,32px)] ${lockClassWhenOpen}`}
-          />
-        )}
-
-        <div className={`text-[clamp(14px,2.4vw,22px)] font-bold ${qLabelClass}`}>Q{questionNumber}</div>
-
-        {/* Coin Reward */}
-        {!isLocked && !solvedByActiveTeam && (
-          <div className={`flex items-center gap-1 mt-1 ${coinRowClass}`}>
-            <Coins className="w-[clamp(14px,2vw,18px)] h-[clamp(14px,2vw,18px)]" />
-            <span className="text-[clamp(11px,1.6vw,14px)] font-semibold">{coinReward}</span>
+      <div className="relative z-30 flex h-full w-full flex-col px-[clamp(4px,1vw,10px)] pb-[clamp(4px,0.8vw,8px)] pt-[clamp(2px,0.5vw,6px)]">
+        {(solveCount === 1 || solveCount === 2) && (
+          <div className="flex shrink-0 items-start justify-between gap-1.5 pb-0.5">
+            <div className="min-w-0 flex-1">
+              {solveCount === 1 && (
+                <motion.div
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  className="inline-flex border border-sky-400/60 bg-white/90 text-sky-900 text-[clamp(9px,1.2vw,11px)] font-bold px-[clamp(5px,0.9vw,7px)] py-[clamp(2px,0.5vw,3px)] rounded-full shadow-none"
+                >
+                  1st
+                </motion.div>
+              )}
+              {solveCount === 2 && (
+                <motion.div
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  className="inline-flex border border-pink-400/60 bg-white/90 text-pink-900 text-[clamp(9px,1.2vw,11px)] font-bold px-[clamp(5px,0.9vw,7px)] py-[clamp(2px,0.5vw,3px)] rounded-full shadow-none"
+                >
+                  2nd
+                </motion.div>
+              )}
+            </div>
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              className={`flex shrink-0 items-center gap-0.5 rounded-full px-[clamp(5px,0.85vw,7px)] py-[clamp(3px,0.65vw,5px)] ring-1 ring-inset ${
+                solveCount === 1
+                  ? 'bg-sky-200/90 ring-sky-400/40'
+                  : 'bg-pink-200/90 ring-pink-400/40'
+              }`}
+            >
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div
+                  key={i}
+                  className={`w-[clamp(5px,0.85vw,7px)] h-[clamp(5px,0.85vw,7px)] rounded-full transition-all duration-300 ${
+                    i < solveCount
+                      ? solveCount === 1
+                        ? 'bg-sky-600'
+                        : 'bg-pink-600'
+                      : solveCount === 1
+                        ? 'bg-sky-900/18'
+                        : 'bg-pink-900/18'
+                  }`}
+                />
+              ))}
+            </motion.div>
           </div>
         )}
-      </div>
 
-      {/* Solve count indicator */}
-      {solveCount > 0 && solveCount < 3 && (
-        <div className="absolute top-2 right-2">
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            className={`flex items-center gap-1 rounded-full px-[clamp(6px,1vw,8px)] py-[clamp(4px,0.8vw,6px)] ring-1 ring-inset ${
-              solveCount === 1
-                ? 'bg-sky-200/90 ring-sky-400/40'
-                : 'bg-pink-200/90 ring-pink-400/40'
-            }`}
-          >
-            {Array.from({ length: 3 }).map((_, i) => (
-              <div
-                key={i}
-                className={`w-[clamp(6px,1vw,8px)] h-[clamp(6px,1vw,8px)] rounded-full transition-all duration-300 ${
-                  i < solveCount
-                    ? solveCount === 1
-                      ? 'bg-sky-600'
-                      : 'bg-pink-600'
-                    : solveCount === 1
-                      ? 'bg-sky-900/18'
-                      : 'bg-pink-900/18'
-                }`}
+        <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-0.5">
+          {solvedByActiveTeam ? (
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: 'spring', stiffness: 220 }}
+            >
+              <Unlock
+                strokeWidth={2.5}
+                className={`w-[clamp(20px,3vw,28px)] h-[clamp(20px,3vw,28px)] ${unlockIconWhenTeamSolved}`}
               />
-            ))}
-          </motion.div>
-        </div>
-      )}
+            </motion.div>
+          ) : (
+            <Lock
+              strokeWidth={2.5}
+              className={`w-[clamp(20px,3vw,28px)] h-[clamp(20px,3vw,28px)] ${lockClassWhenOpen}`}
+            />
+          )}
 
-      {/* Badge for first or second solve */}
-      {solveCount === 1 && (
-        <div className="absolute top-2 left-2">
-          <motion.div
-            initial={{ scale: 0, rotate: -180 }}
-            animate={{ scale: 1, rotate: 0 }}
-            className="border border-sky-400/60 bg-white/90 text-sky-900 text-[clamp(10px,1.4vw,12px)] font-bold px-[clamp(6px,1vw,8px)] py-[clamp(3px,0.7vw,4px)] rounded-full shadow-none"
-          >
-            1st
-          </motion.div>
+          <div className={`text-[clamp(13px,2.2vw,20px)] font-bold leading-none ${qLabelClass}`}>
+            Q{questionNumber}
+          </div>
+
+          {!isLocked && !solvedByActiveTeam && (
+            <div className={`flex items-center gap-0.5 ${coinRowClass}`}>
+              <Coins className="w-[clamp(12px,1.8vw,16px)] h-[clamp(12px,1.8vw,16px)]" />
+              <span className="text-[clamp(10px,1.45vw,13px)] font-semibold leading-none">{coinReward}</span>
+            </div>
+          )}
         </div>
-      )}
-      {solveCount === 2 && (
-        <div className="absolute top-2 left-2">
-          <motion.div
-            initial={{ scale: 0, rotate: -180 }}
-            animate={{ scale: 1, rotate: 0 }}
-            className="border border-pink-400/60 bg-white/90 text-pink-900 text-[clamp(10px,1.4vw,12px)] font-bold px-[clamp(6px,1vw,8px)] py-[clamp(3px,0.7vw,4px)] rounded-full shadow-none"
-          >
-            2nd
-          </motion.div>
-        </div>
-      )}
+      </div>
     </motion.button>
   );
 }
