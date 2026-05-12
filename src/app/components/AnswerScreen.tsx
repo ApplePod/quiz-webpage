@@ -393,7 +393,10 @@ export function AnswerScreen({
     setShowHintDialog(false);
 
     if (hintInsufficientCoins) {
-      setShowRechargeDialog(true);
+      // Open after the hint dialog unmounts — Radix can skip opening a second dialog in the same tick.
+      window.setTimeout(() => {
+        setShowRechargeDialog(true);
+      }, 0);
       return;
     }
 
