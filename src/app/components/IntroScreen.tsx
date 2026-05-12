@@ -14,20 +14,20 @@ type IntroScreenProps = {
 
 const gold = '#f9c059'
 
-const posterImages = [
-  '/sherlock/assets/images/gallery/01.jpg',
-  '/sherlock/assets/images/gallery/02.jpg',
-  '/sherlock/assets/images/gallery/03.jpg',
-  '/sherlock/assets/images/gallery/04.jpg',
-  '/sherlock/assets/images/gallery/05.jpg',
-  '/sherlock/assets/images/gallery/06.jpg',
-  '/sherlock/assets/images/gallery/07.jpg',
-  '/sherlock/assets/images/gallery/08.jpg',
-  '/sherlock/assets/images/gallery/09.jpg',
-  '/sherlock/assets/images/gallery/10.jpg',
-  '/sherlock/assets/images/gallery/11.jpg',
-  '/sherlock/assets/images/gallery/12.jpg',
-]
+const introPosterBase = `${import.meta.env.BASE_URL.replace(/\/?$/, '/')}intro-posters/`
+
+// Each marquee row = one couple (same characters/outfits in that row; different rows = different couples).
+const INTRO_POSTER_ROWS = [
+  ['intro-poster-n01.png', 'intro-poster-n02.png', 'intro-poster-n03.png'],
+  ['intro-poster-n04.png', 'intro-poster-n05.png', 'intro-poster-n06.png', 'intro-poster-n07.png'],
+  ['intro-poster-n08.png', 'intro-poster-n09.png', 'intro-poster-n10.png', 'intro-poster-n11.png'],
+].map((row) => row.map((file) => `${introPosterBase}${file}`)) as readonly [string[], string[], string[]]
+
+function buildMarqueeStrip(urls: readonly string[]): string[] {
+  if (urls.length === 0) return []
+  const triple = [...urls, ...urls, ...urls]
+  return [...triple, ...triple, ...triple]
+}
 
 export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) {
   const title = 'Escape Quiz Room'
@@ -158,48 +158,50 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
   }, [emblaApi, applyCoverflow])
 
   return (
-    <div className="min-h-screen flex flex-col">
-
-      <main className="relative flex-1 flex flex-col items-center justify-center gap-10 py-10 px-4 min-h-0 overflow-hidden">
-        {/* Poster grid background (sherlock main visual 느낌) */}
-        <div className="pointer-events-none absolute inset-0">
-          <div
-            className="absolute -inset-24 opacity-[0.33]"
-            style={{ rotate: '-18deg' }}
-          >
-            {(['left', 'right', 'left'] as const).map((dir, rowIdx) => {
-              const speed = rowIdx === 0 ? 'fast' : rowIdx === 1 ? 'mid' : 'slow'
-              const rowImages = posterImages.concat(posterImages).concat(posterImages)
-              return (
-                <div key={rowIdx} className={rowIdx === 0 ? '' : 'mt-6'}>
-                  <div className="overflow-hidden">
-                    <div
-                      className="intro-poster-row"
-                      data-dir={dir === 'right' ? 'right' : 'left'}
-                      data-speed={speed}
-                    >
-                      {rowImages.map((src, idx) => (
-                        <div
-                          key={`${rowIdx}-${src}-${idx}`}
-                          className="w-[140px] sm:w-[190px] h-[200px] sm:h-[260px] overflow-hidden rounded-sm shadow-[0_16px_60px_rgba(0,0,0,0.7)] bg-black/70"
-                        >
-                          <img
-                            src={src}
-                            alt=""
-                            className="w-full h-full object-cover"
-                            draggable={false}
-                          />
-                        </div>
-                      ))}
-                    </div>
+    <div className="relative min-h-screen flex flex-col">
+      {/* Fixed full-viewport layer: not clipped by App `container` / main overflow; reads well on deploy subpaths */}
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden>
+        <div
+          className="absolute left-1/2 top-1/2 w-[min(220vw,2800px)] -translate-x-1/2 -translate-y-1/2 opacity-[0.52] sm:opacity-[0.58]"
+          style={{ rotate: '-18deg' }}
+        >
+          {(['left', 'right', 'left'] as const).map((dir, rowIdx) => {
+            const speed = rowIdx === 0 ? 'fast' : rowIdx === 1 ? 'mid' : 'slow'
+            const rowUrls = INTRO_POSTER_ROWS[rowIdx] ?? INTRO_POSTER_ROWS[0]
+            const rowImages = buildMarqueeStrip(rowUrls)
+            return (
+              <div key={rowIdx} className={rowIdx === 0 ? '' : 'mt-6'}>
+                <div className="overflow-hidden">
+                  <div
+                    className="intro-poster-row"
+                    data-dir={dir === 'right' ? 'right' : 'left'}
+                    data-speed={speed}
+                  >
+                    {rowImages.map((src, idx) => (
+                      <div
+                        key={`${rowIdx}-${src}-${idx}`}
+                        className="w-[140px] sm:w-[190px] h-[200px] sm:h-[260px] overflow-hidden rounded-sm shadow-[0_16px_60px_rgba(0,0,0,0.7)] bg-zinc-900/80"
+                      >
+                        <img
+                          src={src}
+                          alt=""
+                          className="w-full h-full object-cover"
+                          draggable={false}
+                          loading="eager"
+                          decoding="async"
+                        />
+                      </div>
+                    ))}
                   </div>
                 </div>
-              )
-            })}
-          </div>
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,transparent,rgba(0,0,0,0.9))]" />
+              </div>
+            )
+          })}
         </div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,transparent_18%,rgba(0,0,0,0.55)_55%,rgba(0,0,0,0.82)_100%)]" />
+      </div>
 
+      <main className="relative z-10 flex flex-1 flex-col items-center justify-center gap-10 py-10 px-4 min-h-0 overflow-x-hidden">
         <div className="relative z-10 w-full max-w-5xl space-y-3">
           <p className="text-center text-[10px] sm:text-xs tracking-[0.4em] text-white/45 uppercase">
             Participants
