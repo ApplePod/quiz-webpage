@@ -4,6 +4,7 @@ import { Team, Question } from '../types';
 import {
   ArrowLeft,
   Lightbulb,
+  AlertTriangle,
   Send,
   CheckCircle2,
   XCircle,
@@ -719,13 +720,40 @@ export function AnswerScreen({
 
       {/* Hint Confirmation Dialog */}
       <Dialog open={showHintDialog} onOpenChange={setShowHintDialog}>
-        <DialogContent className="bg-gray-900 border-amber-700/50 text-white">
+        <DialogContent
+          className={
+            hintInsufficientCoins
+              ? 'border-2 border-red-500 bg-white text-red-600 shadow-xl sm:max-w-md'
+              : 'border border-border bg-white text-foreground shadow-xl'
+          }
+        >
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-white">
-              <Lightbulb className="w-6 h-6 text-amber-400" />
-              {hintInsufficientCoins ? '코인이 부족해요' : '힌트보기'}
+            <DialogTitle
+              className={
+                hintInsufficientCoins
+                  ? 'flex items-center gap-2 text-2xl font-bold text-red-600'
+                  : 'flex items-center gap-2 text-foreground'
+              }
+            >
+              {hintInsufficientCoins ? (
+                <>
+                  <AlertTriangle className="h-7 w-7 shrink-0 text-red-600" aria-hidden />
+                  경고
+                </>
+              ) : (
+                <>
+                  <Lightbulb className="h-6 w-6 shrink-0 text-amber-600" aria-hidden />
+                  힌트보기
+                </>
+              )}
             </DialogTitle>
-            <DialogDescription className="text-gray-300">
+            <DialogDescription
+              className={
+                hintInsufficientCoins
+                  ? 'text-xl font-semibold leading-snug text-red-600 sm:text-2xl'
+                  : 'text-base text-muted-foreground'
+              }
+            >
               {hintInsufficientCoins
                 ? '코인이 부족합니다. 무료충전하시겠습니까?'
                 : `힌트를 보면 팀 코인에서 ${question.hintCost}코인이 차감돼요. 계속할까요?`}
@@ -735,15 +763,23 @@ export function AnswerScreen({
             <Button
               variant="outline"
               onClick={() => setShowHintDialog(false)}
-              className="border-white/30 text-white hover:bg-white/10"
+              className={
+                hintInsufficientCoins
+                  ? 'border-red-500 text-red-600 hover:bg-red-50'
+                  : 'border-border text-foreground hover:bg-muted/80'
+              }
             >
               취소
             </Button>
             <Button
               onClick={handleHintConfirm}
-              className="bg-amber-500 hover:bg-amber-400 text-amber-950 font-semibold border border-amber-700/30"
+              className={
+                hintInsufficientCoins
+                  ? 'bg-red-600 font-semibold text-white hover:bg-red-700'
+                  : 'border border-primary/20 bg-primary font-semibold text-primary-foreground hover:opacity-95'
+              }
             >
-              {hintInsufficientCoins ? '네' : '네, 힌트 볼게요'}
+              확인
             </Button>
           </DialogFooter>
         </DialogContent>
