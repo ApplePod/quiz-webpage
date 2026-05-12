@@ -635,6 +635,8 @@ begin
   end if;
 
   delete from submissions where game_id = v_game_id;
+  delete from hint_purchases where game_id = v_game_id;
+  delete from answer_reveals where game_id = v_game_id;
   delete from question_solves where game_id = v_game_id;
   delete from question_status where game_id = v_game_id;
 
@@ -698,6 +700,8 @@ begin
   end if;
 
   delete from question_solves where game_id = v_game_id;
+  delete from hint_purchases where game_id = v_game_id;
+  delete from answer_reveals where game_id = v_game_id;
   delete from question_status where game_id = v_game_id;
 
   insert into question_solves (game_id, question_id, team_id)

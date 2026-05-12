@@ -294,6 +294,16 @@ export async function resetQuestion(questionId: number) {
     throw questionError
   }
 
+  const { error: hintError } = await supabase.from('hint_purchases').delete().eq('question_id', question.id)
+  if (hintError) {
+    throw hintError
+  }
+
+  const { error: revealError } = await supabase.from('answer_reveals').delete().eq('question_id', question.id)
+  if (revealError) {
+    throw revealError
+  }
+
   const { error: solveError } = await supabase
     .from('question_solves')
     .delete()
@@ -314,6 +324,16 @@ export async function resetQuestion(questionId: number) {
 export async function resetAllQuestions() {
   ensureConfigured()
   const supabase = requireSupabase()
+  const { error: hintError } = await supabase.from('hint_purchases').delete().neq('id', '')
+  if (hintError) {
+    throw hintError
+  }
+
+  const { error: revealError } = await supabase.from('answer_reveals').delete().neq('id', '')
+  if (revealError) {
+    throw revealError
+  }
+
   const { error: solveError } = await supabase.from('question_solves').delete().neq('id', '')
   if (solveError) {
     throw solveError

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Lock, Unlock, X, Coins } from 'lucide-react';
+import { Lock, X, Coins } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface QuestionCardProps {
@@ -106,6 +106,7 @@ export function QuestionCard({
   const isSolved = solveCount > 0;
   const isDisabled = isLocked || solvedByActiveTeam;
   const solvedBorder = solvedBorderMap[questionNumber];
+  const cardMuted = isLocked;
 
   // Determine card state
   const getCardStyle = () => {
@@ -160,8 +161,6 @@ export function QuestionCard({
           : isLocked
             ? 'text-neutral-500'
             : 'text-white/80';
-  const unlockIconWhenTeamSolved =
-    solveCount === 1 ? 'text-sky-950' : solveCount === 2 ? 'text-pink-950' : 'text-green-400';
   const coinRowClass =
     solveCount === 0
       ? 'text-amber-900/90'
@@ -177,8 +176,10 @@ export function QuestionCard({
       onClick={isDisabled ? undefined : onClick}
       whileHover={isDisabled ? {} : { scale: 1.05, y: -5 }}
       whileTap={isDisabled ? {} : { scale: 0.95 }}
-      className={`relative w-[var(--cell)] h-[var(--cell)] rounded-2xl border transition-all duration-300 ${cardStyle.bg} ${cardStyle.border} ${cardStyle.shadow} ${
-        isDisabled ? 'cursor-not-allowed opacity-60' : `${cardStyle.hoverBg} cursor-pointer`
+      className={`relative w-[var(--cell)] h-[var(--cell)] rounded-2xl border transition-all duration-300 disabled:opacity-100 ${cardStyle.bg} ${cardStyle.border} ${cardStyle.shadow} ${
+        isDisabled
+          ? `cursor-not-allowed${cardMuted ? ' opacity-60' : ''}`
+          : `${cardStyle.hoverBg} cursor-pointer`
       }`}
       // Keep the element interactive for locked overlays (X click),
       // but fully disable for "solved by active team".
@@ -299,29 +300,16 @@ export function QuestionCard({
         )}
 
         <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-0.5">
-          {solvedByActiveTeam ? (
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: 'spring', stiffness: 220 }}
-            >
-              <Unlock
-                strokeWidth={2.5}
-                className={`w-[clamp(20px,3vw,28px)] h-[clamp(20px,3vw,28px)] ${unlockIconWhenTeamSolved}`}
-              />
-            </motion.div>
-          ) : (
-            <Lock
-              strokeWidth={2.5}
-              className={`w-[clamp(20px,3vw,28px)] h-[clamp(20px,3vw,28px)] ${lockClassWhenOpen}`}
-            />
-          )}
+          <Lock
+            strokeWidth={2.5}
+            className={`w-[clamp(20px,3vw,28px)] h-[clamp(20px,3vw,28px)] ${lockClassWhenOpen}`}
+          />
 
           <div className={`text-[clamp(13px,2.2vw,20px)] font-bold leading-none ${qLabelClass}`}>
             Q{questionNumber}
           </div>
 
-          {!isLocked && !solvedByActiveTeam && (
+          {!isLocked && (
             <div className={`flex items-center gap-0.5 ${coinRowClass}`}>
               <Coins className="w-[clamp(12px,1.8vw,16px)] h-[clamp(12px,1.8vw,16px)]" />
               <span className="text-[clamp(10px,1.45vw,13px)] font-semibold leading-none">{coinReward}</span>

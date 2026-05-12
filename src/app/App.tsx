@@ -62,6 +62,34 @@ export default function App() {
     }
   }, []);
 
+  const clearLocalHintPurchasesForQuestion = useCallback((questionId: number) => {
+    try {
+      const needle = `:${questionId}`;
+      const keys: string[] = [];
+      for (let i = 0; i < window.localStorage.length; i++) {
+        const k = window.localStorage.key(i);
+        if (!k?.startsWith(`${STORAGE_HINT_KEY_PREFIX}:`)) continue;
+        if (k.endsWith(needle)) keys.push(k);
+      }
+      keys.forEach((k) => window.localStorage.removeItem(k));
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const clearAllLocalHintPurchases = useCallback(() => {
+    try {
+      const keys: string[] = [];
+      for (let i = 0; i < window.localStorage.length; i++) {
+        const k = window.localStorage.key(i);
+        if (k?.startsWith(`${STORAGE_HINT_KEY_PREFIX}:`)) keys.push(k);
+      }
+      keys.forEach((k) => window.localStorage.removeItem(k));
+    } catch {
+      // ignore
+    }
+  }, []);
+
   const handleActionError = (actionError: unknown, fallbackMessage: string) => {
     const message =
       actionError instanceof Error ? actionError.message : fallbackMessage;
@@ -490,9 +518,11 @@ export default function App() {
         setQuestionStatuses((previous) =>
           previous.filter((status) => status.questionId !== questionId),
         );
+        clearLocalHintPurchasesForQuestion(questionId);
         return;
       }
       await resetQuestion(questionId);
+      clearLocalHintPurchasesForQuestion(questionId);
       await syncFromSnapshot();
     } catch (actionError) {
       handleActionError(actionError, 'Failed to reset this question.');
@@ -503,9 +533,11 @@ export default function App() {
     try {
       if (!isSupabaseConfigured) {
         setQuestionStatuses([]);
+        clearAllLocalHintPurchases();
         return;
       }
       await resetAllQuestions();
+      clearAllLocalHintPurchases();
       await syncFromSnapshot();
     } catch (actionError) {
       handleActionError(actionError, 'Failed to reset all questions.');
@@ -585,9 +617,11 @@ export default function App() {
         setQuestions(initialQuestions);
         setTimeRemaining(7200);
         setTimerRunning(false);
+        clearAllLocalHintPurchases();
         return;
       }
       await adminResetGame();
+      clearAllLocalHintPurchases();
       await syncFromSnapshot();
     } catch (actionError) {
       handleActionError(actionError, 'Failed to reset the game.');
@@ -631,9 +665,11 @@ export default function App() {
             locked: tier === 3,
           })),
         );
+        clearAllLocalHintPurchases();
         return;
       }
       await adminSetAllQuestionsSolveTier(tier);
+      clearAllLocalHintPurchases();
       await syncFromSnapshot();
     } catch (actionError) {
       handleActionError(
