@@ -441,7 +441,7 @@ export function AnswerScreen({
           disabled={showResultDialog || isSubmittingResult}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back
+          뒤로가기
         </Button>
 
         {/* Main Card */}
@@ -453,19 +453,19 @@ export function AnswerScreen({
           {/* Header */}
           <div className="flex items-center justify-between mb-6 pb-6 border-b border-border/70">
             <div>
-              <h3 className="text-sm text-muted-foreground">Question {question.id}</h3>
+              <h3 className="text-sm text-muted-foreground">Q {question.id}</h3>
               <h2 className="text-2xl font-bold text-foreground">{team.name}</h2>
             </div>
             <div className="flex gap-6">
               <div className="text-right">
-                <div className="text-sm text-muted-foreground">Reward</div>
+                <div className="text-sm text-muted-foreground">보상</div>
                 <div className="text-3xl font-bold text-emerald-700 flex items-center gap-2">
                   <Coins className="w-7 h-7" />
                   {rewardForCurrentOrder}
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-sm text-muted-foreground">Team Coins</div>
+                <div className="text-sm text-muted-foreground">현재 보유코인</div>
                 <div className="text-3xl font-bold text-primary">{displayTeamCoins}</div>
               </div>
             </div>
@@ -489,14 +489,14 @@ export function AnswerScreen({
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div>
                     <label htmlFor="answer" className="block text-sm font-medium text-foreground/80 mb-2">
-                      Your Answer
+                      정답입력
                     </label>
                     <Input
                       id="answer"
                       type="text"
                       value={answer}
                       onChange={(e) => setAnswer(e.target.value)}
-                      placeholder="Type your answer here..."
+                      placeholder="이곳에 정답을 입력해주세요.."
                       className="bg-white/80 border-border text-foreground placeholder:text-muted-foreground focus:border-primary/50 focus:ring-primary/25 text-lg py-6 rounded-2xl"
                       autoFocus
                     />
@@ -508,7 +508,7 @@ export function AnswerScreen({
                     disabled={!answer.trim()}
                   >
                     <Send className="w-5 h-5 mr-2" />
-                    Submit Answer
+                    제출하기
                   </Button>
                 </form>
               ) : (
