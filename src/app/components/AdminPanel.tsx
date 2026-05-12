@@ -27,6 +27,7 @@ export type AdminPanelProps = {
   onAdminResetGame: () => void;
   onAdminSetTestMode: () => void;
   onAdminMarkAllSolved: () => void;
+  onAdminSeedFirstNQuestionsOneSolve: (n: 1 | 2 | 3) => void;
 };
 
 export function AdminPanel({
@@ -47,6 +48,7 @@ export function AdminPanel({
   onAdminResetGame,
   onAdminSetTestMode,
   onAdminMarkAllSolved,
+  onAdminSeedFirstNQuestionsOneSolve,
 }: AdminPanelProps) {
   const [editingTeam, setEditingTeam] = useState<string | null>(null);
   const [editingQuestion, setEditingQuestion] = useState<number | null>(null);
@@ -964,9 +966,62 @@ export function AdminPanel({
                   </div>
                 </div>
 
+                <div className="mt-6 rounded-xl border border-gray-700 bg-gray-900 p-4">
+                  <div className="text-white font-semibold mb-1 flex items-center gap-2">
+                    <ListOrdered className="w-4 h-4 shrink-0" />
+                    부분 정답 시나리오 (메인 그리드)
+                  </div>
+                  <p className="text-xs text-gray-400 mb-4 leading-relaxed">
+                    <span className="text-gray-300 font-medium">Q1 → Q2 → Q3</span> 순으로, 팀코드가 가장 빠른 팀이 각각{' '}
+                    <span className="text-gray-200">1팀만 정답(1차)</span>인 상태로 맞춥니다. 나머지 문제의 풀이 기록은
+                    모두 지워집니다. (제출 로그 submissions 는 그대로입니다.)
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <Button
+                      onClick={() => {
+                        const ok = window.confirm(
+                          'Q1만 1팀 정답(1차) 상태로 만들까요? 다른 문제 풀이는 초기화됩니다.',
+                        );
+                        if (!ok) return;
+                        onAdminSeedFirstNQuestionsOneSolve(1);
+                      }}
+                      className="w-full bg-pink-700/90 hover:bg-pink-600 text-white"
+                    >
+                      1문제만 맞춤
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        const ok = window.confirm(
+                          'Q1·Q2 두 문제만 각 1팀 정답(1차)으로 만들까요? 다른 문제 풀이는 초기화됩니다.',
+                        );
+                        if (!ok) return;
+                        onAdminSeedFirstNQuestionsOneSolve(2);
+                      }}
+                      className="w-full bg-sky-700/90 hover:bg-sky-600 text-white"
+                    >
+                      2문제 맞춤
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        const ok = window.confirm(
+                          'Q1·Q2·Q3 세 문제만 각 1팀 정답(1차)으로 만들까요? 다른 문제 풀이는 초기화됩니다.',
+                        );
+                        if (!ok) return;
+                        onAdminSeedFirstNQuestionsOneSolve(3);
+                      }}
+                      className="w-full bg-violet-700/90 hover:bg-violet-600 text-white"
+                    >
+                      3문제 맞춤
+                    </Button>
+                  </div>
+                </div>
+
                 <div className="mt-5 text-xs text-gray-500 leading-relaxed">
                   팁: “전체 게임 초기화”는 테스트를 처음부터 다시 시작할 때 사용하세요. “테스트 모드”는 빠른 입력 확인용,
                   “전체 정답 처리”는 잠김 UI/정답 표시 UI 확인용입니다.
+                  <span className="block mt-1">
+                    “1·2·3문제 맞춤”은 파스텔 카드(1차 정답)가 몇 칸 생기는지 빠르게 보고 싶을 때 쓰세요.
+                  </span>
                 </div>
               </div>
             </TabsContent>

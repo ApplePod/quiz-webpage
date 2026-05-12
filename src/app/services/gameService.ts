@@ -366,6 +366,16 @@ export async function adminMarkAllSolved() {
   if (error) throw error
 }
 
+export async function adminSeedFirstNQuestionsOneSolve(n: 1 | 2 | 3) {
+  ensureConfigured()
+  const supabase = requireSupabase()
+  const { error } = await supabase.rpc('admin_seed_first_n_questions_one_solve', {
+    p_game_code: GAME_CODE,
+    p_n: n,
+  })
+  if (error) throw error
+}
+
 export async function setQuestionLock(questionId: number, locked: boolean) {
   ensureConfigured()
   const supabase = requireSupabase()

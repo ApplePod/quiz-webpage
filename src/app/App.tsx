@@ -11,6 +11,7 @@ import { isSupabaseConfigured } from '../lib/supabase';
 import {
   adminMarkAllSolved,
   adminResetGame,
+  adminSeedFirstNQuestionsOneSolve,
   adminSetTestMode,
   fetchGameSnapshot,
   purchaseAnswerReveal,
@@ -599,6 +600,32 @@ export default function App() {
     }
   };
 
+  const handleAdminSeedFirstNQuestionsOneSolve = async (n: 1 | 2 | 3) => {
+    try {
+      if (!isSupabaseConfigured) {
+        const orderedTeams = [...teams].sort((a, b) => a.id.localeCompare(b.id));
+        const firstTeam = orderedTeams[0];
+        if (!firstTeam) return;
+        const picked = [...questions].sort((a, b) => a.id - b.id).slice(0, n);
+        const now = new Date().toISOString();
+        setQuestionStatuses(
+          picked.map((q) => ({
+            questionId: q.id,
+            solvedByTeams: [firstTeam.id],
+            solvedBy: [{ teamId: firstTeam.id, solvedAt: now }],
+            solveCount: 1,
+            locked: false,
+          })),
+        );
+        return;
+      }
+      await adminSeedFirstNQuestionsOneSolve(n);
+      await syncFromSnapshot();
+    } catch (actionError) {
+      handleActionError(actionError, 'Failed to seed partial solve scenario.');
+    }
+  };
+
   const currentQuestion = selectedQuestionId
     ? questions.find((q) => q.id === selectedQuestionId)
     : null;
@@ -711,6 +738,7 @@ export default function App() {
             onAdminResetGame: handleAdminResetGame,
             onAdminSetTestMode: handleAdminSetTestMode,
             onAdminMarkAllSolved: handleAdminMarkAllSolved,
+            onAdminSeedFirstNQuestionsOneSolve: handleAdminSeedFirstNQuestionsOneSolve,
           } as any)}
         />
       )}

@@ -717,6 +717,59 @@ $$;
 
 grant execute on function public.admin_mark_all_solved(text) to anon, authenticated;
 
+-- Seed first N questions (by question_no) with exactly one solve each (first team by team_code).
+-- Clears all solves/status for the game first (submissions untouched).
+create or replace function public.admin_seed_first_n_questions_one_solve(p_game_code text, p_n integer)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_game_id uuid;
+begin
+  if p_n is null or p_n < 1 or p_n > 3 then
+    raise exception 'p_n must be 1, 2, or 3';
+  end if;
+
+  select id into v_game_id from games where code = p_game_code limit 1;
+  if v_game_id is null then
+    raise exception 'Game not found';
+  end if;
+
+  delete from question_solves where game_id = v_game_id;
+  delete from question_status where game_id = v_game_id;
+
+  insert into question_solves (game_id, question_id, team_id)
+  select
+    v_game_id,
+    q.id,
+    (select t.id from teams t where t.game_id = v_game_id order by t.team_code limit 1)
+  from (
+    select id from questions where game_id = v_game_id order by question_no limit p_n
+  ) q;
+
+  insert into question_status (game_id, question_id, solve_count, locked)
+  select
+    v_game_id,
+    q.id,
+    1,
+    false
+  from (
+    select id from questions where game_id = v_game_id order by question_no limit p_n
+  ) q
+  on conflict (game_id, question_id)
+  do update set
+    solve_count = 1,
+    locked = false,
+    updated_at = now();
+
+  return jsonb_build_object('ok', true, 'n', p_n);
+end;
+$$;
+
+grant execute on function public.admin_seed_first_n_questions_one_solve(text, integer) to anon, authenticated;
+
 -- Supabase Realtime listens on the built-in `supabase_realtime` publication.
 -- Ensure our tables are included (idempotent).
 do $$
