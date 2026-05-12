@@ -1,6 +1,6 @@
 import { RealtimeChannel } from '@supabase/supabase-js'
 import { initialQuestions, initialTeams } from '../data/initialData'
-import { GameMeta, Question, QuestionStatus, Team } from '../types'
+import { GameMeta, Question, QuestionStatus, Team, TeamAdminUpdate } from '../types'
 import { isSupabaseConfigured, requireSupabase } from '../../lib/supabase'
 import { decodeCorrectAnswer, encodeCorrectAnswer } from '../utils/answerCodec'
 
@@ -194,7 +194,7 @@ export async function purchaseAnswerReveal(teamId: string, questionId: number, c
   return data as any
 }
 
-export async function updateTeam(teamId: string, updates: Partial<Team>) {
+export async function updateTeam(teamId: string, updates: TeamAdminUpdate) {
   ensureConfigured()
   const supabase = requireSupabase()
   const patch: Record<string, unknown> = {}
@@ -203,6 +203,12 @@ export async function updateTeam(teamId: string, updates: Partial<Team>) {
   if (updates.gender !== undefined) patch.gender = updates.gender
   if (updates.coins !== undefined) patch.coins = updates.coins
   if (updates.password !== undefined) patch.password = updates.password
+
+  const nextCode = updates.newTeamCode?.trim()
+  if (nextCode && nextCode !== teamId) {
+    patch.team_code = nextCode
+  }
+
   if (Object.keys(patch).length === 0) return
 
   const { error } = await supabase.from('teams').update(patch).eq('team_code', teamId)

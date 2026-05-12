@@ -5,7 +5,7 @@ import { AdminAuth } from './components/AdminAuth';
 import { AdminPanel } from './components/AdminPanel';
 import { IntroScreen } from './components/IntroScreen';
 import { TeamAuthScreen } from './components/TeamAuthScreen';
-import { Team, Question, QuestionStatus, ViewType } from './types';
+import { Team, Question, QuestionStatus, ViewType, TeamAdminUpdate } from './types';
 import { initialTeams, initialQuestions } from './data/initialData';
 import { isSupabaseConfigured } from '../lib/supabase';
 import {
@@ -419,15 +419,48 @@ export default function App() {
     setShowAdminPanel(false);
   };
 
-  const handleUpdateTeam = async (teamId: string, updates: Partial<Team>) => {
+  const handleUpdateTeam = async (teamId: string, updates: TeamAdminUpdate) => {
+    const nextCodeRaw = updates.newTeamCode?.trim();
+    const nextCode = nextCodeRaw && nextCodeRaw !== teamId ? nextCodeRaw : null;
+
     try {
+      setError('');
       if (!isSupabaseConfigured) {
+        if (nextCode && teams.some((t) => t.id === nextCode && t.id !== teamId)) {
+          setError('이미 사용 중인 팀 코드입니다.');
+          return;
+        }
         setTeams((previous) =>
-          previous.map((team) => (team.id === teamId ? { ...team, ...updates } : team)),
+          previous.map((team) => {
+            if (team.id !== teamId) return team;
+            const { newTeamCode: _n, ...rest } = updates;
+            const merged = { ...team, ...rest };
+            return nextCode ? { ...merged, id: nextCode } : merged;
+          }),
         );
+        try {
+          const stored = window.localStorage.getItem(STORAGE_TEAM_KEY);
+          if (nextCode && stored === teamId) {
+            window.localStorage.setItem(STORAGE_TEAM_KEY, nextCode);
+          }
+        } catch {
+          // ignore
+        }
+        return;
+      }
+      if (nextCode && teams.some((t) => t.id === nextCode && t.id !== teamId)) {
+        setError('이미 사용 중인 팀 코드입니다.');
         return;
       }
       await updateTeam(teamId, updates);
+      try {
+        const stored = window.localStorage.getItem(STORAGE_TEAM_KEY);
+        if (nextCode && stored === teamId) {
+          window.localStorage.setItem(STORAGE_TEAM_KEY, nextCode);
+        }
+      } catch {
+        // ignore
+      }
       await syncFromSnapshot();
     } catch (actionError) {
       handleActionError(actionError, 'Failed to update team.');

@@ -12,6 +12,11 @@ export interface Team {
   password: string;
 }
 
+/** 어드민 팀 저장 시 선택 필드: 팀 코드(team_code) 변경 */
+export type TeamAdminUpdate = Partial<Team> & {
+  newTeamCode?: string;
+};
+
 export interface Question {
   id: number;
   questionText: string;

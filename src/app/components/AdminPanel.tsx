@@ -3,7 +3,7 @@ import { X, FileText, Users, Settings, RotateCcw, Play, Pause, Lock, Save, Coins
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { Team, Question, QuestionStatus } from '../types';
+import { Team, Question, QuestionStatus, TeamAdminUpdate } from '../types';
 import { motion } from 'motion/react';
 import { formatDirectionDigits, parseDirectionDigits, directionDigitsToArrows } from '../utils/answerCodec';
 import { isSupabaseConfigured } from '../../lib/supabase';
@@ -16,7 +16,7 @@ export type AdminPanelProps = {
   timeRemaining: number;
   timerRunning: boolean;
   onClose: () => void;
-  onUpdateTeam: (teamId: string, updates: Partial<Team>) => void;
+  onUpdateTeam: (teamId: string, updates: TeamAdminUpdate) => void;
   onUpdateQuestion: (questionId: number, updates: Partial<Question>) => Promise<void> | void;
   onResetQuestion: (questionId: number) => void;
   onResetAllQuestions: () => void;
@@ -52,7 +52,7 @@ export function AdminPanel({
 }: AdminPanelProps) {
   const [editingTeam, setEditingTeam] = useState<string | null>(null);
   const [editingQuestion, setEditingQuestion] = useState<number | null>(null);
-  const [teamEdits, setTeamEdits] = useState<Partial<Team>>({});
+  const [teamEdits, setTeamEdits] = useState<TeamAdminUpdate>({});
   const [questionEdits, setQuestionEdits] = useState<Partial<Question>>({});
   const [answerTypeDraft, setAnswerTypeDraft] = useState<Question['answerType']>('text');
   const [correctAnswerDraft, setCorrectAnswerDraft] = useState<string>('');
@@ -109,12 +109,21 @@ export function AdminPanel({
     const team = teams.find((t) => t.id === teamId);
     if (team) {
       setEditingTeam(teamId);
-      setTeamEdits(team);
+      setTeamEdits({ ...team, newTeamCode: team.id });
     }
   };
 
   const handleTeamSave = (teamId: string) => {
-    onUpdateTeam(teamId, teamEdits);
+    const raw = (teamEdits.newTeamCode ?? teamId).trim();
+    if (!raw) {
+      window.alert('팀 코드를 입력하세요.');
+      return;
+    }
+    if (raw !== teamId && teams.some((t) => t.id === raw)) {
+      window.alert('이미 사용 중인 팀 코드입니다.');
+      return;
+    }
+    onUpdateTeam(teamId, { ...teamEdits, newTeamCode: raw });
     setEditingTeam(null);
     setTeamEdits({});
   };
@@ -211,7 +220,7 @@ export function AdminPanel({
               </TabsTrigger>
               <TabsTrigger value="teams" className="data-[state=active]:bg-secondary">
                 <Users className="w-4 h-4 mr-2" />
-                Teams
+                팀 / 참가자
               </TabsTrigger>
               <TabsTrigger value="controls" className="data-[state=active]:bg-secondary">
                 <Settings className="w-4 h-4 mr-2" />
@@ -676,12 +685,22 @@ export function AdminPanel({
 
             {/* Teams Tab */}
             <TabsContent value="teams" className="mt-6">
+              <div className="mb-4 rounded-xl border border-gray-600 bg-gray-900/40 px-4 py-3 text-sm text-gray-300 leading-relaxed">
+                <p className="font-semibold text-white mb-1">참가자 · 성별 · 팀 지정</p>
+                <p>
+                  아래 표에서 <strong className="text-white">Edit → Save</strong>로 반영합니다.{' '}
+                  <strong className="text-white">팀 코드</strong>는 로그인에 쓰이는 값(A, B, …)이고,{' '}
+                  <strong className="text-white">팀명</strong>은 스코어보드 등에 표시되는 이름입니다.{' '}
+                  <strong className="text-white">참가자 이름</strong>은 첫 화면(인트로) 카드에만 쓰입니다.{' '}
+                  성별은 <strong className="text-white">자동</strong>이면 팀 목록 순서로 F/M을 추정하고, F/M을 고르면 그대로 표시합니다.
+                </p>
+              </div>
               <div className="bg-gray-800/50 rounded-xl border border-gray-700 overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead className="bg-gray-800 border-b border-gray-700">
                       <tr>
-                        <th className="px-4 py-3 text-left text-gray-300 font-semibold">ID</th>
+                        <th className="px-4 py-3 text-left text-gray-300 font-semibold">팀 코드</th>
                         <th className="px-4 py-3 text-left text-gray-300 font-semibold">팀명</th>
                         <th className="px-4 py-3 text-left text-gray-300 font-semibold">참가자 이름</th>
                         <th className="px-4 py-3 text-left text-gray-300 font-semibold">성별</th>
@@ -697,9 +716,22 @@ export function AdminPanel({
                         return (
                           <tr key={team.id} className="hover:bg-gray-800/50 transition-colors">
                             <td className="px-4 py-3">
-                              <span className="w-8 h-8 border border-white/40 bg-black/40 flex items-center justify-center text-white font-bold text-sm">
-                                {team.id}
-                              </span>
+                              {isEditing ? (
+                                <Input
+                                  value={teamEdits.newTeamCode ?? ''}
+                                  onChange={(e) =>
+                                    setTeamEdits({ ...teamEdits, newTeamCode: e.target.value })
+                                  }
+                                  className="bg-gray-700 border-gray-600 text-white w-20 font-mono uppercase"
+                                  maxLength={16}
+                                  placeholder="A"
+                                  aria-label="팀 코드"
+                                />
+                              ) : (
+                                <span className="w-8 h-8 border border-white/40 bg-black/40 flex items-center justify-center text-white font-bold text-sm">
+                                  {team.id}
+                                </span>
+                              )}
                             </td>
                             <td className="px-4 py-3">
                               {isEditing ? (
