@@ -118,17 +118,17 @@ export function QuestionCard({
       };
     } else if (solveCount === 1) {
       return {
-        bg: 'bg-[#FBCFE8]',
-        border: 'border-pink-300/85',
-        shadow: 'shadow-[0_8px_20px_rgba(190,24,93,0.09)]',
-        hoverBg: 'hover:bg-[#fce7f3]',
-      };
-    } else if (solveCount === 2) {
-      return {
         bg: 'bg-[#DBEAFE]',
         border: 'border-sky-300/85',
         shadow: 'shadow-[0_8px_20px_rgba(30,64,175,0.08)]',
         hoverBg: 'hover:bg-[#e0f2fe]',
+      };
+    } else if (solveCount === 2) {
+      return {
+        bg: 'bg-[#FBCFE8]',
+        border: 'border-pink-300/85',
+        shadow: 'shadow-[0_8px_20px_rgba(190,24,93,0.09)]',
+        hoverBg: 'hover:bg-[#fce7f3]',
       };
     } else {
       return {
@@ -146,29 +146,29 @@ export function QuestionCard({
     solveCount === 0
       ? 'text-neutral-800'
       : solveCount === 1
-        ? 'text-pink-950'
+        ? 'text-sky-950'
         : solveCount === 2
-          ? 'text-sky-950'
+          ? 'text-pink-950'
           : 'text-white';
   const lockClassWhenOpen =
     solveCount === 0
       ? 'text-neutral-700'
       : solveCount === 1
-        ? 'text-pink-950'
+        ? 'text-sky-950'
         : solveCount === 2
-          ? 'text-sky-950'
+          ? 'text-pink-950'
           : isLocked
             ? 'text-neutral-500'
             : 'text-white/80';
   const unlockIconWhenTeamSolved =
-    solveCount === 1 ? 'text-pink-950' : solveCount === 2 ? 'text-sky-950' : 'text-green-400';
+    solveCount === 1 ? 'text-sky-950' : solveCount === 2 ? 'text-pink-950' : 'text-green-400';
   const coinRowClass =
     solveCount === 0
       ? 'text-amber-900/90'
       : solveCount === 1
-        ? 'text-pink-950'
+        ? 'text-sky-950'
         : solveCount === 2
-          ? 'text-sky-950'
+          ? 'text-pink-950'
           : 'text-yellow-400';
 
   return (
@@ -287,8 +287,8 @@ export function QuestionCard({
             animate={{ scale: 1 }}
             className={`flex items-center gap-1 rounded-full px-[clamp(6px,1vw,8px)] py-[clamp(4px,0.8vw,6px)] ring-1 ring-inset ${
               solveCount === 1
-                ? 'bg-pink-200/90 ring-pink-400/40'
-                : 'bg-sky-200/90 ring-sky-400/40'
+                ? 'bg-sky-200/90 ring-sky-400/40'
+                : 'bg-pink-200/90 ring-pink-400/40'
             }`}
           >
             {Array.from({ length: 3 }).map((_, i) => (
@@ -297,11 +297,11 @@ export function QuestionCard({
                 className={`w-[clamp(6px,1vw,8px)] h-[clamp(6px,1vw,8px)] rounded-full transition-all duration-300 ${
                   i < solveCount
                     ? solveCount === 1
-                      ? 'bg-pink-600'
-                      : 'bg-sky-600'
+                      ? 'bg-sky-600'
+                      : 'bg-pink-600'
                     : solveCount === 1
-                      ? 'bg-pink-900/18'
-                      : 'bg-sky-900/18'
+                      ? 'bg-sky-900/18'
+                      : 'bg-pink-900/18'
                 }`}
               />
             ))}
@@ -315,7 +315,7 @@ export function QuestionCard({
           <motion.div
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
-            className="border border-pink-400/60 bg-white/90 text-pink-900 text-[clamp(10px,1.4vw,12px)] font-bold px-[clamp(6px,1vw,8px)] py-[clamp(3px,0.7vw,4px)] rounded-full shadow-none"
+            className="border border-sky-400/60 bg-white/90 text-sky-900 text-[clamp(10px,1.4vw,12px)] font-bold px-[clamp(6px,1vw,8px)] py-[clamp(3px,0.7vw,4px)] rounded-full shadow-none"
           >
             1st
           </motion.div>
@@ -326,7 +326,7 @@ export function QuestionCard({
           <motion.div
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
-            className="border border-sky-400/60 bg-white/90 text-sky-900 text-[clamp(10px,1.4vw,12px)] font-bold px-[clamp(6px,1vw,8px)] py-[clamp(3px,0.7vw,4px)] rounded-full shadow-none"
+            className="border border-pink-400/60 bg-white/90 text-pink-900 text-[clamp(10px,1.4vw,12px)] font-bold px-[clamp(6px,1vw,8px)] py-[clamp(3px,0.7vw,4px)] rounded-full shadow-none"
           >
             2nd
           </motion.div>
