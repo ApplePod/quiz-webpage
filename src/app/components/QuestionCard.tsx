@@ -154,11 +154,16 @@ export function QuestionCard({
     : 'text-white';
   const lockClassWhenOpen = onTintedSolvedCard
     ? solveCount === 1
-      ? 'text-emerald-900'
-      : 'text-orange-900'
+      ? 'text-emerald-950 stroke-[2.35]'
+      : 'text-orange-950 stroke-[2.35]'
     : isLocked
       ? 'text-neutral-500'
       : 'text-white/80';
+  const unlockIconWhenTeamSolved = onTintedSolvedCard
+    ? solveCount === 1
+      ? 'text-emerald-950 stroke-[2.35]'
+      : 'text-orange-950 stroke-[2.35]'
+    : 'text-green-400';
   const coinRowClass = onTintedSolvedCard
     ? solveCount === 1
       ? 'text-emerald-950'
@@ -250,7 +255,7 @@ export function QuestionCard({
             animate={{ scale: 1 }}
             transition={{ type: 'spring', stiffness: 220 }}
           >
-            <Unlock className="w-[clamp(22px,3.2vw,32px)] h-[clamp(22px,3.2vw,32px)] text-green-400" />
+            <Unlock className={`w-[clamp(22px,3.2vw,32px)] h-[clamp(22px,3.2vw,32px)] ${unlockIconWhenTeamSolved}`} />
           </motion.div>
         ) : (
           <Lock className={`w-[clamp(22px,3.2vw,32px)] h-[clamp(22px,3.2vw,32px)] ${lockClassWhenOpen}`} />
