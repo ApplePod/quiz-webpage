@@ -113,28 +113,30 @@ export function MainScreen({
   return (
     <div className="min-h-screen">
       {/* Header with Title and Timer */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between flex-wrap gap-6">
+      <div className="mb-4 sm:mb-8">
+        <div className="flex items-center justify-between flex-wrap gap-3 sm:gap-6">
           {/* Left: Title Section */}
-          <div className="flex items-center gap-4">
+          <div className="flex min-w-0 items-center gap-2.5 sm:gap-4">
             <div className="flex shrink-0 items-center justify-center">
               <img
                 src={brandAsset('logo.svg')}
                 alt="BAR-O"
-                className="h-12 w-auto max-w-[120px] object-contain sm:h-14 sm:max-w-[140px]"
+                className="h-9 w-auto max-w-[96px] object-contain sm:h-12 sm:max-w-[120px] md:h-14 md:max-w-[140px]"
                 draggable={false}
               />
             </div>
-            <div>
-              <div className="text-[10px] tracking-[0.35em] text-black font-medium">
+            <div className="min-w-0">
+              <div className="text-[9px] tracking-[0.28em] text-black font-medium sm:text-[10px] sm:tracking-[0.35em]">
                 윤월주관
               </div>
-              <h1 className="text-4xl font-bold text-foreground tracking-tight">BAR-O</h1>
+              <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl md:text-4xl">
+                BAR-O
+              </h1>
             </div>
           </div>
 
           {/* Right: Timer */}
-          <div className="flex items-center gap-4">
+          <div className="flex shrink-0 items-center gap-2 sm:gap-4">
             {activeTeam && (
               <div className="hidden sm:flex items-center gap-3 rounded-2xl border border-border bg-white/60 backdrop-blur px-4 py-2 shadow-[0_10px_24px_rgba(32,26,34,0.10)]">
                 <div className="w-8 h-8 border border-border bg-white/70 flex items-center justify-center rounded-xl">
@@ -158,21 +160,22 @@ export function MainScreen({
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-3 lg:gap-8">
         {/* Left Section: Question Grid */}
         <div className="lg:col-span-2">
-          <div className="mystery-card-solid rounded-2xl p-6">
-            {/* 5x5 stays fixed; cells scale with viewport (clamp) and scroll when needed */}
+          <div className="mystery-card-solid rounded-2xl p-3 sm:p-5 md:p-6">
+            {/* 5x5: cell size fits narrow phones; horizontal scroll if needed */}
             <div
-              className="-mx-6 px-6 overflow-x-auto"
+              className="-mx-3 overflow-x-auto px-3 sm:-mx-5 sm:px-5 md:-mx-6 md:px-6"
               style={
                 {
-                  ['--cell' as any]: 'clamp(64px, 12vw, 132px)',
-                  ['--gap' as any]: 'clamp(8px, 1.8vw, 16px)',
+                  ['--gap' as any]: 'clamp(5px, 1.25vw, 14px)',
+                  ['--cell' as any]:
+                    'min(132px, max(56px, calc((min(100vw, 1280px) - 2.5rem - 4 * clamp(5px, 1.25vw, 14px)) / 5)))',
                 } as React.CSSProperties
               }
             >
-              <div className="w-fit mx-auto pb-1">
+              <div className="mx-auto w-fit pb-1">
                 <div className="grid grid-cols-[repeat(5,var(--cell))] gap-[var(--gap)]">
                   {questions.map((question) => {
                     const status = questionStatuses.find((s) => sameQuestionId(s.questionId, question.id));

@@ -699,7 +699,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      <div className="relative z-10 container mx-auto px-4 py-8">
+      <div className="relative z-10 container mx-auto px-3 py-5 sm:px-4 sm:py-8">
         {error && (
           <div className="mb-4 rounded-lg border border-red-500/40 bg-red-500/15 p-3 text-sm text-red-100">
             {error}

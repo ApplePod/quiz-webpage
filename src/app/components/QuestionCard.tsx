@@ -41,7 +41,7 @@ const solvedBorderMap: Record<number, BorderSide[] | 'diagonal'> = {
   25: [3],
 }
 
-const solvedBorderThicknessPx = 5
+const solvedBorderThicknessPx = 4
 const solvedBorderGlow = 'shadow-[0_0_10px_rgba(239,68,68,0.8)]'
 
 function SolvedBorderMask({ sides }: { sides: BorderSide[] }) {
@@ -249,7 +249,11 @@ export function QuestionCard({
         </div>
       )}
 
-      <div className="relative z-30 flex h-full w-full flex-col px-[clamp(4px,1vw,10px)] pb-[clamp(4px,0.8vw,8px)] pt-[clamp(2px,0.5vw,6px)]">
+      <div
+        className={`relative z-30 flex h-full w-full flex-col px-[clamp(5px,1.1vw,10px)] pt-[clamp(3px,0.65vw,8px)] ${
+          isSolved ? 'pb-[clamp(11px,2vw,16px)]' : 'pb-[clamp(8px,1.4vw,12px)]'
+        }`}
+      >
         {(solveCount === 1 || solveCount === 2) && (
           <div className="flex shrink-0 items-start justify-between gap-1.5 pb-0.5">
             <div className="min-w-0 flex-1">
@@ -299,7 +303,7 @@ export function QuestionCard({
           </div>
         )}
 
-        <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-[clamp(5px,1vw,10px)]">
+        <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-[clamp(6px,1.1vw,10px)]">
           <Lock
             strokeWidth={2.5}
             className={`w-[clamp(20px,3vw,28px)] h-[clamp(20px,3vw,28px)] ${lockClassWhenOpen}`}
@@ -310,7 +314,7 @@ export function QuestionCard({
           </div>
 
           {!isLocked && (
-            <div className={`flex items-center gap-0.5 ${coinRowClass}`}>
+            <div className={`mt-0.5 flex items-center gap-0.5 pb-px ${coinRowClass}`}>
               <Coins className="w-[clamp(12px,1.8vw,16px)] h-[clamp(12px,1.8vw,16px)]" />
               <span className="text-[clamp(10px,1.45vw,13px)] font-semibold leading-none">{coinReward}</span>
             </div>

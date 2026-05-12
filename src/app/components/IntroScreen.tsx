@@ -284,7 +284,7 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
               윤월주관
             </div>
 
-            <h1 className="mt-3 text-3xl sm:text-4xl font-bold mystery-title">
+            <h1 className="mt-3 text-xl leading-snug sm:text-2xl md:text-3xl font-bold mystery-title px-1">
               <motion.span
                 initial="hidden"
                 animate="show"

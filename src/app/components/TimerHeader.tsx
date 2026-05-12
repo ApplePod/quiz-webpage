@@ -32,8 +32,8 @@ export function TimerHeader({ timeRemaining, timerRunning }: TimerHeaderProps) {
       <div className="absolute inset-0 opacity-[0.85] bg-[radial-gradient(circle_at_30%_20%,rgba(255,79,167,0.14),transparent_45%),radial-gradient(circle_at_80%_70%,rgba(130,102,255,0.12),transparent_52%)]" />
 
       {/* Content */}
-      <div className="relative z-10 py-3 px-6">
-        <div className="flex items-center gap-3">
+      <div className="relative z-10 py-2.5 px-3 sm:py-3 sm:px-5 md:px-6">
+        <div className="flex items-center gap-2 sm:gap-3">
           {/* Icon */}
           <motion.div
             animate={
@@ -51,9 +51,9 @@ export function TimerHeader({ timeRemaining, timerRunning }: TimerHeaderProps) {
             }}
           >
             {isCriticalTime ? (
-              <AlertCircle className="w-7 h-7 text-red-300" />
+              <AlertCircle className="h-6 w-6 text-red-300 sm:h-7 sm:w-7" />
             ) : (
-              <Clock className="w-7 h-7 text-foreground/85" />
+              <Clock className="h-6 w-6 text-foreground/85 sm:h-7 sm:w-7" />
             )}
           </motion.div>
 
@@ -71,7 +71,7 @@ export function TimerHeader({ timeRemaining, timerRunning }: TimerHeaderProps) {
                 duration: 1,
                 repeat: Infinity,
               }}
-              className={`text-3xl font-bold font-mono tracking-wide ${
+              className={`text-xl font-bold font-mono tracking-wide sm:text-2xl md:text-3xl ${
                 isCriticalTime ? 'text-red-200' : isLowTime ? 'text-orange-200' : 'text-foreground'
               }`}
               style={{
