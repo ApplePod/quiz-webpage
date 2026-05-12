@@ -61,32 +61,12 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
     startIndex,
   })
 
-  const femaleCrewTokens = useMemo(() => {
-    return '준우 비누 슈엘 알려줘21 겨란후라이 에르나 이부리 포틀'
-      .split(' ')
-      .map((s) => s.trim())
-      .filter(Boolean)
-  }, [])
-
-  const maleCrewTokens = useMemo(() => {
-    return '석석 with 프위메 깡지 인계동카카시 몬지 냥녕늉'
-      .split(' ')
-      .map((s) => s.trim())
-      .filter(Boolean)
-  }, [])
-
-  // Teams in initialData are ordered; we treat the first half as 여자, second half as 남자.
+  // Teams list order: first half → F, second half → M (display letter only once per card).
   const femaleCount = Math.max(1, Math.floor(marqueeTeams.length / 2))
 
-  const getGenderAndCrew = (baseIndex: number) => {
-    const isFemale = baseIndex < femaleCount
-    if (isFemale) {
-      const crew = femaleCrewTokens[baseIndex % Math.max(1, femaleCrewTokens.length)]
-      return { genderLabel: 'F', genderIcon: 'F', crewName: crew ?? '—' }
-    }
-    const maleIndex = baseIndex - femaleCount
-    const crew = maleCrewTokens[maleIndex % Math.max(1, maleCrewTokens.length)]
-    return { genderLabel: 'M', genderIcon: 'M', crewName: crew ?? '—' }
+  const getGenderLetter = (teamIndex: number) => {
+    const isFemale = teamIndex < femaleCount
+    return isFemale ? 'F' : 'M'
   }
 
   const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n))
@@ -233,43 +213,32 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
                       />
                       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.88),rgba(255,255,255,0.65),rgba(255,255,255,0.92))]" />
                       <div className="relative flex-1 flex flex-col items-center justify-center p-3 text-center gap-2">
-                        <span
-                          className="inline-flex h-11 w-11 items-center justify-center border text-lg font-bold"
-                          style={{
-                            borderColor: 'rgba(255,79,167,0.45)',
-                            color: 'rgba(32,26,34,0.92)',
-                            textShadow: '0 1px 0 rgba(255,255,255,0.9)',
-                          }}
-                        >
-                          {team.id}
-                        </span>
                         {(() => {
-                          const baseIndex = marqueeTeams.length ? idx % marqueeTeams.length : 0
-                          const { genderIcon, genderLabel, crewName } = getGenderAndCrew(baseIndex)
+                          const teamIndex =
+                            marqueeTeams.length === 0
+                              ? 0
+                              : Math.max(
+                                  0,
+                                  marqueeTeams.findIndex((t) => t.id === team.id),
+                                )
+                          const genderLetter = getGenderLetter(teamIndex)
                           return (
                             <>
                               <span
-                                className="text-sm font-semibold text-foreground leading-tight line-clamp-3"
+                                className="text-sm font-semibold text-foreground leading-tight line-clamp-4"
                                 style={{ textShadow: '0 1px 0 rgba(255,255,255,0.9)' }}
                               >
-                                {crewName}
+                                {team.name}
                               </span>
                               <span
-                                className="text-[10px] tracking-widest uppercase text-foreground/65 flex items-center gap-1"
+                                className="text-[10px] tracking-widest uppercase text-foreground/65"
                                 style={{ textShadow: '0 1px 0 rgba(255,255,255,0.9)' }}
                               >
-                                <span className="text-foreground/80">{genderIcon}</span>
-                                {genderLabel}
+                                {genderLetter}
                               </span>
                             </>
                           )
                         })()}
-                      </div>
-                      <div
-                        className="relative border-t border-border/70 px-2 py-2 text-center text-[11px] tabular-nums"
-                        style={{ color: 'rgba(255,79,167,0.92)', textShadow: '0 1px 0 rgba(255,255,255,0.9)' }}
-                      >
-                        {team.coins} coins
                       </div>
                     </div>
                   </div>
