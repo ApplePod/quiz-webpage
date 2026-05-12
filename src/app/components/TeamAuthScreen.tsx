@@ -53,17 +53,7 @@ export function TeamAuthScreen({
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="shrink-0 border-b border-border bg-white/70 backdrop-blur-md">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-center">
-          <div className="text-center">
-            <div className="text-[10px] tracking-[0.35em] text-foreground/60">BAR-O</div>
-            <div className="text-lg sm:text-xl font-bold text-foreground tracking-tight">Team Check-in</div>
-          </div>
-        </div>
-      </header>
-
-      <div className="flex-1 flex items-center justify-center px-4 py-8">
+    <div className="min-h-dvh min-h-screen flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-3xl">
         <Button
           onClick={() => {
@@ -182,7 +172,6 @@ export function TeamAuthScreen({
             </>
           )}
         </motion.div>
-      </div>
       </div>
     </div>
   )
