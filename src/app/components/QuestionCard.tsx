@@ -145,6 +145,25 @@ export function QuestionCard({
 
   const cardStyle = getCardStyle();
 
+  const onTintedSolvedCard = solveCount === 1 || solveCount === 2;
+  const qLabelClass = onTintedSolvedCard
+    ? solveCount === 1
+      ? 'text-emerald-950 drop-shadow-[0_1px_0_rgba(255,255,255,0.45)]'
+      : 'text-orange-950 drop-shadow-[0_1px_0_rgba(255,255,255,0.45)]'
+    : 'text-white';
+  const lockClassWhenOpen = onTintedSolvedCard
+    ? solveCount === 1
+      ? 'text-emerald-900'
+      : 'text-orange-900'
+    : isLocked
+      ? 'text-neutral-500'
+      : 'text-white/80';
+  const coinRowClass = onTintedSolvedCard
+    ? solveCount === 1
+      ? 'text-emerald-950'
+      : 'text-orange-950'
+    : 'text-yellow-400';
+
   return (
     <motion.button
       key={`${questionNumber}-${solveCount}`}
@@ -249,14 +268,14 @@ export function QuestionCard({
             <Unlock className="w-[clamp(22px,3.2vw,32px)] h-[clamp(22px,3.2vw,32px)] text-green-400" />
           </motion.div>
         ) : (
-          <Lock className={`w-[clamp(22px,3.2vw,32px)] h-[clamp(22px,3.2vw,32px)] ${isLocked ? 'text-neutral-500' : 'text-white/80'}`} />
+          <Lock className={`w-[clamp(22px,3.2vw,32px)] h-[clamp(22px,3.2vw,32px)] ${lockClassWhenOpen}`} />
         )}
 
-        <div className="text-[clamp(14px,2.4vw,22px)] font-bold text-white">Q{questionNumber}</div>
+        <div className={`text-[clamp(14px,2.4vw,22px)] font-bold ${qLabelClass}`}>Q{questionNumber}</div>
 
         {/* Coin Reward */}
         {!isLocked && !solvedByActiveTeam && (
-          <div className="flex items-center gap-1 text-yellow-400 mt-1">
+          <div className={`flex items-center gap-1 mt-1 ${coinRowClass}`}>
             <Coins className="w-[clamp(14px,2vw,18px)] h-[clamp(14px,2vw,18px)]" />
             <span className="text-[clamp(11px,1.6vw,14px)] font-semibold">{coinReward}</span>
           </div>
