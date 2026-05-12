@@ -667,59 +667,11 @@ $$;
 
 grant execute on function public.admin_set_test_mode(text) to anon, authenticated;
 
-create or replace function public.admin_mark_all_solved(p_game_code text)
-returns jsonb
-language plpgsql
-security definer
-set search_path = public
-as $$
-declare
-  v_game_id uuid;
-begin
-  select id into v_game_id from games where code = p_game_code limit 1;
-  if v_game_id is null then
-    raise exception 'Game not found';
-  end if;
+drop function if exists public.admin_seed_first_n_questions_one_solve(text, integer);
 
-  -- Insert up to 3 solve rows per question using first three teams (by team_code).
-  with ordered_teams as (
-    select id as team_id
-    from teams
-    where game_id = v_game_id
-    order by team_code
-    limit 3
-  ),
-  target_questions as (
-    select id as question_id
-    from questions
-    where game_id = v_game_id
-  )
-  insert into question_solves (game_id, question_id, team_id)
-  select v_game_id, q.question_id, t.team_id
-  from target_questions q
-  cross join ordered_teams t
-  on conflict (game_id, question_id, team_id) do nothing;
-
-  -- Reflect locked state on status table (3/3).
-  insert into question_status (game_id, question_id, solve_count, locked)
-  select v_game_id, q.id, 3, true
-  from questions q
-  where q.game_id = v_game_id
-  on conflict (game_id, question_id)
-  do update set
-    solve_count = 3,
-    locked = true,
-    updated_at = now();
-
-  return jsonb_build_object('ok', true);
-end;
-$$;
-
-grant execute on function public.admin_mark_all_solved(text) to anon, authenticated;
-
--- Seed first N questions (by question_no) with exactly one solve each (first team by team_code).
+-- Every question gets the same solve tier: 1 = first team only, 2 = first two teams, 3 = three teams + locked.
 -- Clears all solves/status for the game first (submissions untouched).
-create or replace function public.admin_seed_first_n_questions_one_solve(p_game_code text, p_n integer)
+create or replace function public.admin_set_all_questions_solve_tier(p_game_code text, p_tier integer)
 returns jsonb
 language plpgsql
 security definer
@@ -728,13 +680,17 @@ as $$
 declare
   v_game_id uuid;
 begin
-  if p_n is null or p_n < 1 or p_n > 3 then
-    raise exception 'p_n must be 1, 2, or 3';
+  if p_tier is null or p_tier < 1 or p_tier > 3 then
+    raise exception 'p_tier must be 1, 2, or 3';
   end if;
 
   select id into v_game_id from games where code = p_game_code limit 1;
   if v_game_id is null then
     raise exception 'Game not found';
+  end if;
+
+  if (select count(*)::int from teams where game_id = v_game_id) < p_tier then
+    raise exception 'Not enough teams for this tier';
   end if;
 
   delete from question_solves where game_id = v_game_id;
@@ -744,31 +700,50 @@ begin
   select
     v_game_id,
     q.id,
-    (select t.id from teams t where t.game_id = v_game_id order by t.team_code limit 1)
-  from (
-    select id from questions where game_id = v_game_id order by question_no limit p_n
-  ) q;
+    t.team_id
+  from questions q
+  cross join (
+    select id as team_id
+    from teams
+    where game_id = v_game_id
+    order by team_code
+    limit p_tier
+  ) t
+  where q.game_id = v_game_id
+  on conflict (game_id, question_id, team_id) do nothing;
 
   insert into question_status (game_id, question_id, solve_count, locked)
   select
     v_game_id,
     q.id,
-    1,
-    false
-  from (
-    select id from questions where game_id = v_game_id order by question_no limit p_n
-  ) q
+    p_tier,
+    (p_tier = 3)
+  from questions q
+  where q.game_id = v_game_id
   on conflict (game_id, question_id)
   do update set
-    solve_count = 1,
-    locked = false,
+    solve_count = excluded.solve_count,
+    locked = excluded.locked,
     updated_at = now();
 
-  return jsonb_build_object('ok', true, 'n', p_n);
+  return jsonb_build_object('ok', true, 'tier', p_tier);
 end;
 $$;
 
-grant execute on function public.admin_seed_first_n_questions_one_solve(text, integer) to anon, authenticated;
+grant execute on function public.admin_set_all_questions_solve_tier(text, integer) to anon, authenticated;
+
+create or replace function public.admin_mark_all_solved(p_game_code text)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  return public.admin_set_all_questions_solve_tier(p_game_code, 3);
+end;
+$$;
+
+grant execute on function public.admin_mark_all_solved(text) to anon, authenticated;
 
 -- Supabase Realtime listens on the built-in `supabase_realtime` publication.
 -- Ensure our tables are included (idempotent).

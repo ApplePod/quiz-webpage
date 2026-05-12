@@ -358,20 +358,15 @@ export async function adminSetTestMode() {
 }
 
 export async function adminMarkAllSolved() {
-  ensureConfigured()
-  const supabase = requireSupabase()
-  const { error } = await supabase.rpc('admin_mark_all_solved', {
-    p_game_code: GAME_CODE,
-  })
-  if (error) throw error
+  return adminSetAllQuestionsSolveTier(3)
 }
 
-export async function adminSeedFirstNQuestionsOneSolve(n: 1 | 2 | 3) {
+export async function adminSetAllQuestionsSolveTier(tier: 1 | 2 | 3) {
   ensureConfigured()
   const supabase = requireSupabase()
-  const { error } = await supabase.rpc('admin_seed_first_n_questions_one_solve', {
+  const { error } = await supabase.rpc('admin_set_all_questions_solve_tier', {
     p_game_code: GAME_CODE,
-    p_n: n,
+    p_tier: tier,
   })
   if (error) throw error
 }

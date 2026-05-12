@@ -9,9 +9,8 @@ import { Team, Question, QuestionStatus, ViewType } from './types';
 import { initialTeams, initialQuestions } from './data/initialData';
 import { isSupabaseConfigured } from '../lib/supabase';
 import {
-  adminMarkAllSolved,
   adminResetGame,
-  adminSeedFirstNQuestionsOneSolve,
+  adminSetAllQuestionsSolveTier,
   adminSetTestMode,
   fetchGameSnapshot,
   purchaseAnswerReveal,
@@ -578,52 +577,43 @@ export default function App() {
     }
   };
 
-  const handleAdminMarkAllSolved = async () => {
+  const handleAdminSetAllQuestionsSolveTier = async (tier: 1 | 2 | 3) => {
     try {
       if (!isSupabaseConfigured) {
-        const topTeams = teams.slice().sort((a, b) => a.id.localeCompare(b.id)).slice(0, 3);
-        const solvedByTeams = topTeams.map((t) => t.id);
+        const orderedTeams = [...teams].sort((a, b) => a.id.localeCompare(b.id)).slice(0, tier);
+        if (orderedTeams.length < tier) {
+          setError(`이 테스트는 팀이 최소 ${tier}개 있어야 합니다.`);
+          return;
+        }
+        const now = Date.now();
         setQuestionStatuses(
           questions.map((q) => ({
             questionId: q.id,
-            solvedByTeams,
-            solveCount: 3,
-            locked: true,
+            solvedByTeams: orderedTeams.map((t) => t.id),
+            solvedBy: orderedTeams.map((t, i) => ({
+              teamId: t.id,
+              solvedAt: new Date(now + i * 50).toISOString(),
+            })),
+            solveCount: tier,
+            locked: tier === 3,
           })),
         );
         return;
       }
-      await adminMarkAllSolved();
+      await adminSetAllQuestionsSolveTier(tier);
       await syncFromSnapshot();
     } catch (actionError) {
-      handleActionError(actionError, 'Failed to mark all questions as solved.');
+      handleActionError(
+        actionError,
+        tier === 3
+          ? 'Failed to mark all questions as solved.'
+          : `Failed to set all questions to tier ${tier}.`,
+      );
     }
   };
 
-  const handleAdminSeedFirstNQuestionsOneSolve = async (n: 1 | 2 | 3) => {
-    try {
-      if (!isSupabaseConfigured) {
-        const orderedTeams = [...teams].sort((a, b) => a.id.localeCompare(b.id));
-        const firstTeam = orderedTeams[0];
-        if (!firstTeam) return;
-        const picked = [...questions].sort((a, b) => a.id - b.id).slice(0, n);
-        const now = new Date().toISOString();
-        setQuestionStatuses(
-          picked.map((q) => ({
-            questionId: q.id,
-            solvedByTeams: [firstTeam.id],
-            solvedBy: [{ teamId: firstTeam.id, solvedAt: now }],
-            solveCount: 1,
-            locked: false,
-          })),
-        );
-        return;
-      }
-      await adminSeedFirstNQuestionsOneSolve(n);
-      await syncFromSnapshot();
-    } catch (actionError) {
-      handleActionError(actionError, 'Failed to seed partial solve scenario.');
-    }
+  const handleAdminMarkAllSolved = async () => {
+    await handleAdminSetAllQuestionsSolveTier(3);
   };
 
   const currentQuestion = selectedQuestionId
@@ -738,7 +728,7 @@ export default function App() {
             onAdminResetGame: handleAdminResetGame,
             onAdminSetTestMode: handleAdminSetTestMode,
             onAdminMarkAllSolved: handleAdminMarkAllSolved,
-            onAdminSeedFirstNQuestionsOneSolve: handleAdminSeedFirstNQuestionsOneSolve,
+            onAdminSetAllQuestionsSolveTier: handleAdminSetAllQuestionsSolveTier,
           } as any)}
         />
       )}
