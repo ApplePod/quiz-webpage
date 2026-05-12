@@ -119,7 +119,7 @@ export function MainScreen({
           <div className="flex items-center gap-4">
             <div className="flex shrink-0 items-center justify-center">
               <img
-                src={brandAsset('logo.png')}
+                src={brandAsset('logo.svg')}
                 alt="BAR-O"
                 className="h-12 w-auto max-w-[120px] object-contain sm:h-14 sm:max-w-[140px]"
                 draggable={false}

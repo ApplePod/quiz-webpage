@@ -273,7 +273,7 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
           <div className="relative text-center">
             <div className="mx-auto mb-5 flex justify-center">
               <img
-                src={brandAsset('logo.png')}
+                src={brandAsset('logo.svg')}
                 alt="BAR-O"
                 className="h-[92px] w-auto max-w-[min(240px,85vw)] object-contain"
                 draggable={false}
