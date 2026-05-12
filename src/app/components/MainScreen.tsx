@@ -145,7 +145,7 @@ export function MainScreen({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Section: Question Grid */}
         <div className="lg:col-span-2">
-          <div className="mystery-card p-6">
+          <div className="mystery-card-solid rounded-2xl p-6">
             <h2 className="text-2xl font-bold mystery-title mb-6">Questions</h2>
             {/* 5x5 stays fixed; cells scale with viewport (clamp) and scroll when needed */}
             <div

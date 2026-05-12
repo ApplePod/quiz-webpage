@@ -119,19 +119,19 @@ export function QuestionCard({
         hoverBg: 'hover:brightness-[1.06]',
       };
     } else if (solveCount === 1) {
-      // Opaque pastel (no glass): avoids “white haze” from blur + translucent green on light page bg
+      // Solid mid green — light pastels read like a white veil on top of “real” green
       return {
-        bg: 'bg-emerald-100',
-        border: 'border-emerald-400/80',
-        shadow: 'shadow-[0_10px_22px_rgba(16,185,129,0.22)]',
-        hoverBg: 'hover:bg-emerald-50',
+        bg: 'bg-emerald-600',
+        border: 'border-emerald-500',
+        shadow: 'shadow-[0_10px_26px_rgba(5,150,105,0.45)]',
+        hoverBg: 'hover:bg-emerald-500',
       };
     } else if (solveCount === 2) {
       return {
-        bg: 'bg-orange-100',
-        border: 'border-orange-400/80',
-        shadow: 'shadow-[0_10px_22px_rgba(249,115,22,0.22)]',
-        hoverBg: 'hover:bg-orange-50',
+        bg: 'bg-orange-500',
+        border: 'border-orange-400',
+        shadow: 'shadow-[0_10px_26px_rgba(234,88,12,0.4)]',
+        hoverBg: 'hover:bg-orange-400',
       };
     } else {
       // Locked (3 solves)
@@ -147,22 +147,18 @@ export function QuestionCard({
   const cardStyle = getCardStyle();
 
   const onTintedSolvedCard = solveCount === 1 || solveCount === 2;
-  const qLabelClass = onTintedSolvedCard
-    ? solveCount === 1
-      ? 'text-emerald-950'
-      : 'text-orange-950'
-    : 'text-white';
+  const qLabelClass = 'text-white';
   const lockClassWhenOpen = onTintedSolvedCard
     ? solveCount === 1
-      ? 'text-emerald-900'
-      : 'text-orange-900'
+      ? 'text-emerald-100'
+      : 'text-orange-50'
     : isLocked
       ? 'text-neutral-500'
       : 'text-white/80';
   const coinRowClass = onTintedSolvedCard
     ? solveCount === 1
-      ? 'text-emerald-950'
-      : 'text-orange-950'
+      ? 'text-emerald-50'
+      : 'text-orange-50'
     : 'text-yellow-400';
 
   return (
@@ -177,8 +173,8 @@ export function QuestionCard({
               boxShadow: [
                 cardStyle.shadow,
                 solveCount === 1
-                  ? '0 12px 30px rgba(16, 185, 129, 0.28)'
-                  : '0 12px 30px rgba(249, 115, 22, 0.28)',
+                  ? '0 12px 32px rgba(5, 150, 105, 0.55)'
+                  : '0 12px 32px rgba(234, 88, 12, 0.5)',
                 cardStyle.shadow,
               ],
             }
@@ -291,8 +287,8 @@ export function QuestionCard({
             animate={{ scale: 1 }}
             className={`flex items-center gap-1 rounded-full px-[clamp(6px,1vw,8px)] py-[clamp(4px,0.8vw,6px)] ring-1 ${
               solveCount === 1
-                ? 'bg-emerald-200/90 ring-emerald-700/25'
-                : 'bg-orange-200/90 ring-orange-700/25'
+                ? 'bg-emerald-950/35 ring-emerald-100/25'
+                : 'bg-orange-950/35 ring-orange-100/25'
             }`}
           >
             {Array.from({ length: 3 }).map((_, i) => (
@@ -301,11 +297,11 @@ export function QuestionCard({
                 className={`w-[clamp(6px,1vw,8px)] h-[clamp(6px,1vw,8px)] rounded-full transition-all duration-300 ${
                   i < solveCount
                     ? solveCount === 1
-                      ? 'bg-green-400'
-                      : 'bg-orange-400'
+                      ? 'bg-emerald-100'
+                      : 'bg-orange-100'
                     : solveCount === 1
-                      ? 'bg-emerald-900/25'
-                      : 'bg-orange-900/25'
+                      ? 'bg-emerald-950/40'
+                      : 'bg-orange-950/40'
                 }`}
               />
             ))}
@@ -319,7 +315,7 @@ export function QuestionCard({
           <motion.div
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
-            className="bg-green-500 text-white text-[clamp(10px,1.4vw,12px)] font-bold px-[clamp(6px,1vw,8px)] py-[clamp(3px,0.7vw,4px)] rounded-full"
+            className="bg-emerald-950/90 text-emerald-50 ring-1 ring-emerald-100/30 text-[clamp(10px,1.4vw,12px)] font-bold px-[clamp(6px,1vw,8px)] py-[clamp(3px,0.7vw,4px)] rounded-full"
           >
             1st
           </motion.div>
@@ -330,7 +326,7 @@ export function QuestionCard({
           <motion.div
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
-            className="bg-orange-500 text-white text-[clamp(10px,1.4vw,12px)] font-bold px-[clamp(6px,1vw,8px)] py-[clamp(3px,0.7vw,4px)] rounded-full"
+            className="bg-orange-950/90 text-orange-50 ring-1 ring-orange-100/30 text-[clamp(10px,1.4vw,12px)] font-bold px-[clamp(6px,1vw,8px)] py-[clamp(3px,0.7vw,4px)] rounded-full"
           >
             2nd
           </motion.div>
