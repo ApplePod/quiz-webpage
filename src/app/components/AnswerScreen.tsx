@@ -632,25 +632,25 @@ export function AnswerScreen({
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-center gap-3">
+                  <div className="flex flex-wrap items-center justify-center gap-3">
                     <Button
                       type="button"
                       variant="outline"
                       onClick={popDirectionDigit}
-                      className="border-border/80 bg-white/80 text-foreground hover:bg-violet-50/90 hover:border-violet-200"
+                      className="min-h-11 min-w-[8.5rem] border-2 border-violet-400 bg-gradient-to-b from-violet-50 to-white px-4 font-semibold text-violet-950 shadow-md hover:border-violet-500 hover:from-violet-100 hover:to-violet-50/90 hover:shadow-lg disabled:border-violet-200 disabled:from-muted/40 disabled:to-muted/30 disabled:text-muted-foreground disabled:shadow-none"
                       disabled={directionDigits.length === 0}
                     >
-                      <Delete className="w-4 h-4 mr-2" />
+                      <Delete className="w-4 h-4 mr-2 shrink-0 text-violet-700" />
                       한 칸 삭제
                     </Button>
                     <Button
                       type="button"
                       variant="outline"
                       onClick={resetDirectionDigits}
-                      className="border-border/80 bg-white/80 text-foreground hover:bg-sky-50/90 hover:border-sky-200"
+                      className="min-h-11 min-w-[8.5rem] border-2 border-sky-400 bg-gradient-to-b from-sky-50 to-white px-4 font-semibold text-sky-950 shadow-md hover:border-sky-500 hover:from-sky-100 hover:to-sky-50/90 hover:shadow-lg disabled:border-sky-200 disabled:from-muted/40 disabled:to-muted/30 disabled:text-muted-foreground disabled:shadow-none"
                       disabled={directionDigits.length === 0}
                     >
-                      <RotateCcw className="w-4 h-4 mr-2" />
+                      <RotateCcw className="w-4 h-4 mr-2 shrink-0 text-sky-700" />
                       초기화
                     </Button>
                   </div>
