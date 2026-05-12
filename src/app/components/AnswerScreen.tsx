@@ -668,30 +668,30 @@ export function AnswerScreen({
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-yellow-500/20 border border-yellow-400/50 rounded-xl p-4"
+                    className="bg-amber-50/95 border border-amber-900/25 rounded-xl p-4 shadow-sm"
                   >
                     <div className="flex items-start gap-3">
-                      <Lightbulb className="w-5 h-5 text-yellow-400 mt-0.5" />
+                      <Lightbulb className="w-5 h-5 text-amber-700 mt-0.5 shrink-0" />
                       <div>
-                        <h4 className="font-semibold text-yellow-300 mb-1">Hint</h4>
+                        <h4 className="font-semibold text-amber-950 mb-1">힌트</h4>
                         {question.hintType === 'image' ? (
                           <div className="space-y-2">
                             {question.hintImageUrl ? (
                               <img
                                 src={question.hintImageUrl}
                                 alt="Hint"
-                                className="max-h-[320px] w-auto rounded-lg border border-yellow-400/30"
+                                className="max-h-[320px] w-auto rounded-lg border border-amber-900/20"
                                 loading="lazy"
                               />
                             ) : (
-                              <p className="text-yellow-100/80 text-sm">이미지 힌트가 설정되지 않았습니다.</p>
+                              <p className="text-amber-900/80 text-sm">이미지 힌트가 설정되지 않았습니다.</p>
                             )}
                             {question.hint?.trim() ? (
-                              <p className="text-yellow-100">{question.hint}</p>
+                              <p className="text-amber-950">{question.hint}</p>
                             ) : null}
                           </div>
                         ) : (
-                          <p className="text-yellow-100">{question.hint}</p>
+                          <p className="text-amber-950">{question.hint}</p>
                         )}
                       </div>
                     </div>
@@ -704,11 +704,11 @@ export function AnswerScreen({
                       setHintInsufficientCoins(team.coins < question.hintCost);
                       setShowHintDialog(true);
                     }}
-                    className="w-full border-yellow-400/50 text-yellow-300 hover:bg-yellow-500/10 hover:text-yellow-200"
+                    className="w-full border-amber-900/40 bg-amber-50 text-amber-950 shadow-[0_2px_0_rgba(120,53,15,0.08)] hover:bg-amber-100 hover:border-amber-900/55 hover:text-amber-950"
                     disabled={hintPurchased}
                   >
-                    <Lightbulb className="w-5 h-5 mr-2" />
-                    {hintPurchased ? 'Hint Purchased' : `View Hint (-${question.hintCost} coins)`}
+                    <Lightbulb className="w-5 h-5 mr-2 text-amber-800 shrink-0" />
+                    {hintPurchased ? '힌트를 확인했어요' : `힌트보기 (-${question.hintCost} 코인)`}
                   </Button>
                 )}
               </div>
@@ -719,16 +719,16 @@ export function AnswerScreen({
 
       {/* Hint Confirmation Dialog */}
       <Dialog open={showHintDialog} onOpenChange={setShowHintDialog}>
-        <DialogContent className="bg-gray-900 border-yellow-400/50 text-white">
+        <DialogContent className="bg-gray-900 border-amber-700/50 text-white">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-yellow-300">
-              <Lightbulb className="w-6 h-6" />
-              {hintInsufficientCoins ? 'Coins Needed' : 'View Hint'}
+            <DialogTitle className="flex items-center gap-2 text-white">
+              <Lightbulb className="w-6 h-6 text-amber-400" />
+              {hintInsufficientCoins ? '코인이 부족해요' : '힌트보기'}
             </DialogTitle>
             <DialogDescription className="text-gray-300">
               {hintInsufficientCoins
                 ? '코인이 부족합니다. 무료충전하시겠습니까?'
-                : `Viewing the hint will deduct ${question.hintCost} coins from your team balance. Do you want to continue?`}
+                : `힌트를 보면 팀 코인에서 ${question.hintCost}코인이 차감돼요. 계속할까요?`}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -737,13 +737,13 @@ export function AnswerScreen({
               onClick={() => setShowHintDialog(false)}
               className="border-white/30 text-white hover:bg-white/10"
             >
-              Cancel
+              취소
             </Button>
             <Button
               onClick={handleHintConfirm}
-              className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold"
+              className="bg-amber-500 hover:bg-amber-400 text-amber-950 font-semibold border border-amber-700/30"
             >
-              {hintInsufficientCoins ? 'Yes' : 'Yes, Show Hint'}
+              {hintInsufficientCoins ? '네' : '네, 힌트 볼게요'}
             </Button>
           </DialogFooter>
         </DialogContent>
