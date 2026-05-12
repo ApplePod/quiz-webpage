@@ -530,13 +530,13 @@ export function AnswerScreen({
                 <div className="space-y-5">
                   <div className="flex items-center justify-between">
                     <div>
-                      <div className="text-sm font-medium text-foreground/85">Direction Lock</div>
+                      <div className="text-sm font-medium text-foreground/85">방향 자물쇠</div>
                       <div className="text-xs text-muted-foreground mt-1">
                         버튼(상/하/좌/우)을 눌러 입력하세요.
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-xs text-muted-foreground">Progress</div>
+                      <div className="text-xs text-muted-foreground">입력 횟수</div>
                       <div className="text-sm text-foreground font-mono">
                         {directionDigits.length}/{expectedDirectionDigits.length || '∞'}
                       </div>
@@ -546,40 +546,40 @@ export function AnswerScreen({
                   <div className="bg-white/60 rounded-2xl border border-border p-6 shadow-[0_12px_34px_rgba(32,26,34,0.10)]">
                     <div className="flex items-center justify-center">
                       <div className="relative w-56 h-56">
-                        <div className="absolute inset-0 border border-border bg-white/70 shadow-inner rounded-2xl" />
-                        <div className="absolute inset-6 rounded-full border border-border/70 bg-white/55" />
+                        <div className="absolute inset-0 border border-border bg-gradient-to-br from-violet-50/90 via-white to-sky-50/80 shadow-inner rounded-2xl" />
+                        <div className="absolute inset-6 rounded-full border border-violet-100/80 bg-white/70 shadow-[inset_0_2px_12px_rgba(139,92,246,0.08)]" />
 
                         {/* Buttons */}
                         <button
                           type="button"
                           onClick={() => pushDirectionDigit(1)}
-                          className="absolute left-1/2 top-2 -translate-x-1/2 rounded-full border border-border bg-white/80 backdrop-blur px-4 py-3 text-foreground hover:bg-white active:scale-95 transition shadow-[0_10px_24px_rgba(32,26,34,0.10)]"
+                          className="absolute left-1/2 top-2 -translate-x-1/2 rounded-full border border-violet-200/90 bg-gradient-to-b from-white to-violet-50 px-4 py-3 text-violet-700 shadow-md transition hover:border-violet-300 hover:from-violet-50 hover:to-violet-100 hover:shadow-lg active:scale-95"
                         >
                           <ChevronUp className="w-6 h-6" />
                         </button>
                         <button
                           type="button"
                           onClick={() => pushDirectionDigit(2)}
-                          className="absolute left-1/2 bottom-2 -translate-x-1/2 rounded-full border border-border bg-white/80 backdrop-blur px-4 py-3 text-foreground hover:bg-white active:scale-95 transition shadow-[0_10px_24px_rgba(32,26,34,0.10)]"
+                          className="absolute left-1/2 bottom-2 -translate-x-1/2 rounded-full border border-sky-200/90 bg-gradient-to-t from-white to-sky-50 px-4 py-3 text-sky-700 shadow-md transition hover:border-sky-300 hover:from-sky-50 hover:to-sky-100 hover:shadow-lg active:scale-95"
                         >
                           <ChevronDown className="w-6 h-6" />
                         </button>
                         <button
                           type="button"
                           onClick={() => pushDirectionDigit(4)}
-                          className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full border border-white/20 bg-white/10 backdrop-blur px-4 py-3 text-white hover:bg-white/15 active:scale-95 transition"
+                          className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full border border-fuchsia-200/90 bg-gradient-to-r from-white to-fuchsia-50 px-4 py-3 text-fuchsia-700 shadow-md transition hover:border-fuchsia-300 hover:from-fuchsia-50 hover:to-fuchsia-100 hover:shadow-lg active:scale-95"
                         >
                           <ChevronLeft className="w-6 h-6" />
                         </button>
                         <button
                           type="button"
                           onClick={() => pushDirectionDigit(3)}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full border border-white/20 bg-white/10 backdrop-blur px-4 py-3 text-white hover:bg-white/15 active:scale-95 transition"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full border border-amber-200/90 bg-gradient-to-l from-white to-amber-50 px-4 py-3 text-amber-800 shadow-md transition hover:border-amber-300 hover:from-amber-50 hover:to-amber-100 hover:shadow-lg active:scale-95"
                         >
                           <ChevronRight className="w-6 h-6" />
                         </button>
 
-                        {/* Knob */}
+                        {/* Knob — round, soft pastel */}
                         <motion.div
                           animate={{
                             x:
@@ -599,16 +599,16 @@ export function AnswerScreen({
                           transition={{ type: 'spring', stiffness: 320, damping: 20 }}
                           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
                         >
-                          <div className="relative w-20 h-20 border border-white/30 bg-black/45 shadow-[0_0_30px_rgba(255,255,255,0.08)]">
-                            <div className="absolute inset-2 rounded-full border border-white/15 bg-white/5" />
-                            <div className="absolute left-1/2 top-2 -translate-x-1/2 w-2 h-6 bg-white/70 shadow-[0_0_14px_rgba(255,255,255,0.25)]" />
+                          <div className="relative flex h-[5.25rem] w-[5.25rem] items-center justify-center rounded-full border-2 border-white/90 bg-gradient-to-br from-violet-200/90 via-pink-100 to-amber-100 p-1 shadow-[0_10px_28px_rgba(139,92,246,0.25)] ring-2 ring-violet-200/40">
+                            <div className="absolute inset-2 z-[1] rounded-full bg-gradient-to-br from-white/90 to-violet-50/80 shadow-inner" />
+                            <div className="absolute left-1/2 top-2.5 z-[2] h-6 w-2.5 -translate-x-1/2 rounded-full bg-gradient-to-b from-violet-500 to-fuchsia-400 shadow-[0_2px_8px_rgba(139,92,246,0.45)]" />
                           </div>
                         </motion.div>
                       </div>
                     </div>
 
                     <div className="mt-5 flex flex-col items-center gap-3">
-                      <div className="text-2xl text-white tracking-widest">
+                      <div className="text-2xl text-foreground tracking-widest">
                         {directionDigits.length ? directionDigitsToArrows(directionDigits) : '—'}
                       </div>
                       <div className="flex items-center gap-2">
@@ -620,13 +620,13 @@ export function AnswerScreen({
                             key={idx}
                             className={`h-2.5 w-2.5 rounded-full border ${
                               idx < directionDigits.length
-                                ? 'bg-white/70 border-white/50 shadow-[0_0_10px_rgba(255,255,255,0.22)]'
-                                : 'bg-white/5 border-white/15'
+                                ? 'border-violet-400 bg-violet-400 shadow-[0_0_10px_rgba(139,92,246,0.35)]'
+                                : 'border-border/80 bg-muted/30'
                             }`}
                           />
                         ))}
                       </div>
-                      <div className="text-xs text-gray-400 font-mono">
+                      <div className="text-xs text-muted-foreground font-mono">
                         {directionDigits.length ? `[${directionDigits.join(', ')}]` : '[ ]'}
                       </div>
                     </div>
@@ -637,7 +637,7 @@ export function AnswerScreen({
                       type="button"
                       variant="outline"
                       onClick={popDirectionDigit}
-                      className="border-white/40 bg-black/30 text-white hover:bg-black/40 hover:border-white/60"
+                      className="border-border/80 bg-white/80 text-foreground hover:bg-violet-50/90 hover:border-violet-200"
                       disabled={directionDigits.length === 0}
                     >
                       <Delete className="w-4 h-4 mr-2" />
@@ -647,7 +647,7 @@ export function AnswerScreen({
                       type="button"
                       variant="outline"
                       onClick={resetDirectionDigits}
-                      className="border-white/40 bg-black/30 text-white hover:bg-black/40 hover:border-white/60"
+                      className="border-border/80 bg-white/80 text-foreground hover:bg-sky-50/90 hover:border-sky-200"
                       disabled={directionDigits.length === 0}
                     >
                       <RotateCcw className="w-4 h-4 mr-2" />
@@ -655,7 +655,7 @@ export function AnswerScreen({
                     </Button>
                   </div>
 
-                  <div className="text-xs text-gray-400">
+                  <div className="text-xs text-muted-foreground">
                     입력이 정답 길이에 도달하면 자동으로 제출/판정됩니다.
                   </div>
                 </div>
