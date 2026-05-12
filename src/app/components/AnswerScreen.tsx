@@ -86,7 +86,7 @@ export function AnswerScreen({
       ? `${directionDigitsToArrows(question.correctAnswer)} (${question.correctAnswer.join(', ')})`
       : String(question.correctAnswer ?? '');
 
-  /** Close overlays; optionally stop confetti (keep for correct celebration). */
+  /** Close hint/recharge; optional confetti reset (never clears wrong-answer FX here). */
   const openResultDialog = React.useCallback((opts?: { clearConfetti?: boolean }) => {
     const clear = opts?.clearConfetti !== false;
     if (clear) {
@@ -96,7 +96,6 @@ export function AnswerScreen({
         /* ignore */
       }
       setShowConfetti(false);
-      setShowWrongFx(false);
     }
     setHintModalOpen(false);
     setShowRechargeNotice(false);
@@ -436,8 +435,8 @@ export function AnswerScreen({
     <div className="min-h-screen flex items-center justify-center px-4">
       <canvas
         ref={confettiCanvasRef}
-        className={`pointer-events-none fixed inset-0 h-full w-full transition-opacity duration-200 ${
-          showResultDialog || hintModalOpen || showRechargeNotice ? 'z-0 opacity-0' : 'z-[70] opacity-100'
+        className={`pointer-events-none fixed inset-0 z-[70] h-full w-full transition-opacity duration-200 ${
+          hintModalOpen || showRechargeNotice ? 'opacity-0' : 'opacity-100'
         }`}
         aria-hidden="true"
       />
@@ -906,17 +905,9 @@ export function AnswerScreen({
         }}
       >
         <DialogContent
-          className={
-            result === 'correct'
-              ? `relative overflow-hidden border-2 border-emerald-200/90 bg-gradient-to-br from-emerald-50/95 via-white to-teal-50/85 p-6 text-emerald-950 shadow-[0_22px_50px_-12px_rgba(16,185,129,0.22)] sm:max-w-lg [&>button]:text-emerald-600 [&>button]:hover:bg-emerald-100/80 [&>button]:hover:text-emerald-900 ${
-                  result !== 'incorrect' ? '[&>button]:hidden' : ''
-                }`
-              : result === 'locked'
-                ? `relative overflow-hidden border-2 border-amber-200/90 bg-gradient-to-br from-amber-50/95 via-white to-orange-50/75 p-6 text-amber-950 shadow-[0_22px_50px_-12px_rgba(245,158,11,0.22)] sm:max-w-lg [&>button]:text-amber-600 [&>button]:hover:bg-amber-100/80 [&>button]:hover:text-amber-900 ${
-                    result !== 'incorrect' ? '[&>button]:hidden' : ''
-                  }`
-                : `relative overflow-hidden border-2 border-rose-200/90 bg-gradient-to-br from-rose-50/95 via-white to-orange-50/70 p-6 text-rose-950 shadow-[0_22px_50px_-12px_rgba(244,63,94,0.18)] sm:max-w-lg [&>button]:text-rose-500 [&>button]:hover:bg-rose-100/80 [&>button]:hover:text-rose-800`
-          }
+          className={`bg-gray-900/95 border-white/20 text-white overflow-hidden ${
+            result !== 'incorrect' ? '[&>button]:hidden' : ''
+          }`}
           onEscapeKeyDown={(e) => {
             if (result !== 'incorrect') e.preventDefault();
           }}
@@ -925,70 +916,29 @@ export function AnswerScreen({
           }}
         >
           {result === 'correct' && (
-            <>
-              <div
-                className="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full bg-emerald-200/40 blur-3xl"
-                aria-hidden
-              />
-              <div
-                className="pointer-events-none absolute -bottom-12 -left-12 h-40 w-40 rounded-full bg-teal-200/35 blur-3xl"
-                aria-hidden
-              />
-            </>
-          )}
-          {result === 'incorrect' && (
-            <>
-              <div
-                className="pointer-events-none absolute -right-14 -top-16 h-44 w-44 rounded-full bg-rose-200/45 blur-3xl"
-                aria-hidden
-              />
-              <div
-                className="pointer-events-none absolute -bottom-10 left-1/3 h-36 w-36 -translate-x-1/2 rounded-full bg-orange-100/50 blur-3xl"
-                aria-hidden
-              />
-            </>
-          )}
-          {result === 'locked' && (
-            <>
-              <div
-                className="pointer-events-none absolute -right-12 -top-16 h-44 w-44 rounded-full bg-amber-200/45 blur-3xl"
-                aria-hidden
-              />
-              <div
-                className="pointer-events-none absolute -bottom-10 -left-10 h-36 w-36 rounded-full bg-orange-200/35 blur-3xl"
-                aria-hidden
-              />
-            </>
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(34,197,94,0.18),transparent_55%)]" />
           )}
 
-          <DialogHeader className="relative z-10">
-            <DialogTitle className="flex items-center gap-2 text-xl sm:text-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-white">
               {result === 'correct' ? (
                 <>
-                  <CheckCircle2 className="h-7 w-7 shrink-0 text-emerald-600" />
-                  <span className="font-bold text-emerald-950">정답입니다!</span>
+                  <CheckCircle2 className="w-6 h-6 text-green-400" />
+                  정답입니다!
                 </>
               ) : result === 'locked' ? (
                 <>
-                  <XCircle className="h-7 w-7 shrink-0 text-amber-600" />
-                  <span className="font-bold text-amber-950">늦었어요!</span>
+                  <XCircle className="w-6 h-6 text-amber-300" />
+                  늦었어요!
                 </>
               ) : (
                 <>
-                  <XCircle className="h-7 w-7 shrink-0 text-rose-600" />
-                  <span className="font-bold text-rose-950">틀렸습니다</span>
+                  <XCircle className="w-6 h-6 text-red-400" />
+                  틀렸습니다
                 </>
               )}
             </DialogTitle>
-            <DialogDescription
-              className={
-                result === 'correct'
-                  ? 'text-base font-medium text-emerald-900/85'
-                  : result === 'locked'
-                    ? 'text-base font-medium text-amber-900/85'
-                    : 'text-base font-medium text-rose-900/85'
-              }
-            >
+            <DialogDescription className="text-gray-300">
               {result === 'correct' ? (
                 typeof resolvedReward === 'number' ? (
                   `+${resolvedReward} 코인 획득!`
@@ -1003,47 +953,37 @@ export function AnswerScreen({
             </DialogDescription>
           </DialogHeader>
 
-          <div
-            className={`relative z-10 rounded-2xl border p-4 ${
-              result === 'correct'
-                ? 'border-emerald-100/90 bg-white/70 text-emerald-900/90 shadow-sm'
-                : result === 'locked'
-                  ? 'border-amber-100/90 bg-white/70 text-amber-900/90 shadow-sm'
-                  : 'border-rose-100/90 bg-white/70 text-rose-900/90 shadow-sm'
-            }`}
-          >
+          <div className="relative z-10 rounded-xl border border-white/10 bg-black/20 p-4">
             {result === 'correct' ? (
-              <div className="text-sm leading-relaxed">확인을 누르면 홈으로 이동합니다.</div>
+              <div className="text-sm text-gray-200">확인을 누르면 홈으로 이동합니다.</div>
             ) : result === 'locked' ? (
-              <div className="text-sm leading-relaxed">이 문제는 잠겨서 더 이상 제출할 수 없어요. 홈으로 이동합니다.</div>
+              <div className="text-sm text-gray-200">
+                이 문제는 잠겨서 더 이상 제출할 수 없어요. 홈으로 이동합니다.
+              </div>
             ) : (
-              <div className="text-sm leading-relaxed">입력을 초기화하고 바로 다시 풀 수 있어요.</div>
+              <div className="text-sm text-gray-200">입력을 초기화하고 바로 다시 풀 수 있어요.</div>
             )}
           </div>
 
-          <DialogFooter className="relative z-10 gap-2 sm:gap-3">
+          <DialogFooter>
             {result === 'correct' ? (
               <Button
                 type="button"
                 onClick={handleConfirmCorrect}
-                className="rounded-full border-0 bg-gradient-to-r from-emerald-500 to-teal-500 px-8 font-semibold text-white shadow-lg shadow-emerald-300/40 hover:from-emerald-600 hover:to-teal-600"
+                className="bg-green-600 hover:bg-green-700 text-white"
                 disabled={isSubmittingResult}
               >
                 확인
               </Button>
             ) : result === 'locked' ? (
-              <Button
-                type="button"
-                onClick={onBack}
-                className="rounded-full border-2 border-amber-400/80 bg-gradient-to-r from-amber-400 to-orange-400 px-8 font-semibold text-amber-950 shadow-md hover:from-amber-500 hover:to-orange-500"
-              >
+              <Button type="button" onClick={onBack} className="bg-amber-500 hover:bg-amber-600 text-black font-semibold">
                 홈으로
               </Button>
             ) : (
               <Button
                 type="button"
                 onClick={handleRetry}
-                className="rounded-full border-2 border-rose-400/90 bg-gradient-to-r from-rose-500 to-orange-400 px-8 font-semibold text-white shadow-lg shadow-rose-300/40 hover:from-rose-600 hover:to-orange-500"
+                className="border border-white/40 bg-transparent text-white hover:bg-white/10"
               >
                 다시 풀기
               </Button>
