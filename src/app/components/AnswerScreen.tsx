@@ -86,6 +86,13 @@ export function AnswerScreen({
       ? `${directionDigitsToArrows(question.correctAnswer)} (${question.correctAnswer.join(', ')})`
       : String(question.correctAnswer ?? '');
 
+  /** Result dialog must sit above recharge portal (z-100) and confetti layers; close other overlays. */
+  const openResultDialog = React.useCallback(() => {
+    setHintModalOpen(false);
+    setShowRechargeNotice(false);
+    setShowResultDialog(true);
+  }, []);
+
   const submitCorrectAnswer = async (submittedAnswer: string) => {
     setIsSubmittingResult(true);
     setResolvedReward(null);
@@ -96,7 +103,7 @@ export function AnswerScreen({
         setShowWrongFx(false);
         setShowSolvedFx(false);
         setResult('locked');
-        setShowResultDialog(true);
+        openResultDialog();
         return;
       }
       if (typeof response?.reward === 'number') {
@@ -105,7 +112,7 @@ export function AnswerScreen({
       setShowSolvedFx(true);
       setShowConfetti(true);
       setShowWrongFx(false);
-      setShowResultDialog(true);
+      openResultDialog();
 
       // Auto return home after a short celebration.
       if (autoBackTimerRef.current) window.clearTimeout(autoBackTimerRef.current);
@@ -148,16 +155,16 @@ export function AnswerScreen({
     const isCorrect = isCorrectForQuestion(question, answer);
     setResult(isCorrect ? 'correct' : 'incorrect');
     setShowSolvedFx(false);
-    setShowResultDialog(false);
     setShowConfetti(false);
     setShowWrongFx(!isCorrect);
 
     if (isCorrect) {
+      setShowResultDialog(false);
       void submitCorrectAnswer(answer);
       return;
     }
 
-    setShowResultDialog(true);
+    openResultDialog();
     setRetryShake(true);
     setTimeout(() => setRetryShake(false), 450);
   };
@@ -237,14 +244,14 @@ export function AnswerScreen({
         );
         setResult(isCorrect ? 'correct' : 'incorrect');
         setShowSolvedFx(false);
-        setShowResultDialog(false);
         setShowConfetti(false);
         setShowWrongFx(!isCorrect);
 
         if (isCorrect) {
+          setShowResultDialog(false);
           void submitCorrectAnswer(submitted);
         } else {
-          setShowResultDialog(true);
+          openResultDialog();
           setRetryShake(true);
           setTimeout(() => setRetryShake(false), 450);
         }
@@ -307,7 +314,7 @@ export function AnswerScreen({
       gravity: 0.95,
       decay: 0.92,
       scalar: 1,
-      zIndex: 1000,
+      zIndex: 65,
       colors: palette,
       shapes: ['square', 'circle', 'star'] as const,
       disableForReducedMotion: true,
@@ -384,7 +391,7 @@ export function AnswerScreen({
       gravity: 1.15,
       decay: 0.9,
       scalar: 1,
-      zIndex: 1000,
+      zIndex: 65,
       disableForReducedMotion: true,
       origin: { x: 0.5, y: 0.3 },
     };
