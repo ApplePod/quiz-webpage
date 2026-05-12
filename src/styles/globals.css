@@ -1,11 +1,17 @@
 @custom-variant dark (&:is(.dark *));
 
 @font-face {
-  font-family: "Jalnan2";
-  src:
-    url("/fonts/Jalnan2.otf") format("opentype"),
-    url("/fonts/Jalnan2TTF.ttf") format("truetype");
-  font-weight: 400;
+  font-family: "Binggrae";
+  src: url("/fonts/Binggrae.ttf") format("truetype");
+  font-weight: 100 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Binggrae";
+  src: url("/fonts/Binggrae-Bold.ttf") format("truetype");
+  font-weight: 600 900;
   font-style: normal;
   font-display: swap;
 }
@@ -61,7 +67,7 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-family: var(--font-family);
-    letter-spacing: 0.01em;
+    letter-spacing: 0;
   }
 }
 

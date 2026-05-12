@@ -2,8 +2,8 @@
 
 :root {
   --font-size: 16px;
-  /* Jalnan2 (정읍체): round display Korean; Pretendard for fallback / monospace feel */
-  --font-family: "Jalnan2", "Pretendard", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  /* Binggrae: round soft Korean UI; Pretendard fallback. Use font-bold for 700 (Binggrae-Bold). */
+  --font-family: "Binggrae", "Pretendard", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
 
   /* Pastel dating escape room: airy background + soft ink + glass cards */
   --background: #fff7fb;

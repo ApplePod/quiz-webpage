@@ -299,7 +299,7 @@ export function QuestionCard({
           </div>
         )}
 
-        <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-0.5">
+        <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-[clamp(5px,1vw,10px)]">
           <Lock
             strokeWidth={2.5}
             className={`w-[clamp(20px,3vw,28px)] h-[clamp(20px,3vw,28px)] ${lockClassWhenOpen}`}
