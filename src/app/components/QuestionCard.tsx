@@ -41,68 +41,54 @@ const solvedBorderMap: Record<number, BorderSide[] | 'diagonal'> = {
   25: [3],
 }
 
-const solvedBorderThicknessLockedPx = 5
-const solvedBorderThicknessOpenPx = 3
-/** Dark / locked tiles: vivid path */
-const solvedBorderGlowLocked = 'shadow-[0_0_10px_rgba(239,68,68,0.55)]'
-/** Pastel open tiles: no glow — thick red was reading as “coral frame” on mint */
+const solvedBorderThicknessPx = 5
+const solvedBorderGlow = 'shadow-[0_0_10px_rgba(239,68,68,0.8)]'
 
-function SolvedBorderMask({
-  sides,
-  thicknessPx,
-  segmentClassName,
-  withGlow,
-}: {
-  sides: BorderSide[]
-  thicknessPx: number
-  segmentClassName: string
-  withGlow: boolean
-}) {
-  const thickness = `${thicknessPx}px`
+function SolvedBorderMask({ sides }: { sides: BorderSide[] }) {
+  // Return to the simpler overlay style, but match corner rounding
+  // by rounding the segment ends with the same radius as the card.
+  const thickness = `${solvedBorderThicknessPx}px`
   const style: React.CSSProperties = { width: thickness, height: thickness }
 
   return (
-    <div
-      className={`absolute inset-0 rounded-2xl ${withGlow ? solvedBorderGlowLocked : ''}`}
-      aria-hidden="true"
-    >
+    <div className={`absolute inset-0 rounded-2xl ${solvedBorderGlow}`} aria-hidden="true">
       {sides.includes(1) && (
         <div
-          className={`absolute left-0 right-0 top-0 rounded-t-2xl ${segmentClassName}`}
+          className="absolute left-0 right-0 top-0 bg-red-500 rounded-t-2xl"
           style={{ height: thickness }}
         />
       )}
       {sides.includes(2) && (
         <div
-          className={`absolute bottom-0 left-0 top-0 rounded-l-2xl ${segmentClassName}`}
+          className="absolute bottom-0 left-0 top-0 bg-red-500 rounded-l-2xl"
           style={{ width: thickness }}
         />
       )}
       {sides.includes(3) && (
         <div
-          className={`absolute bottom-0 left-0 right-0 rounded-b-2xl ${segmentClassName}`}
+          className="absolute bottom-0 left-0 right-0 bg-red-500 rounded-b-2xl"
           style={{ height: thickness }}
         />
       )}
       {sides.includes(4) && (
         <div
-          className={`absolute bottom-0 right-0 top-0 rounded-r-2xl ${segmentClassName}`}
+          className="absolute bottom-0 right-0 top-0 bg-red-500 rounded-r-2xl"
           style={{ width: thickness }}
         />
       )}
 
       {/* Corner dots to soften joins when adjacent sides exist */}
       {sides.includes(1) && sides.includes(2) && (
-        <div className={`absolute left-0 top-0 rounded-full ${segmentClassName}`} style={{ ...style }} />
+        <div className="absolute left-0 top-0 bg-red-500 rounded-full" style={{ ...style }} />
       )}
       {sides.includes(1) && sides.includes(4) && (
-        <div className={`absolute right-0 top-0 rounded-full ${segmentClassName}`} style={{ ...style }} />
+        <div className="absolute right-0 top-0 bg-red-500 rounded-full" style={{ ...style }} />
       )}
       {sides.includes(3) && sides.includes(2) && (
-        <div className={`absolute bottom-0 left-0 rounded-full ${segmentClassName}`} style={{ ...style }} />
+        <div className="absolute bottom-0 left-0 bg-red-500 rounded-full" style={{ ...style }} />
       )}
       {sides.includes(3) && sides.includes(4) && (
-        <div className={`absolute bottom-0 right-0 rounded-full ${segmentClassName}`} style={{ ...style }} />
+        <div className="absolute bottom-0 right-0 bg-red-500 rounded-full" style={{ ...style }} />
       )}
     </div>
   )
@@ -159,10 +145,6 @@ export function QuestionCard({
   };
 
   const cardStyle = getCardStyle();
-
-  const pathLockedVisual = isLocked
-  const pathThicknessPx = pathLockedVisual ? solvedBorderThicknessLockedPx : solvedBorderThicknessOpenPx
-  const pathSegmentClass = pathLockedVisual ? 'bg-red-500' : 'bg-rose-300/95'
 
   const onTintedSolvedCard = solveCount === 1 || solveCount === 2;
   const qLabelClass = onTintedSolvedCard
@@ -249,20 +231,13 @@ export function QuestionCard({
           {solvedBorder === 'diagonal' ? (
             <div className="absolute inset-0 overflow-hidden rounded-2xl">
               <div
-                className={`absolute left-1/2 top-1/2 w-[170%] -translate-x-1/2 -translate-y-1/2 rotate-45 ${
-                  pathLockedVisual ? `bg-red-500 ${solvedBorderGlowLocked}` : 'bg-rose-300/95'
-                }`}
-                style={{ height: `${pathThicknessPx}px` }}
+                className={`absolute left-1/2 top-1/2 w-[170%] -translate-x-1/2 -translate-y-1/2 rotate-45 bg-red-500 ${solvedBorderGlow}`}
+                style={{ height: `${solvedBorderThicknessPx}px` }}
                 aria-hidden="true"
               />
             </div>
           ) : (
-            <SolvedBorderMask
-              sides={solvedBorder}
-              thicknessPx={pathThicknessPx}
-              segmentClassName={pathSegmentClass}
-              withGlow={pathLockedVisual}
-            />
+            <SolvedBorderMask sides={solvedBorder} />
           )}
         </div>
       )}
@@ -298,10 +273,10 @@ export function QuestionCard({
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            className={`flex items-center gap-1 rounded-full border px-[clamp(6px,1vw,8px)] py-[clamp(4px,0.8vw,6px)] ${
+            className={`flex items-center gap-1 rounded-full px-[clamp(6px,1vw,8px)] py-[clamp(4px,0.8vw,6px)] ring-1 ring-inset ${
               solveCount === 1
-                ? 'border-emerald-300/70 bg-white'
-                : 'border-orange-300/70 bg-white'
+                ? 'bg-emerald-100/90 ring-emerald-400/35'
+                : 'bg-orange-100/90 ring-orange-400/35'
             }`}
           >
             {Array.from({ length: 3 }).map((_, i) => (
@@ -328,7 +303,7 @@ export function QuestionCard({
           <motion.div
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
-            className="border border-emerald-300/80 bg-white text-emerald-900 text-[clamp(10px,1.4vw,12px)] font-bold px-[clamp(6px,1vw,8px)] py-[clamp(3px,0.7vw,4px)] rounded-full shadow-none"
+            className="bg-emerald-600 text-white text-[clamp(10px,1.4vw,12px)] font-bold px-[clamp(6px,1vw,8px)] py-[clamp(3px,0.7vw,4px)] rounded-full shadow-none"
           >
             1st
           </motion.div>
@@ -339,7 +314,7 @@ export function QuestionCard({
           <motion.div
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
-            className="border border-orange-300/80 bg-white text-orange-900 text-[clamp(10px,1.4vw,12px)] font-bold px-[clamp(6px,1vw,8px)] py-[clamp(3px,0.7vw,4px)] rounded-full shadow-none"
+            className="bg-orange-600 text-white text-[clamp(10px,1.4vw,12px)] font-bold px-[clamp(6px,1vw,8px)] py-[clamp(3px,0.7vw,4px)] rounded-full shadow-none"
           >
             2nd
           </motion.div>
