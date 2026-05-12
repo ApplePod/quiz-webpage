@@ -293,16 +293,16 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
             }}
           />
           <div className="relative text-center">
-            <div className="mx-auto mb-5 w-[104px] h-[104px] border border-border bg-white/70 backdrop-blur-md flex items-center justify-center shadow-[0_0_60px_rgba(255,79,167,0.12)] rounded-2xl">
+            <div className="mx-auto mb-5 flex justify-center">
               <img
                 src={brandAsset('logo.png')}
                 alt="BAR-O"
-                className="w-[88px] h-[88px] object-contain opacity-95"
+                className="h-[92px] w-auto max-w-[min(240px,85vw)] object-contain"
                 draggable={false}
               />
             </div>
 
-            <div className="text-xs tracking-[0.2em] text-[#f9c059]/85">
+            <div className="text-xs tracking-[0.2em] text-black font-medium">
               윤월주관
             </div>
 

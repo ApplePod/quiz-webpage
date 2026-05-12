@@ -2,7 +2,7 @@
 
 :root {
   --font-size: 16px;
-  --font-family: "Cormorant Garamond", Pretendard, Pretendard-Medium, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
 
   /* Pastel dating escape room: airy background + soft ink + glass cards */
   --background: #fff7fb;

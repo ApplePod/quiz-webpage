@@ -117,17 +117,16 @@ export function MainScreen({
         <div className="flex items-center justify-between flex-wrap gap-6">
           {/* Left: Title Section */}
           <div className="flex items-center gap-4">
-            <div className="relative w-14 h-14 border border-border bg-white/80 backdrop-blur flex items-center justify-center shadow-[0_12px_34px_rgba(32,26,34,0.12)] overflow-hidden rounded-2xl">
-              <div className="pointer-events-none absolute inset-0 opacity-[0.5] bg-[radial-gradient(circle_at_30%_20%,rgba(255,79,167,0.12),transparent_55%),radial-gradient(circle_at_80%_70%,rgba(130,102,255,0.1),transparent_58%)]" />
+            <div className="flex shrink-0 items-center justify-center">
               <img
                 src={brandAsset('logo.png')}
                 alt="BAR-O"
-                className="relative z-[1] w-11 h-11 object-contain"
+                className="h-12 w-auto max-w-[120px] object-contain sm:h-14 sm:max-w-[140px]"
                 draggable={false}
               />
             </div>
             <div>
-              <div className="text-[10px] tracking-[0.35em] text-foreground/60">
+              <div className="text-[10px] tracking-[0.35em] text-black font-medium">
                 윤월주관
               </div>
               <h1 className="text-4xl font-bold text-foreground tracking-tight">BAR-O</h1>
