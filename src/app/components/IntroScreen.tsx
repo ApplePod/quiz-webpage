@@ -160,7 +160,7 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
   return (
     <div className="relative min-h-screen flex flex-col">
       {/* Fixed full-viewport layer: not clipped by App `container` / main overflow; reads well on deploy subpaths */}
-      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden>
+          <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden>
         <div
           className="absolute left-1/2 top-1/2 w-[min(220vw,2800px)] -translate-x-1/2 -translate-y-1/2 opacity-[0.52] sm:opacity-[0.58]"
           style={{ rotate: '-18deg' }}
@@ -180,7 +180,7 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
                     {rowImages.map((src, idx) => (
                       <div
                         key={`${rowIdx}-${src}-${idx}`}
-                        className="w-[140px] sm:w-[190px] h-[200px] sm:h-[260px] overflow-hidden rounded-sm shadow-[0_16px_60px_rgba(0,0,0,0.7)] bg-zinc-900/80"
+                        className="w-[140px] sm:w-[190px] h-[200px] sm:h-[260px] overflow-hidden rounded-md shadow-[0_16px_60px_rgba(32,26,34,0.18)] bg-white/30"
                       >
                         <img
                           src={src}
@@ -198,12 +198,12 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
             )
           })}
         </div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,transparent_18%,rgba(0,0,0,0.55)_55%,rgba(0,0,0,0.82)_100%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,rgba(255,255,255,0.0)_18%,rgba(255,255,255,0.55)_56%,rgba(255,255,255,0.82)_100%)]" />
       </div>
 
       <main className="relative z-10 flex flex-1 flex-col items-center justify-center gap-10 py-10 px-4 min-h-0 overflow-x-hidden">
         <div className="relative z-10 w-full max-w-5xl space-y-3">
-          <p className="text-center text-[10px] sm:text-xs tracking-[0.4em] text-white/45 uppercase">
+          <p className="text-center text-[10px] sm:text-xs tracking-[0.4em] text-foreground/60 uppercase">
             Participants
           </p>
 
@@ -223,17 +223,18 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
                     className="embla__slide min-w-[160px] sm:min-w-[200px] max-w-[220px] flex-[0_0_auto] will-change-transform transition-[filter] duration-300 [transform-style:preserve-3d]"
                     key={`${team.id}-${team.name}-${idx}`}
                   >
-                    <div className="relative h-full overflow-hidden rounded-sm border border-white/25 bg-black/55 backdrop-blur-sm shadow-[0_0_0_1px_rgba(249,192,89,0.08),0_12px_40px_rgba(0,0,0,0.45)] aspect-[3/4] flex flex-col select-none">
+                    <div className="relative h-full overflow-hidden rounded-lg border border-border bg-white/55 backdrop-blur-sm shadow-[0_0_0_1px_rgba(255,79,167,0.08),0_12px_40px_rgba(32,26,34,0.12)] aspect-[3/4] flex flex-col select-none">
                       <div
-                        className="absolute inset-0 opacity-[0.15] bg-cover bg-center pointer-events-none"
+                        className="absolute inset-0 opacity-[0.10] bg-cover bg-center pointer-events-none"
                         style={{
-                          backgroundImage: 'url("/sherlock/assets/images/menu-bg.png")',
+                          backgroundImage:
+                            'radial-gradient(circle at 30% 20%, rgba(255,79,167,0.18), transparent 52%), radial-gradient(circle at 80% 70%, rgba(130,102,255,0.16), transparent 58%)',
                         }}
                       />
                       <div className="relative flex-1 flex flex-col items-center justify-center p-3 text-center gap-2">
                         <span
-                          className="inline-flex h-11 w-11 items-center justify-center border text-lg font-bold text-white"
-                          style={{ borderColor: `${gold}55` }}
+                          className="inline-flex h-11 w-11 items-center justify-center border text-lg font-bold"
+                          style={{ borderColor: 'rgba(255,79,167,0.35)', color: 'rgba(32,26,34,0.92)' }}
                         >
                           {team.id}
                         </span>
@@ -242,11 +243,11 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
                           const { genderIcon, genderLabel, crewName } = getGenderAndCrew(baseIndex)
                           return (
                             <>
-                              <span className="text-sm font-semibold text-white leading-tight line-clamp-3">
+                              <span className="text-sm font-semibold text-foreground leading-tight line-clamp-3">
                                 {crewName}
                               </span>
-                              <span className="text-[10px] tracking-widest uppercase text-white/40 flex items-center gap-1">
-                                <span className="text-white/60">{genderIcon}</span>
+                              <span className="text-[10px] tracking-widest uppercase text-foreground/55 flex items-center gap-1">
+                                <span className="text-foreground/70">{genderIcon}</span>
                                 {genderLabel}
                               </span>
                             </>
@@ -254,8 +255,8 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
                         })()}
                       </div>
                       <div
-                        className="relative border-t border-white/15 px-2 py-2 text-center text-[11px] tabular-nums"
-                        style={{ color: `${gold}cc` }}
+                        className="relative border-t border-border/70 px-2 py-2 text-center text-[11px] tabular-nums"
+                        style={{ color: 'rgba(255,79,167,0.85)' }}
                       >
                         {team.coins} coins
                       </div>
@@ -271,7 +272,7 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55 }}
-          className="relative z-10 w-full max-w-lg mystery-card p-8 sm:p-10 overflow-hidden border-[#f9c059]/20"
+          className="relative z-10 w-full max-w-lg mystery-card p-8 sm:p-10 overflow-hidden"
         >
           <div
             className="pointer-events-none absolute inset-0 opacity-[0.12]"
@@ -281,11 +282,11 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
             }}
           />
           <div className="relative text-center">
-            <div className="mx-auto mb-5 w-[104px] h-[104px] border border-white/15 bg-black/40 backdrop-blur-md flex items-center justify-center shadow-[0_0_60px_rgba(249,192,89,0.14)]">
+            <div className="mx-auto mb-5 w-[104px] h-[104px] border border-border bg-white/45 backdrop-blur-md flex items-center justify-center shadow-[0_0_60px_rgba(255,79,167,0.10)] rounded-2xl">
               <img
                 src="/brand/logo-white.png"
                 alt=""
-                className="w-24 h-24 object-contain opacity-95"
+                className="w-24 h-24 object-contain opacity-90"
                 draggable={false}
               />
             </div>
