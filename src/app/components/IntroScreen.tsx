@@ -12,9 +12,9 @@ type IntroScreenProps = {
   onAdminClick: () => void
 }
 
-const gold = '#f9c059'
-
 const introPosterBase = `${import.meta.env.BASE_URL.replace(/\/?$/, '/')}intro-posters/`
+const brandAsset = (file: string) =>
+  `${import.meta.env.BASE_URL.replace(/\/?$/, '/')}brand/${file}`
 
 // Each marquee row = one couple (same characters/outfits in that row; different rows = different couples).
 const INTRO_POSTER_ROWS = [
@@ -293,11 +293,11 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
             }}
           />
           <div className="relative text-center">
-            <div className="mx-auto mb-5 w-[104px] h-[104px] border border-border bg-white/45 backdrop-blur-md flex items-center justify-center shadow-[0_0_60px_rgba(255,79,167,0.10)] rounded-2xl">
+            <div className="mx-auto mb-5 w-[104px] h-[104px] border border-border bg-white/70 backdrop-blur-md flex items-center justify-center shadow-[0_0_60px_rgba(255,79,167,0.12)] rounded-2xl">
               <img
-                src="/brand/logo-white.png"
-                alt=""
-                className="w-24 h-24 object-contain opacity-90"
+                src={brandAsset('logo.png')}
+                alt="BAR-O"
+                className="w-[88px] h-[88px] object-contain opacity-95"
                 draggable={false}
               />
             </div>
@@ -348,10 +348,9 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
             <div className="mt-8">
               <Button
                 onClick={onStart}
-                className="w-full border font-semibold py-7 text-lg bg-black/30 hover:bg-[#f9c059]/12"
-                style={{ borderColor: `${gold}66`, color: '#fff' }}
+                className="w-full rounded-xl border border-pink-300/55 bg-gradient-to-b from-pink-100 to-pink-200/95 text-pink-950 font-semibold py-7 text-lg shadow-[0_10px_28px_rgba(255,79,167,0.16)] hover:from-pink-200 hover:to-pink-300/95 hover:border-pink-400/45 transition-colors"
               >
-                <Sparkles className="w-5 h-5 mr-2" style={{ color: gold }} />
+                <Sparkles className="w-5 h-5 mr-2 text-primary shrink-0" />
                 입장하기
               </Button>
             </div>

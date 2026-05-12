@@ -4,7 +4,7 @@ import { Scoreboard } from './Scoreboard';
 import { TimerHeader } from './TimerHeader';
 import { AdminButton } from './AdminButton';
 import { Team, QuestionStatus, Question } from '../types';
-import { BookOpen, Coins, Sparkles } from 'lucide-react';
+import { Coins, Sparkles } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog';
 import { Button } from './ui/button';
 import { directionDigitsToArrows } from '../utils/answerCodec';
@@ -22,6 +22,9 @@ interface MainScreenProps {
   onChangeTeam?: () => void;
   onPurchaseAnswerReveal?: (teamId: string, questionId: number, cost?: number) => Promise<any> | any;
 }
+
+const brandAsset = (file: string) =>
+  `${import.meta.env.BASE_URL.replace(/\/?$/, '/')}brand/${file}`;
 
 function activeTeamSolvedQuestion(
   activeTeam: Team | null | undefined,
@@ -114,9 +117,14 @@ export function MainScreen({
         <div className="flex items-center justify-between flex-wrap gap-6">
           {/* Left: Title Section */}
           <div className="flex items-center gap-4">
-            <div className="relative w-14 h-14 border border-border bg-white/65 backdrop-blur flex items-center justify-center shadow-[0_12px_34px_rgba(32,26,34,0.12)] overflow-hidden rounded-2xl">
-              <div className="pointer-events-none absolute inset-0 opacity-[0.85] bg-[radial-gradient(circle_at_30%_20%,rgba(255,79,167,0.18),transparent_55%),radial-gradient(circle_at_80%_70%,rgba(130,102,255,0.14),transparent_58%)]" />
-              <BookOpen className="w-8 h-8 text-foreground/90" />
+            <div className="relative w-14 h-14 border border-border bg-white/80 backdrop-blur flex items-center justify-center shadow-[0_12px_34px_rgba(32,26,34,0.12)] overflow-hidden rounded-2xl">
+              <div className="pointer-events-none absolute inset-0 opacity-[0.5] bg-[radial-gradient(circle_at_30%_20%,rgba(255,79,167,0.12),transparent_55%),radial-gradient(circle_at_80%_70%,rgba(130,102,255,0.1),transparent_58%)]" />
+              <img
+                src={brandAsset('logo.png')}
+                alt="BAR-O"
+                className="relative z-[1] w-11 h-11 object-contain"
+                draggable={false}
+              />
             </div>
             <div>
               <div className="text-[10px] tracking-[0.35em] text-foreground/60">
