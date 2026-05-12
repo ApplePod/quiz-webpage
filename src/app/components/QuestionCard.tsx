@@ -119,19 +119,19 @@ export function QuestionCard({
         hoverBg: 'hover:brightness-[1.06]',
       };
     } else if (solveCount === 1) {
-      // Opaque pastel (no glass): avoids “white haze” from blur + translucent green on light page bg
+      // Deeper pastel (200→300): still soft, less “white wash” than 100
       return {
-        bg: 'bg-emerald-100',
-        border: 'border-emerald-400/80',
-        shadow: 'shadow-[0_10px_22px_rgba(16,185,129,0.22)]',
-        hoverBg: 'hover:bg-emerald-50',
+        bg: 'bg-gradient-to-b from-emerald-200 to-emerald-300',
+        border: 'border-emerald-500/45',
+        shadow: 'shadow-[0_10px_26px_rgba(5,150,105,0.2)]',
+        hoverBg: 'hover:brightness-[1.04]',
       };
     } else if (solveCount === 2) {
       return {
-        bg: 'bg-orange-100',
-        border: 'border-orange-400/80',
-        shadow: 'shadow-[0_10px_22px_rgba(249,115,22,0.22)]',
-        hoverBg: 'hover:bg-orange-50',
+        bg: 'bg-gradient-to-b from-orange-200 to-orange-300',
+        border: 'border-orange-500/45',
+        shadow: 'shadow-[0_10px_26px_rgba(234,88,12,0.2)]',
+        hoverBg: 'hover:brightness-[1.04]',
       };
     } else {
       // Locked (3 solves)
@@ -177,8 +177,8 @@ export function QuestionCard({
               boxShadow: [
                 cardStyle.shadow,
                 solveCount === 1
-                  ? '0 12px 30px rgba(16, 185, 129, 0.28)'
-                  : '0 12px 30px rgba(249, 115, 22, 0.28)',
+                  ? '0 12px 28px rgba(5, 150, 105, 0.32)'
+                  : '0 12px 28px rgba(234, 88, 12, 0.3)',
                 cardStyle.shadow,
               ],
             }
@@ -291,8 +291,8 @@ export function QuestionCard({
             animate={{ scale: 1 }}
             className={`flex items-center gap-1 rounded-full px-[clamp(6px,1vw,8px)] py-[clamp(4px,0.8vw,6px)] ring-1 ${
               solveCount === 1
-                ? 'bg-emerald-200/90 ring-emerald-700/25'
-                : 'bg-orange-200/90 ring-orange-700/25'
+                ? 'bg-emerald-400/50 ring-emerald-800/20'
+                : 'bg-orange-400/50 ring-orange-800/20'
             }`}
           >
             {Array.from({ length: 3 }).map((_, i) => (
@@ -301,11 +301,11 @@ export function QuestionCard({
                 className={`w-[clamp(6px,1vw,8px)] h-[clamp(6px,1vw,8px)] rounded-full transition-all duration-300 ${
                   i < solveCount
                     ? solveCount === 1
-                      ? 'bg-green-400'
-                      : 'bg-orange-400'
+                      ? 'bg-emerald-700'
+                      : 'bg-orange-700'
                     : solveCount === 1
-                      ? 'bg-emerald-900/25'
-                      : 'bg-orange-900/25'
+                      ? 'bg-emerald-950/18'
+                      : 'bg-orange-950/18'
                 }`}
               />
             ))}
@@ -319,7 +319,7 @@ export function QuestionCard({
           <motion.div
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
-            className="bg-green-500 text-white text-[clamp(10px,1.4vw,12px)] font-bold px-[clamp(6px,1vw,8px)] py-[clamp(3px,0.7vw,4px)] rounded-full"
+            className="bg-emerald-700 text-emerald-50 ring-1 ring-emerald-900/15 text-[clamp(10px,1.4vw,12px)] font-bold px-[clamp(6px,1vw,8px)] py-[clamp(3px,0.7vw,4px)] rounded-full"
           >
             1st
           </motion.div>
@@ -330,7 +330,7 @@ export function QuestionCard({
           <motion.div
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
-            className="bg-orange-500 text-white text-[clamp(10px,1.4vw,12px)] font-bold px-[clamp(6px,1vw,8px)] py-[clamp(3px,0.7vw,4px)] rounded-full"
+            className="bg-orange-700 text-orange-50 ring-1 ring-orange-900/15 text-[clamp(10px,1.4vw,12px)] font-bold px-[clamp(6px,1vw,8px)] py-[clamp(3px,0.7vw,4px)] rounded-full"
           >
             2nd
           </motion.div>
