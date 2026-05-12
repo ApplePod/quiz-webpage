@@ -119,19 +119,19 @@ export function QuestionCard({
         hoverBg: 'hover:brightness-[1.06]',
       };
     } else if (solveCount === 1) {
-      // Deeper pastel (200→300): still soft, less “white wash” than 100
+      // Flat pastel, no tinted glow / blur
       return {
-        bg: 'bg-gradient-to-b from-emerald-200 to-emerald-300',
-        border: 'border-emerald-500/45',
-        shadow: 'shadow-[0_10px_26px_rgba(5,150,105,0.2)]',
-        hoverBg: 'hover:brightness-[1.04]',
+        bg: 'bg-emerald-200',
+        border: 'border-emerald-300/80',
+        shadow: 'shadow-[0_8px_20px_rgba(32,26,34,0.08)]',
+        hoverBg: 'hover:bg-emerald-100',
       };
     } else if (solveCount === 2) {
       return {
-        bg: 'bg-gradient-to-b from-orange-200 to-orange-300',
-        border: 'border-orange-500/45',
-        shadow: 'shadow-[0_10px_26px_rgba(234,88,12,0.2)]',
-        hoverBg: 'hover:brightness-[1.04]',
+        bg: 'bg-orange-200',
+        border: 'border-orange-300/80',
+        shadow: 'shadow-[0_8px_20px_rgba(32,26,34,0.08)]',
+        hoverBg: 'hover:bg-orange-100',
       };
     } else {
       // Locked (3 solves)
@@ -171,23 +171,7 @@ export function QuestionCard({
       onClick={isDisabled ? undefined : onClick}
       whileHover={isDisabled ? {} : { scale: 1.05, y: -5 }}
       whileTap={isDisabled ? {} : { scale: 0.95 }}
-      animate={
-        solveCount > 0 && !isLocked
-          ? {
-              boxShadow: [
-                cardStyle.shadow,
-                solveCount === 1
-                  ? '0 12px 28px rgba(5, 150, 105, 0.32)'
-                  : '0 12px 28px rgba(234, 88, 12, 0.3)',
-                cardStyle.shadow,
-              ],
-            }
-          : {}
-      }
-      transition={{ duration: 0.6 }}
-      className={`relative w-[var(--cell)] h-[var(--cell)] rounded-2xl border transition-all duration-300 ${
-        onTintedSolvedCard ? '' : 'backdrop-blur-md'
-      } ${cardStyle.bg} ${cardStyle.border} ${cardStyle.shadow} ${
+      className={`relative w-[var(--cell)] h-[var(--cell)] rounded-2xl border transition-all duration-300 ${cardStyle.bg} ${cardStyle.border} ${cardStyle.shadow} ${
         isDisabled ? 'cursor-not-allowed opacity-60' : `${cardStyle.hoverBg} cursor-pointer`
       }`}
       // Keep the element interactive for locked overlays (X click),
@@ -211,7 +195,7 @@ export function QuestionCard({
               stiffness: 200,
               damping: 20,
             }}
-            className="absolute inset-0 flex items-center justify-center bg-neutral-950/85 rounded-2xl backdrop-blur-sm z-10"
+            className="absolute inset-0 flex items-center justify-center bg-neutral-950/92 rounded-2xl z-10"
           >
             <button
               type="button"
@@ -289,10 +273,10 @@ export function QuestionCard({
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            className={`flex items-center gap-1 rounded-full px-[clamp(6px,1vw,8px)] py-[clamp(4px,0.8vw,6px)] ring-1 ${
+            className={`flex items-center gap-1 rounded-full px-[clamp(6px,1vw,8px)] py-[clamp(4px,0.8vw,6px)] ring-1 ring-inset ${
               solveCount === 1
-                ? 'bg-emerald-400/50 ring-emerald-800/20'
-                : 'bg-orange-400/50 ring-orange-800/20'
+                ? 'bg-emerald-100/90 ring-emerald-400/35'
+                : 'bg-orange-100/90 ring-orange-400/35'
             }`}
           >
             {Array.from({ length: 3 }).map((_, i) => (
@@ -301,11 +285,11 @@ export function QuestionCard({
                 className={`w-[clamp(6px,1vw,8px)] h-[clamp(6px,1vw,8px)] rounded-full transition-all duration-300 ${
                   i < solveCount
                     ? solveCount === 1
-                      ? 'bg-emerald-700'
-                      : 'bg-orange-700'
+                      ? 'bg-emerald-600'
+                      : 'bg-orange-600'
                     : solveCount === 1
-                      ? 'bg-emerald-950/18'
-                      : 'bg-orange-950/18'
+                      ? 'bg-emerald-900/20'
+                      : 'bg-orange-900/20'
                 }`}
               />
             ))}
@@ -319,7 +303,7 @@ export function QuestionCard({
           <motion.div
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
-            className="bg-emerald-700 text-emerald-50 ring-1 ring-emerald-900/15 text-[clamp(10px,1.4vw,12px)] font-bold px-[clamp(6px,1vw,8px)] py-[clamp(3px,0.7vw,4px)] rounded-full"
+            className="bg-emerald-600 text-white text-[clamp(10px,1.4vw,12px)] font-bold px-[clamp(6px,1vw,8px)] py-[clamp(3px,0.7vw,4px)] rounded-full shadow-none"
           >
             1st
           </motion.div>
@@ -330,7 +314,7 @@ export function QuestionCard({
           <motion.div
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
-            className="bg-orange-700 text-orange-50 ring-1 ring-orange-900/15 text-[clamp(10px,1.4vw,12px)] font-bold px-[clamp(6px,1vw,8px)] py-[clamp(3px,0.7vw,4px)] rounded-full"
+            className="bg-orange-600 text-white text-[clamp(10px,1.4vw,12px)] font-bold px-[clamp(6px,1vw,8px)] py-[clamp(3px,0.7vw,4px)] rounded-full shadow-none"
           >
             2nd
           </motion.div>

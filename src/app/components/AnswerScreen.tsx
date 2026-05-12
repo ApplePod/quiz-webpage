@@ -414,7 +414,7 @@ export function AnswerScreen({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.6, y: 12 }}
             transition={{ type: 'spring', stiffness: 260, damping: 18 }}
-            className="rounded-2xl border border-green-400/30 bg-black/55 backdrop-blur-md px-6 py-5 shadow-[0_0_40px_rgba(34,197,94,0.25)]"
+            className="rounded-2xl border border-emerald-200 bg-emerald-50 px-6 py-5 shadow-[0_12px_28px_rgba(32,26,34,0.1)]"
             aria-hidden="true"
           >
             <div className="flex items-center gap-3">
@@ -422,11 +422,11 @@ export function AnswerScreen({
                 animate={{ rotate: [0, -8, 0], scale: [1, 1.08, 1] }}
                 transition={{ duration: 0.5, repeat: 1, repeatType: 'mirror' }}
               >
-                <Unlock className="w-10 h-10 text-green-300" />
+                <Unlock className="w-10 h-10 text-emerald-600" />
               </motion.div>
               <div className="leading-tight">
-                <div className="text-white font-bold">문제가 풀렸어요!</div>
-                <div className="text-sm text-green-100/90">점수는 제출 순간에 확정됩니다.</div>
+                <div className="text-emerald-950 font-bold">문제가 풀렸어요!</div>
+                <div className="text-sm text-emerald-800/90">점수는 제출 순간에 확정됩니다.</div>
               </div>
             </div>
           </motion.div>
@@ -459,7 +459,7 @@ export function AnswerScreen({
             <div className="flex gap-6">
               <div className="text-right">
                 <div className="text-sm text-muted-foreground">Reward</div>
-                <div className="text-3xl font-bold text-green-500 flex items-center gap-2">
+                <div className="text-3xl font-bold text-emerald-700 flex items-center gap-2">
                   <Coins className="w-7 h-7" />
                   {rewardForCurrentOrder}
                 </div>
