@@ -731,13 +731,13 @@ export function AnswerScreen({
             <DialogTitle
               className={
                 hintInsufficientCoins
-                  ? 'flex items-center gap-2 text-2xl font-bold text-red-600'
+                  ? 'flex items-center gap-2 text-xl font-bold text-red-600'
                   : 'flex items-center gap-2 text-foreground'
               }
             >
               {hintInsufficientCoins ? (
                 <>
-                  <AlertTriangle className="h-7 w-7 shrink-0 text-red-600" aria-hidden />
+                  <AlertTriangle className="h-6 w-6 shrink-0 text-red-600" aria-hidden />
                   경고
                 </>
               ) : (
@@ -750,7 +750,7 @@ export function AnswerScreen({
             <DialogDescription
               className={
                 hintInsufficientCoins
-                  ? 'text-xl font-semibold leading-snug text-red-600 sm:text-2xl'
+                  ? 'text-lg font-semibold leading-snug text-red-600 sm:text-xl'
                   : 'text-base text-muted-foreground'
               }
             >
