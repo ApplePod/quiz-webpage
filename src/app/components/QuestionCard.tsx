@@ -119,18 +119,19 @@ export function QuestionCard({
         hoverBg: 'hover:brightness-[1.06]',
       };
     } else if (solveCount === 1) {
+      // Opaque pastel (no glass): avoids “white haze” from blur + translucent green on light page bg
       return {
-        bg: 'bg-green-500/20',
-        border: 'border-green-400/60',
-        shadow: 'shadow-lg shadow-green-500/40',
-        hoverBg: 'hover:bg-green-500/30',
+        bg: 'bg-emerald-100',
+        border: 'border-emerald-400/80',
+        shadow: 'shadow-[0_10px_22px_rgba(16,185,129,0.22)]',
+        hoverBg: 'hover:bg-emerald-50',
       };
     } else if (solveCount === 2) {
       return {
-        bg: 'bg-orange-500/20',
-        border: 'border-orange-400/60',
-        shadow: 'shadow-lg shadow-orange-500/40',
-        hoverBg: 'hover:bg-orange-500/30',
+        bg: 'bg-orange-100',
+        border: 'border-orange-400/80',
+        shadow: 'shadow-[0_10px_22px_rgba(249,115,22,0.22)]',
+        hoverBg: 'hover:bg-orange-50',
       };
     } else {
       // Locked (3 solves)
@@ -148,8 +149,8 @@ export function QuestionCard({
   const onTintedSolvedCard = solveCount === 1 || solveCount === 2;
   const qLabelClass = onTintedSolvedCard
     ? solveCount === 1
-      ? 'text-emerald-950 drop-shadow-[0_1px_0_rgba(255,255,255,0.45)]'
-      : 'text-orange-950 drop-shadow-[0_1px_0_rgba(255,255,255,0.45)]'
+      ? 'text-emerald-950'
+      : 'text-orange-950'
     : 'text-white';
   const lockClassWhenOpen = onTintedSolvedCard
     ? solveCount === 1
@@ -176,17 +177,17 @@ export function QuestionCard({
               boxShadow: [
                 cardStyle.shadow,
                 solveCount === 1
-                  ? '0 10px 40px rgba(34, 197, 94, 0.5)'
-                  : '0 10px 40px rgba(249, 115, 22, 0.5)',
+                  ? '0 12px 30px rgba(16, 185, 129, 0.28)'
+                  : '0 12px 30px rgba(249, 115, 22, 0.28)',
                 cardStyle.shadow,
               ],
             }
           : {}
       }
       transition={{ duration: 0.6 }}
-      className={`relative w-[var(--cell)] h-[var(--cell)] rounded-2xl backdrop-blur-md border transition-all duration-300 ${
-        cardStyle.bg
-      } ${cardStyle.border} ${cardStyle.shadow} ${
+      className={`relative w-[var(--cell)] h-[var(--cell)] rounded-2xl border transition-all duration-300 ${
+        onTintedSolvedCard ? '' : 'backdrop-blur-md'
+      } ${cardStyle.bg} ${cardStyle.border} ${cardStyle.shadow} ${
         isDisabled ? 'cursor-not-allowed opacity-60' : `${cardStyle.hoverBg} cursor-pointer`
       }`}
       // Keep the element interactive for locked overlays (X click),
@@ -288,7 +289,11 @@ export function QuestionCard({
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            className="flex items-center gap-1 bg-black/50 rounded-full px-[clamp(6px,1vw,8px)] py-[clamp(4px,0.8vw,6px)] ring-1 ring-white/10"
+            className={`flex items-center gap-1 rounded-full px-[clamp(6px,1vw,8px)] py-[clamp(4px,0.8vw,6px)] ring-1 ${
+              solveCount === 1
+                ? 'bg-emerald-200/90 ring-emerald-700/25'
+                : 'bg-orange-200/90 ring-orange-700/25'
+            }`}
           >
             {Array.from({ length: 3 }).map((_, i) => (
               <div
@@ -298,7 +303,9 @@ export function QuestionCard({
                     ? solveCount === 1
                       ? 'bg-green-400'
                       : 'bg-orange-400'
-                    : 'bg-neutral-600'
+                    : solveCount === 1
+                      ? 'bg-emerald-900/25'
+                      : 'bg-orange-900/25'
                 }`}
               />
             ))}
