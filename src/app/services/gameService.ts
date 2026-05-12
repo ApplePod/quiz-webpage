@@ -56,6 +56,8 @@ function mapSnapshot(payload: any): GameSnapshot {
   const teams: Team[] = (payload.teams ?? []).map((team: any) => ({
     id: team.team_code,
     name: team.name,
+    participantName: typeof team.participant_name === 'string' ? team.participant_name : '',
+    gender: team.gender === 'F' || team.gender === 'M' ? team.gender : null,
     coins: team.coins,
     password: team.password,
   }))
@@ -195,14 +197,15 @@ export async function purchaseAnswerReveal(teamId: string, questionId: number, c
 export async function updateTeam(teamId: string, updates: Partial<Team>) {
   ensureConfigured()
   const supabase = requireSupabase()
-  const { error } = await supabase
-    .from('teams')
-    .update({
-      name: updates.name,
-      coins: updates.coins,
-      password: updates.password,
-    })
-    .eq('team_code', teamId)
+  const patch: Record<string, unknown> = {}
+  if (updates.name !== undefined) patch.name = updates.name
+  if (updates.participantName !== undefined) patch.participant_name = updates.participantName
+  if (updates.gender !== undefined) patch.gender = updates.gender
+  if (updates.coins !== undefined) patch.coins = updates.coins
+  if (updates.password !== undefined) patch.password = updates.password
+  if (Object.keys(patch).length === 0) return
+
+  const { error } = await supabase.from('teams').update(patch).eq('team_code', teamId)
 
   if (error) {
     throw error
@@ -315,7 +318,13 @@ export async function resetAllTeams() {
   const updates = initialTeams.map((team) =>
     supabase
       .from('teams')
-      .update({ coins: team.coins, name: team.name, password: team.password })
+      .update({
+        coins: team.coins,
+        name: team.name,
+        participant_name: team.participantName ?? '',
+        gender: team.gender ?? null,
+        password: team.password,
+      })
       .eq('team_code', team.id),
   )
   const results = await Promise.all(updates)

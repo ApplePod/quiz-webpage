@@ -37,7 +37,7 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
   const marqueeTeams = useMemo(() => {
     if (teams.length > 0) return teams
     return [
-      { id: '—', name: '팀 로딩 중', coins: 0, password: '' },
+      { id: '—', name: '', participantName: '불러오는 중…', coins: 0, password: '' },
     ] as Team[]
   }, [teams])
 
@@ -194,7 +194,7 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
               tabIndex={0}
               role="region"
               aria-roledescription="carousel"
-              aria-label="참가 팀 카드"
+              aria-label="참가자 카드"
             >
               <div className="embla__container flex gap-4 pl-8 pr-8 py-6 [transform-style:preserve-3d]">
                 {loopTeams.map((team, idx) => (
@@ -221,14 +221,18 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
                                   0,
                                   marqueeTeams.findIndex((t) => t.id === team.id),
                                 )
-                          const genderLetter = getGenderLetter(teamIndex)
+                          const genderLetter =
+                            team.gender === 'F' || team.gender === 'M'
+                              ? team.gender
+                              : getGenderLetter(teamIndex)
+                          const displayName = (team.participantName ?? '').trim() || '—'
                           return (
                             <>
                               <span
                                 className="text-sm font-semibold text-foreground leading-tight line-clamp-4"
                                 style={{ textShadow: '0 1px 0 rgba(255,255,255,0.9)' }}
                               >
-                                {team.name}
+                                {displayName}
                               </span>
                               <span
                                 className="text-[10px] tracking-widest uppercase text-foreground/65"

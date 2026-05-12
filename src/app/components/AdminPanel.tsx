@@ -682,7 +682,9 @@ export function AdminPanel({
                     <thead className="bg-gray-800 border-b border-gray-700">
                       <tr>
                         <th className="px-4 py-3 text-left text-gray-300 font-semibold">ID</th>
-                        <th className="px-4 py-3 text-left text-gray-300 font-semibold">Team Name</th>
+                        <th className="px-4 py-3 text-left text-gray-300 font-semibold">팀명</th>
+                        <th className="px-4 py-3 text-left text-gray-300 font-semibold">참가자 이름</th>
+                        <th className="px-4 py-3 text-left text-gray-300 font-semibold">성별</th>
                         <th className="px-4 py-3 text-left text-gray-300 font-semibold">Coins</th>
                         <th className="px-4 py-3 text-left text-gray-300 font-semibold">Password</th>
                         <th className="px-4 py-3 text-left text-gray-300 font-semibold">Actions</th>
@@ -708,6 +710,47 @@ export function AdminPanel({
                                 />
                               ) : (
                                 <span className="text-white font-semibold">{team.name}</span>
+                              )}
+                            </td>
+                            <td className="px-4 py-3">
+                              {isEditing ? (
+                                <Input
+                                  value={teamEdits.participantName ?? ''}
+                                  onChange={(e) =>
+                                    setTeamEdits({ ...teamEdits, participantName: e.target.value })
+                                  }
+                                  placeholder="인트로에 표시"
+                                  className="bg-gray-700 border-gray-600 text-white"
+                                />
+                              ) : (
+                                <span className="text-gray-200">
+                                  {(team.participantName ?? '').trim() || '—'}
+                                </span>
+                              )}
+                            </td>
+                            <td className="px-4 py-3">
+                              {isEditing ? (
+                                <select
+                                  value={teamEdits.gender === 'F' || teamEdits.gender === 'M' ? teamEdits.gender : ''}
+                                  onChange={(e) => {
+                                    const v = e.target.value
+                                    setTeamEdits({
+                                      ...teamEdits,
+                                      gender: v === '' ? null : (v as 'F' | 'M'),
+                                    })
+                                  }}
+                                  className="h-9 rounded-md bg-gray-700 border border-gray-600 text-white text-sm px-2 min-w-[120px]"
+                                >
+                                  <option value="">자동 (목록 순)</option>
+                                  <option value="F">F</option>
+                                  <option value="M">M</option>
+                                </select>
+                              ) : (
+                                <span className="text-gray-300">
+                                  {team.gender === 'F' || team.gender === 'M'
+                                    ? team.gender
+                                    : '자동'}
+                                </span>
                               )}
                             </td>
                             <td className="px-4 py-3">

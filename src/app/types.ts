@@ -2,7 +2,12 @@
 
 export interface Team {
   id: string;
+  /** 팀명 (스코어보드·관리자 등; 인트로 카드에는 비표시) */
   name: string;
+  /** 인트로 등에 표시할 참가자 이름 */
+  participantName?: string;
+  /** 성별 표시. 비우면 인트로에서 팀 목록 순서로 F/M 추정 */
+  gender?: 'F' | 'M' | null;
   coins: number;
   password: string;
 }

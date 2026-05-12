@@ -2,12 +2,12 @@ import { Team, Question } from '../types';
 
 // Initial team data with passwords
 export const initialTeams: Team[] = [
-  { id: 'A', name: 'Group A', coins: 0, password: '1' },
-  { id: 'B', name: 'Group B', coins: 0, password: '1' },
-  { id: 'C', name: 'Group C', coins: 0, password: '1' },
-  { id: 'D', name: 'Group D', coins: 0, password: '1' },
-  { id: 'E', name: 'Group E', coins: 0, password: '1' },
-  { id: 'F', name: 'Group F', coins: 0, password: '1' },
+  { id: 'A', name: 'Group A', participantName: '참가자 A', gender: 'F', coins: 0, password: '1' },
+  { id: 'B', name: 'Group B', participantName: '참가자 B', gender: 'F', coins: 0, password: '1' },
+  { id: 'C', name: 'Group C', participantName: '참가자 C', gender: 'F', coins: 0, password: '1' },
+  { id: 'D', name: 'Group D', participantName: '참가자 D', gender: 'M', coins: 0, password: '1' },
+  { id: 'E', name: 'Group E', participantName: '참가자 E', gender: 'M', coins: 0, password: '1' },
+  { id: 'F', name: 'Group F', participantName: '참가자 F', gender: 'M', coins: 0, password: '1' },
 ];
 
 // 바오 퀴즈 25문제 (텍스트 / 방향 자물쇠)
