@@ -223,18 +223,23 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
                     className="embla__slide min-w-[160px] sm:min-w-[200px] max-w-[220px] flex-[0_0_auto] will-change-transform transition-[filter] duration-300 [transform-style:preserve-3d]"
                     key={`${team.id}-${team.name}-${idx}`}
                   >
-                    <div className="relative h-full overflow-hidden rounded-lg border border-border bg-white/55 backdrop-blur-sm shadow-[0_0_0_1px_rgba(255,79,167,0.08),0_12px_40px_rgba(32,26,34,0.12)] aspect-[3/4] flex flex-col select-none">
+                    <div className="relative h-full overflow-hidden rounded-lg border border-border bg-white/75 backdrop-blur-md shadow-[0_0_0_1px_rgba(255,79,167,0.10),0_18px_55px_rgba(32,26,34,0.16)] aspect-[3/4] flex flex-col select-none">
                       <div
-                        className="absolute inset-0 opacity-[0.10] bg-cover bg-center pointer-events-none"
+                        className="absolute inset-0 opacity-[0.08] bg-cover bg-center pointer-events-none"
                         style={{
                           backgroundImage:
                             'radial-gradient(circle at 30% 20%, rgba(255,79,167,0.18), transparent 52%), radial-gradient(circle at 80% 70%, rgba(130,102,255,0.16), transparent 58%)',
                         }}
                       />
+                      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.88),rgba(255,255,255,0.65),rgba(255,255,255,0.92))]" />
                       <div className="relative flex-1 flex flex-col items-center justify-center p-3 text-center gap-2">
                         <span
                           className="inline-flex h-11 w-11 items-center justify-center border text-lg font-bold"
-                          style={{ borderColor: 'rgba(255,79,167,0.35)', color: 'rgba(32,26,34,0.92)' }}
+                          style={{
+                            borderColor: 'rgba(255,79,167,0.45)',
+                            color: 'rgba(32,26,34,0.92)',
+                            textShadow: '0 1px 0 rgba(255,255,255,0.9)',
+                          }}
                         >
                           {team.id}
                         </span>
@@ -243,11 +248,17 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
                           const { genderIcon, genderLabel, crewName } = getGenderAndCrew(baseIndex)
                           return (
                             <>
-                              <span className="text-sm font-semibold text-foreground leading-tight line-clamp-3">
+                              <span
+                                className="text-sm font-semibold text-foreground leading-tight line-clamp-3"
+                                style={{ textShadow: '0 1px 0 rgba(255,255,255,0.9)' }}
+                              >
                                 {crewName}
                               </span>
-                              <span className="text-[10px] tracking-widest uppercase text-foreground/55 flex items-center gap-1">
-                                <span className="text-foreground/70">{genderIcon}</span>
+                              <span
+                                className="text-[10px] tracking-widest uppercase text-foreground/65 flex items-center gap-1"
+                                style={{ textShadow: '0 1px 0 rgba(255,255,255,0.9)' }}
+                              >
+                                <span className="text-foreground/80">{genderIcon}</span>
                                 {genderLabel}
                               </span>
                             </>
@@ -256,7 +267,7 @@ export function IntroScreen({ teams, onStart, onAdminClick }: IntroScreenProps) 
                       </div>
                       <div
                         className="relative border-t border-border/70 px-2 py-2 text-center text-[11px] tabular-nums"
-                        style={{ color: 'rgba(255,79,167,0.85)' }}
+                        style={{ color: 'rgba(255,79,167,0.92)', textShadow: '0 1px 0 rgba(255,255,255,0.9)' }}
                       >
                         {team.coins} coins
                       </div>
