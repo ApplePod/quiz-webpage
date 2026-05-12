@@ -88,6 +88,12 @@
     border-color: rgba(32, 26, 34, 0.12);
   }
 
+  .mystery-card-solid {
+    @apply border shadow-[0_18px_60px_rgba(32,26,34,0.10)];
+    border-color: rgba(32, 26, 34, 0.12);
+    background: rgb(255 252 254 / 0.96);
+  }
+
   .mystery-title {
     @apply tracking-tight;
     color: rgb(32 26 34 / 0.92);
