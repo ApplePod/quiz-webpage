@@ -7,6 +7,7 @@ import { IntroScreen } from './components/IntroScreen';
 import { TeamAuthScreen } from './components/TeamAuthScreen';
 import { Team, Question, QuestionStatus, ViewType, TeamAdminUpdate } from './types';
 import { initialTeams, initialQuestions } from './data/initialData';
+import { withBundledHintImages } from './utils/bundledHints';
 import { isSupabaseConfigured } from '../lib/supabase';
 import {
   adminResetGame,
@@ -32,7 +33,7 @@ import { sameQuestionId } from './utils/questionIds';
 export default function App() {
   const [currentView, setCurrentView] = useState<ViewType>('intro');
   const [teams, setTeams] = useState<Team[]>(initialTeams);
-  const [questions, setQuestions] = useState<Question[]>(initialQuestions);
+  const [questions, setQuestions] = useState<Question[]>(() => withBundledHintImages(initialQuestions));
   const [selectedQuestionId, setSelectedQuestionId] = useState<number | null>(null);
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
   const [timeRemaining, setTimeRemaining] = useState<number>(7200); // 2 hours in seconds
@@ -499,8 +500,10 @@ export default function App() {
     try {
       if (!isSupabaseConfigured) {
         setQuestions((previous) =>
-          previous.map((question) =>
-            question.id === questionId ? { ...question, ...updates } : question,
+          withBundledHintImages(
+            previous.map((question) =>
+              question.id === questionId ? { ...question, ...updates } : question,
+            ),
           ),
         );
         return;
@@ -614,7 +617,7 @@ export default function App() {
       if (!isSupabaseConfigured) {
         setQuestionStatuses([]);
         setTeams(initialTeams);
-        setQuestions(initialQuestions);
+        setQuestions(withBundledHintImages(initialQuestions));
         setTimeRemaining(7200);
         setTimerRunning(false);
         clearAllLocalHintPurchases();
@@ -633,7 +636,9 @@ export default function App() {
       if (!isSupabaseConfigured) {
         setTeams((previous) => previous.map((t) => ({ ...t, password: '1' })));
         setQuestions((previous) =>
-          previous.map((q) => ({ ...q, questionText: '1', answerType: 'text', correctAnswer: '1' })),
+          withBundledHintImages(
+            previous.map((q) => ({ ...q, questionText: '1', answerType: 'text', correctAnswer: '1' })),
+          ),
         );
         return;
       }

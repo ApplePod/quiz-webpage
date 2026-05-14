@@ -1,6 +1,7 @@
 import { RealtimeChannel } from '@supabase/supabase-js'
 import { initialQuestions, initialTeams } from '../data/initialData'
 import { GameMeta, Question, QuestionStatus, Team, TeamAdminUpdate } from '../types'
+import { withBundledHintImages } from '../utils/bundledHints'
 import { mergeParticipantsFromSnapshot } from '../utils/teamParticipants'
 import { isSupabaseConfigured, requireSupabase } from '../../lib/supabase'
 import { decodeCorrectAnswer, encodeCorrectAnswer } from '../utils/answerCodec'
@@ -35,7 +36,7 @@ function buildLocalSnapshot(): GameSnapshot {
       timerRunning: false,
     },
     teams: initialTeams,
-    questions: initialQuestions,
+    questions: withBundledHintImages(initialQuestions),
     questionStatuses: [],
   }
 }
@@ -109,7 +110,7 @@ function mapSnapshot(payload: any): GameSnapshot {
       timerRunning: game.timer_running,
     },
     teams,
-    questions,
+    questions: withBundledHintImages(questions),
     questionStatuses,
   }
 }
