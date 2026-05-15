@@ -67,19 +67,6 @@ export const initialTeams: Team[] = [
     coins: 0,
     password: '1',
   },
-  {
-    id: 'F',
-    name: '팀 F',
-    participantName: '무명씨',
-    gender: 'M',
-    participants: [
-      { name: '무명씨', gender: 'M' },
-      { name: '해피독', gender: 'M' },
-      { name: '붉은충격', gender: 'M' },
-    ],
-    coins: 0,
-    password: '1',
-  },
 ];
 
 // 바오 퀴즈 25문제 (텍스트 / 방향 자물쇠)

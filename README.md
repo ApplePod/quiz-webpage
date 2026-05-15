@@ -6,7 +6,7 @@ A modern, interactive team-based quiz competition platform built with React, Typ
 
 ### Core Functionality
 - **25 Questions**: Interactive grid of questions (Q1-Q25) with visual status indicators
-- **Team-Based Competition**: 6 teams (Groups A-F) competing with coin-based scoring
+- **Team-Based Competition**: 5 teams (Groups A-E) competing with coin-based scoring
 - **Multi-Step Flow**: Question selection → Team selection → Password authentication → Answer submission
 - **Real-time Scoreboard**: Live team rankings with coin balances
 - **2-Hour Timer**: Countdown timer with visual urgency indicators

@@ -492,8 +492,8 @@ export function AnswerScreen({
             <div className="flex gap-6">
               <div className="text-right">
                 <div className="text-sm text-muted-foreground">보상</div>
-                <div className="text-3xl font-bold text-emerald-700 flex items-center gap-2">
-                  <Coins className="w-7 h-7" />
+                <div className="text-3xl font-bold text-yellow-500 flex items-center gap-2">
+                  <Coins className="w-7 h-7 text-yellow-500" />
                   {rewardForCurrentOrder}
                 </div>
               </div>

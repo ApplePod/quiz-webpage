@@ -86,19 +86,6 @@ from game_ref,
       ),
       0,
       '1'
-    ),
-    (
-      'F',
-      '팀 F',
-      '무명씨',
-      'M',
-      jsonb_build_array(
-        jsonb_build_object('name', '무명씨', 'gender', 'M'),
-        jsonb_build_object('name', '해피독', 'gender', 'M'),
-        jsonb_build_object('name', '붉은충격', 'gender', 'M')
-      ),
-      0,
-      '1'
     )
 ) as v(team_code, name, participant_name, gender, participants, coins, password)
 on conflict (game_id, team_code) do update set
@@ -108,6 +95,14 @@ on conflict (game_id, team_code) do update set
   participants = excluded.participants,
   coins = excluded.coins,
   password = excluded.password;
+
+-- Remove legacy 6th team when re-seeding
+with game_ref as (
+  select id from public.games where code = 'demo-room'
+)
+delete from public.teams t
+using game_ref g
+where t.game_id = g.id and t.team_code = 'F';
 
 with game_ref as (
   select id from public.games where code = 'demo-room'
