@@ -320,7 +320,7 @@ export function QuestionCard({
             Q{questionNumber}
           </div>
 
-          {!isLocked && (
+          {!isLocked && !solvedByActiveTeam && (
             <div className={`mt-0.5 flex items-center gap-0.5 pb-px ${coinRowClass}`}>
               <Coins className="w-[clamp(12px,1.8vw,16px)] h-[clamp(12px,1.8vw,16px)]" />
               <span className="text-[clamp(10px,1.45vw,13px)] font-semibold leading-none">{coinReward}</span>
