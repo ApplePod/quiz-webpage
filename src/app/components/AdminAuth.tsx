@@ -9,7 +9,7 @@ interface AdminAuthProps {
   onCancel: () => void;
 }
 
-const ADMIN_PASSWORD = 'admin';
+const ADMIN_PASSWORD = 'yunwol4504';
 
 export function AdminAuth({ onSuccess, onCancel }: AdminAuthProps) {
   const [password, setPassword] = useState('');
