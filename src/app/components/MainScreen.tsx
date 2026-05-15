@@ -210,7 +210,7 @@ export function MainScreen({
 
         {/* Right Section: Scoreboard */}
         <div className="lg:col-span-1">
-          <Scoreboard teams={teams} />
+          <Scoreboard teams={teams} activeTeamId={activeTeam?.id} />
           <AdminButton onClick={onAdminClick} />
         </div>
       </div>

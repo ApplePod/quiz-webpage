@@ -5,9 +5,10 @@ import { motion } from 'motion/react';
 
 interface ScoreboardProps {
   teams: Team[];
+  activeTeamId?: string | null;
 }
 
-export function Scoreboard({ teams }: ScoreboardProps) {
+export function Scoreboard({ teams, activeTeamId }: ScoreboardProps) {
   // Sort teams by coins (descending)
   const sortedTeams = [...teams].sort((a, b) => b.coins - a.coins);
   const maxCoins = sortedTeams[0]?.coins ?? 0;
@@ -25,7 +26,9 @@ export function Scoreboard({ teams }: ScoreboardProps) {
 
           <div className="space-y-3">
             {sortedTeams.map((team, index) => {
-              const isTopTeam = leaderTeam !== null && team.id === leaderTeam.id;
+              const isActiveTeam =
+                activeTeamId != null && String(team.id) === String(activeTeamId);
+              const isLeader = leaderTeam !== null && team.id === leaderTeam.id;
               return (
                 <motion.div
                   key={team.id}
@@ -33,7 +36,7 @@ export function Scoreboard({ teams }: ScoreboardProps) {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.1 }}
                   className={`p-4 rounded-2xl border transition-all duration-300 ${
-                    isTopTeam
+                    isActiveTeam
                       ? 'bg-yellow-500/10 border-yellow-400/40 shadow-[0_0_30px_rgba(250,204,21,0.18)]'
                       : 'bg-white/60 border-border hover:bg-white/80 shadow-[0_12px_30px_rgba(32,26,34,0.10)]'
                   }`}
@@ -42,7 +45,7 @@ export function Scoreboard({ teams }: ScoreboardProps) {
                     <div className="flex items-center gap-3">
                       <div
                         className={`w-10 h-10 border flex items-center justify-center font-bold rounded-xl ${
-                          isTopTeam
+                          isActiveTeam
                             ? 'border-yellow-300/60 bg-yellow-400 text-yellow-900'
                             : 'border-border bg-white/70 text-foreground'
                         }`}
@@ -51,7 +54,7 @@ export function Scoreboard({ teams }: ScoreboardProps) {
                       </div>
                       <div>
                         <div className="font-semibold text-foreground">{team.name}</div>
-                        {isTopTeam && (
+                        {isLeader && (
                           <div className="text-xs text-orange-500 flex items-center gap-1.5 font-medium">
                             <motion.span
                               className="inline-flex"
