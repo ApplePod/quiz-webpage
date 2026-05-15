@@ -1,5 +1,5 @@
 import React from 'react';
-import { Lock, X, Coins } from 'lucide-react';
+import { Lock, Unlock, X, Coins } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface QuestionCardProps {
@@ -304,10 +304,17 @@ export function QuestionCard({
         )}
 
         <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-[clamp(6px,1.1vw,10px)]">
-          <Lock
-            strokeWidth={2.5}
-            className={`w-[clamp(20px,3vw,28px)] h-[clamp(20px,3vw,28px)] ${lockClassWhenOpen}`}
-          />
+          {solvedByActiveTeam ? (
+            <Unlock
+              strokeWidth={2.5}
+              className={`w-[clamp(20px,3vw,28px)] h-[clamp(20px,3vw,28px)] ${lockClassWhenOpen}`}
+            />
+          ) : (
+            <Lock
+              strokeWidth={2.5}
+              className={`w-[clamp(20px,3vw,28px)] h-[clamp(20px,3vw,28px)] ${lockClassWhenOpen}`}
+            />
+          )}
 
           <div className={`text-[clamp(13px,2.2vw,20px)] font-bold leading-none ${qLabelClass}`}>
             Q{questionNumber}
