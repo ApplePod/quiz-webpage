@@ -10,7 +10,9 @@ interface ScoreboardProps {
 export function Scoreboard({ teams }: ScoreboardProps) {
   // Sort teams by coins (descending)
   const sortedTeams = [...teams].sort((a, b) => b.coins - a.coins);
-  const topTeam = sortedTeams[0];
+  const maxCoins = sortedTeams[0]?.coins ?? 0;
+  const leadersAtMax = sortedTeams.filter((t) => t.coins === maxCoins);
+  const leaderTeam = maxCoins > 0 && leadersAtMax.length === 1 ? leadersAtMax[0] : null;
 
   return (
     <div className="h-full">
@@ -23,7 +25,7 @@ export function Scoreboard({ teams }: ScoreboardProps) {
 
           <div className="space-y-3">
             {sortedTeams.map((team, index) => {
-              const isTopTeam = team.id === topTeam.id;
+              const isTopTeam = leaderTeam !== null && team.id === leaderTeam.id;
               return (
                 <motion.div
                   key={team.id}
@@ -49,7 +51,7 @@ export function Scoreboard({ teams }: ScoreboardProps) {
                       </div>
                       <div>
                         <div className="font-semibold text-foreground">{team.name}</div>
-                        {index === 0 && (
+                        {isTopTeam && (
                           <div className="text-xs text-orange-500 flex items-center gap-1.5 font-medium">
                             <motion.span
                               className="inline-flex"

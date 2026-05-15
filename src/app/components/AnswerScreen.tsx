@@ -492,9 +492,14 @@ export function AnswerScreen({
             <div className="flex gap-6">
               <div className="text-right">
                 <div className="text-sm text-muted-foreground">보상</div>
-                <div className="text-3xl font-bold text-yellow-500 flex items-center gap-2">
-                  <Coins className="w-7 h-7 text-yellow-500" />
-                  {rewardForCurrentOrder}
+                <div className="flex items-center gap-2 text-3xl font-bold">
+                  <Coins
+                    className="h-7 w-7 fill-amber-300/45 text-amber-500 drop-shadow-[0_1px_4px_rgba(217,119,6,0.45)]"
+                    strokeWidth={2.25}
+                  />
+                  <span className="tabular-nums bg-gradient-to-b from-amber-300 via-amber-500 to-amber-700 bg-clip-text text-transparent drop-shadow-[0_1px_1px_rgba(180,83,9,0.25)]">
+                    {rewardForCurrentOrder}
+                  </span>
                 </div>
               </div>
               <div className="text-right">
